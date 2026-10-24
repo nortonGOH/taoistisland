@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>道教科儀與思想史：星辰・命籍・身體・生命 十二辰式盤系統</title>
+  <title>道教科儀與思想史：星辰・命籍・身體・生命 式盤系統</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js, OrbitControls, TWEEN -->
@@ -71,7 +71,7 @@
     </button>
   </div>
 
-  <!-- 五大理論模式與核心入口速選列 -->
+  <!-- 核心入口速選列 -->
   <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-56 max-h-[85vh] overflow-y-auto custom-scrollbar">
     <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">概念節點 / 式盤辰位</span>
     <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
@@ -137,11 +137,6 @@
 
     <!-- 動態填入的階層內容 -->
     <div id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
-
-    <div class="mt-6 p-3 rounded-lg bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400">
-      <span class="font-semibold text-cyan-400 block mb-0.5">學術註腳與文獻對照</span>
-      本系統各節點嚴格遵循芝加哥格式（Chicago Manual of Style），明確標示《正統道藏》經號（CT編號）、卷次與當代學術專著，以供相互對照核驗。
-    </div>
   </aside>
 
   <!-- JavaScript 控制與非同步資料載入 -->
@@ -179,9 +174,9 @@
         document.getElementById("canvas-container").innerHTML = `
           <div class="flex items-center justify-center h-full px-4">
             <div class="bg-rose-950/90 border border-rose-500 text-rose-200 px-6 py-5 rounded-xl max-w-lg text-sm shadow-2xl">
-              <h3 class="font-bold text-base mb-2">⚠️ 文獻資料庫 (islands.json) 讀取失敗</h3>
+              <h3 class="font-bold text-base mb-2">⚠️ 資料庫 (islands.json) 讀取失敗</h3>
               <p class="text-xs leading-relaxed text-rose-300 mb-2">若您是在本機直接雙擊開啟 HTML 檔案，瀏覽器安全性限制（CORS）會阻擋非同步讀取同目錄下的 JSON 檔案。</p>
-              <p class="text-xs text-rose-400">請將檔案上傳至 GitHub Pages 託管，或在本機使用簡易 HTTP 伺服器（如 VS Code Live Server）開啟即可正常瀏覽。</p>
+              <p class="text-xs text-rose-400">請將檔案上傳至 GitHub Pages 託管，或在本機使用簡易 HTTP 伺服器開啟。</p>
             </div>
           </div>
         `;
@@ -520,14 +515,8 @@
               </div>
             </div>
             <div class="p-3 rounded-lg bg-rose-950/30 border border-rose-700/40">
-              <span class="text-[10px] uppercase font-bold text-rose-400 block mb-1 font-sans">【版本考異與文獻爭議】</span>
+              <span class="text-[10px] uppercase font-bold text-rose-400 block mb-1 font-sans">【版本考異與文獻辨析】</span>
               <p class="text-slate-300 font-sans leading-relaxed text-xs">${selectedIsland.researcher.dispute}</p>
-            </div>
-            <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
-              <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【芝加哥格式原文註腳 (Chicago Citation)】</span>
-              <div class="p-2 rounded bg-slate-950/70 border border-slate-800 font-serif text-slate-200 text-xs leading-relaxed">
-                ${selectedIsland.researcher.citations}
-              </div>
             </div>
           </div>
         `;
