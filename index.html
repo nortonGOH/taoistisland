@@ -43,17 +43,17 @@
   <div id="canvas-container" class="absolute inset-0"></div>
 
   <!-- 頂部學術導言與核心問題面板 -->
-  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[480px] z-10 pointer-events-none">
+  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[500px] z-10 pointer-events-none">
     <div class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">道教思想史式盤體系</span>
         <span class="text-xs text-slate-400">中央天樞 × 十二辰位</span>
       </div>
       <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
-        不同時期與文本，如何描述星辰、命籍、身體與生命之間的關係？
+        宇宙胚胎、胞結沉淪與星真解脫：漢魏晉南北朝身體本體論與命籍重構
       </h1>
       <p class="text-[11px] text-slate-300 leading-relaxed">
-        從「宇宙氣化同構」、「天曹司法行政」、「身神存思步綱」到「大乘調泰與雷法超越」，拒絕單一宿命論，呈現歷代神學典籍之多層次建構。
+        從「九天胎變結胞」、「二十四結節病理」、「亦離亦合陶器之喻」到「五斗分司與雷法超越」，呈現道教身命觀之深層辯證。
       </p>
     </div>
   </header>
@@ -72,56 +72,56 @@
   </div>
 
   <!-- 五大理論模式與核心入口速選列 -->
-  <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-52 max-h-[85vh] overflow-y-auto custom-scrollbar">
-    <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">五大交疊模式 / 辰位</span>
+  <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-56 max-h-[85vh] overflow-y-auto custom-scrollbar">
+    <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">概念節點 / 式盤辰位</span>
     <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>中央天樞：北斗樞機</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+      <span>中央天樞：北斗五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
     </button>
     <div class="h-px bg-slate-800 my-1"></div>
     <button onclick="selectIslandById('sector_0')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>子位｜從數到籍 (天師)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+      <span>子位｜從數到籍 (天師道)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
     <button onclick="selectIslandById('sector_1')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>丑位｜身即小宇宙 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>丑位｜身即小宇宙 (太平經)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
     <button onclick="selectIslandById('sector_2')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>寅位｜建除生殺 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>寅位｜建除生殺 (太平經)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
     <button onclick="selectIslandById('sector_3')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>卯位｜司命除算 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>卯位｜九天胎變司命勒籍</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
     <button onclick="selectIslandById('sector_4')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>辰位｜身神同構 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+      <span>辰位｜二十四結節病理</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
     </button>
     <button onclick="selectIslandById('sector_5')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>巳位｜步綱隨斗 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+      <span>巳位｜陶弘景亦離亦合論</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
     </button>
     <button onclick="selectIslandById('sector_6')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>午位｜移度斷籍 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+      <span>午位｜解結成真逆修造化</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
     </button>
     <button onclick="selectIslandById('sector_7')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>未位｜九天生神 (靈寶)</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+      <span>未位｜星真同構身神合一</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
     </button>
     <button onclick="selectIslandById('sector_8')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>申位｜燃燈調泰 (靈寶)</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+      <span>申位｜星宿錯綜燃燈調泰</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
     </button>
     <button onclick="selectIslandById('sector_9')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>酉位｜本命祿食 (唐宋)</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+      <span>酉位｜本命星君祿食日料</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
     </button>
     <button onclick="selectIslandById('sector_10')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>戌位｜拜斗禳解 (唐宋)</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+      <span>戌位｜拜斗醮謝削落死籍</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
     </button>
     <button onclick="selectIslandById('sector_11')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>亥位｜雷法超越 (宋元)</span><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+      <span>亥位｜雷法變神終極超越</span><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
     </button>
   </div>
 
   <!-- 側邊深度檢視抽屜 -->
-  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[460px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
+  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[480px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
         <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
-        <span id="drawer-status" class="text-[11px] text-amber-400/90 font-medium">典籍已審查</span>
+        <span id="drawer-status" class="text-[11px] text-amber-400/90 font-medium">考訂已審查</span>
       </div>
       <button onclick="closeDrawer()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -159,7 +159,6 @@
     const DISK_HEIGHT = 0.65;
     const TOTAL_SECTORS = 12;
 
-    // 非同步載入 islands.json
     async function loadIslandsData() {
       try {
         const response = await fetch('./islands.json');
@@ -168,7 +167,6 @@
         }
         ISLANDS_DATA = await response.json();
 
-        // 轉換 16 進位顏色字串為整數
         ISLANDS_DATA.forEach(item => {
           if (typeof item.color === 'string') {
             item.color = parseInt(item.color, 16);
@@ -382,7 +380,7 @@
     }
 
     function onPointerDown(event) {
-      if (event.clientX > window.innerWidth - 460 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
+      if (event.clientX > window.innerWidth - 480 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
         return;
       }
 
@@ -565,7 +563,6 @@
       renderer.render(scene, camera);
     }
 
-    // 啟動資料庫讀取
     loadIslandsData();
   </script>
 </body>
