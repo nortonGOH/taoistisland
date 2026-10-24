@@ -75,7 +75,7 @@
   <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-60 max-h-[85vh] overflow-y-auto custom-scrollbar">
     <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">歷史流變 / 十二辰位</span>
     <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>中央天樞：北斗七星五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+      <span>中央天樞：北斗五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
     </button>
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【漢魏兩晉南北朝】</span>
@@ -122,7 +122,7 @@
   </div>
 
   <!-- 側邊深度檢視抽屜 -->
-  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[480px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
+  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[500px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
         <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
@@ -259,11 +259,9 @@
       scene.add(new THREE.Points(starGeo, starMat));
     }
 
-    // 建立北斗七星空間排列樣式
     function createBeidouAsterism() {
       const group = new THREE.Group();
 
-      // 北斗七星相對座標 (X, Z 空間分佈，杓身魁四星與斗柄三星)
       const starCoords = [
         { name: "天樞", x: -1.4, z: 0.8 },
         { name: "天璇", x: -1.2, z: -0.6 },
@@ -281,14 +279,12 @@
         roughness: 0.2
       });
 
-      // 放置星曜球體
       starCoords.forEach(pos => {
         const starMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), starMat);
         starMesh.position.set(pos.x, DISK_HEIGHT / 2 + 0.35, pos.z);
         group.add(starMesh);
       });
 
-      // 繪製七星相連之金色光軌 (天樞-天璇-天璣-天權-玉衡-開陽-搖光 及 魁四星閉合 天權-天樞)
       const lineMat = new THREE.LineBasicMaterial({
         color: 0x38bdf8,
         transparent: true,
@@ -301,8 +297,8 @@
         new THREE.Vector3(starCoords[1].x, DISK_HEIGHT / 2 + 0.35, starCoords[1].z),
         new THREE.Vector3(starCoords[2].x, DISK_HEIGHT / 2 + 0.35, starCoords[2].z),
         new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
-        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z), // 斗魁封閉
-        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z), // 折回天權連玉衡
+        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
+        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
         new THREE.Vector3(starCoords[4].x, DISK_HEIGHT / 2 + 0.35, starCoords[4].z),
         new THREE.Vector3(starCoords[5].x, DISK_HEIGHT / 2 + 0.35, starCoords[5].z),
         new THREE.Vector3(starCoords[6].x, DISK_HEIGHT / 2 + 0.35, starCoords[6].z)
@@ -316,7 +312,6 @@
     }
 
     function buildDialSystem() {
-      // 1. 中央天樞圓盤 (天盤樞機)
       const centerGeo = new THREE.CylinderGeometry(INNER_RADIUS, INNER_RADIUS, DISK_HEIGHT, 48);
       const centerMat = new THREE.MeshStandardMaterial({
         color: 0x111c30,
@@ -331,7 +326,6 @@
       const centerEdgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
       centerMesh.add(new THREE.LineSegments(centerEdgeGeo, centerEdgeMat));
 
-      // 中央天盤改用「北斗七星」實體圖式
       const beidouGroup = createBeidouAsterism();
       centerMesh.add(beidouGroup);
 
@@ -344,7 +338,6 @@
       scene.add(centerMesh);
       clickableMeshes.push(centerMesh);
 
-      // 2. 外環十二等分扇區
       const sectorAngle = (Math.PI * 2) / TOTAL_SECTORS;
       const angleGap = 0.035;
 
@@ -429,7 +422,7 @@
     }
 
     function onPointerDown(event) {
-      if (event.clientX > window.innerWidth - 480 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
+      if (event.clientX > window.innerWidth - 500 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
         return;
       }
 
@@ -491,6 +484,18 @@
       }
     }
 
+    function toggleStepFourNarrative() {
+      const content = document.getElementById("step4-content");
+      const icon = document.getElementById("step4-icon");
+      if (content.classList.contains("hidden")) {
+        content.classList.remove("hidden");
+        icon.classList.add("rotate-180");
+      } else {
+        content.classList.add("hidden");
+        icon.classList.remove("rotate-180");
+      }
+    }
+
     function renderDrawer() {
       if (!selectedIsland) return;
 
@@ -530,6 +535,21 @@
               <blockquote class="text-xs text-emerald-200/90 font-serif border-l-2 border-emerald-500 pl-2.5 py-0.5 leading-relaxed">
                 ${selectedIsland.beginner.step3_evidence}
               </blockquote>
+            </div>
+            <!-- 步驟四：點選展開完整內容敘述 -->
+            <div class="rounded-lg bg-slate-800/80 border border-amber-500/40 overflow-hidden shadow-lg transition-all">
+              <button onclick="toggleStepFourNarrative()" class="w-full p-3.5 flex items-center justify-between text-left hover:bg-slate-700/50 transition-colors">
+                <span class="text-xs font-bold text-amber-300 flex items-center gap-2">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                  【步驟四：內容敘述】點此展開深度論述
+                </span>
+                <svg id="step4-icon" class="w-4 h-4 text-amber-400 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </button>
+              <div id="step4-content" class="hidden px-4 pb-4 pt-1 border-t border-slate-700/60 text-xs text-slate-200 leading-relaxed space-y-2.5 font-sans bg-slate-900/60">
+                ${selectedIsland.beginner.step4_narrative || "暫無詳細論述。"}
+              </div>
             </div>
           </div>
         `;
@@ -595,13 +615,11 @@
 
       const t = time * 0.0015;
 
-      // 中央北斗七星整體緩慢自轉（呈現天盤斗柄隨天迴旋之象）
       const centerObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "beidou");
       if (centerObj && centerObj.userData.markerMesh) {
         centerObj.userData.markerMesh.rotation.y = t * 0.2;
       }
 
-      // 外環各辰位微浮動
       clickableMeshes.forEach((mesh, idx) => {
         if (!mesh.userData.data || mesh.userData.data.id === "beidou") return;
         const marker = mesh.userData.markerMesh;
