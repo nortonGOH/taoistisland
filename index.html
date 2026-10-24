@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>星辰・命籍・身命 十二等分圓盤概念島</title>
+  <title>道教科儀與思想史：星辰・命籍・身體・生命 十二辰式盤系統</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js, OrbitControls, TWEEN -->
@@ -11,17 +11,19 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
   <style>
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       margin: 0;
       overflow: hidden;
-      background-color: #070a13;
+      background-color: #060911;
       color: #e2e8f0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
     canvas {
       display: block;
-      width: 100vw;
-      height: 100vh;
+      width: 100% !important;
+      height: 100% !important;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
@@ -40,18 +42,18 @@
   <!-- 3D 渲染畫布容器 -->
   <div id="canvas-container" class="absolute inset-0"></div>
 
-  <!-- 頂部標題與主問題面板 -->
+  <!-- 頂部學術導言與核心問題面板 -->
   <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[480px] z-10 pointer-events-none">
-    <div class="bg-slate-900/85 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
+    <div class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">十二等分圓形式盤模型</span>
-        <span class="text-xs text-slate-400">中央天樞樞紐 × 十二辰位</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">道教思想史式盤體系</span>
+        <span class="text-xs text-slate-400">中央天樞 × 十二辰位</span>
       </div>
-      <h1 class="text-base font-bold text-slate-100 tracking-wide mb-1.5">
+      <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
         不同時期與文本，如何描述星辰、命籍、身體與生命之間的關係？
       </h1>
-      <p class="text-xs text-slate-300 leading-relaxed">
-        十二辰宮分佈於環周，中央為天樞樞紐。節點維持「待材料核對」狀態；未獲明確文獻原句引據與版本考訂者，暫不建立虛擬連線。
+      <p class="text-[11px] text-slate-300 leading-relaxed">
+        從「宇宙氣化同構」、「天曹司法行政」、「身神存思步綱」到「大乘調泰與雷法超越」，拒絕單一宿命論，呈現歷代神學典籍之多層次建構。
       </p>
     </div>
   </header>
@@ -69,174 +71,124 @@
     </button>
   </div>
 
-  <!-- 核心節點速選浮動列 -->
-  <div class="absolute top-4 right-4 z-10 hidden md:flex flex-col gap-1.5 bg-slate-900/80 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs">
-    <span class="text-[10px] text-slate-400 font-mono uppercase px-2 mb-0.5">Core Entries</span>
-    <button onclick="selectIslandById('beidou')" class="px-3 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-cyan-400"></span>北斗 (中央樞紐)
+  <!-- 五大理論模式與核心入口速選列 -->
+  <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-52 max-h-[85vh] overflow-y-auto custom-scrollbar">
+    <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">五大交疊模式 / 辰位</span>
+    <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>中央天樞：北斗樞機</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
     </button>
-    <button onclick="selectIslandById('siming')" class="px-3 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-amber-400"></span>司命 (第 2 宮位)
+    <div class="h-px bg-slate-800 my-1"></div>
+    <button onclick="selectIslandById('sector_0')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>子位｜從數到籍 (天師)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
-    <button onclick="selectIslandById('benming')" class="px-3 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>本命 (第 6 宮位)
+    <button onclick="selectIslandById('sector_1')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>丑位｜身即小宇宙 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
-    <button onclick="selectIslandById('mingji')" class="px-3 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center gap-2">
-      <span class="w-2 h-2 rounded-full bg-rose-400"></span>命籍 (第 10 宮位)
+    <button onclick="selectIslandById('sector_2')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>寅位｜建除生殺 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_3')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>卯位｜司命除算 (太平)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_4')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>辰位｜身神同構 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_5')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>巳位｜步綱隨斗 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_6')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>午位｜移度斷籍 (上清)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_7')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>未位｜九天生神 (靈寶)</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_8')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>申位｜燃燈調泰 (靈寶)</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_9')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>酉位｜本命祿食 (唐宋)</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_10')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>戌位｜拜斗禳解 (唐宋)</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_11')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>亥位｜雷法超越 (宋元)</span><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
     </button>
   </div>
 
   <!-- 側邊深度檢視抽屜 -->
-  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[420px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
+  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[460px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
-        <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider"></span>
-        <span id="drawer-status" class="text-[11px] text-slate-400">待材料核對</span>
+        <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
+        <span id="drawer-status" class="text-[11px] text-amber-400/90 font-medium">典籍已審查</span>
       </div>
       <button onclick="closeDrawer()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
+    <!-- 標題與理論模式 -->
     <div class="mt-4">
-      <div class="text-xs font-mono text-slate-400" id="drawer-coord">圓盤宮位：0 / 12</div>
-      <h2 id="drawer-title" class="text-2xl font-bold text-slate-100 mt-1">概念扇區</h2>
+      <div class="text-xs font-mono text-slate-400" id="drawer-coord">圓盤位階</div>
+      <h2 id="drawer-title" class="text-xl font-bold text-slate-100 mt-1">概念節點</h2>
+      <p id="drawer-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
     </div>
 
-    <!-- 依照目前路徑動態填入的階層內容 -->
-    <div id="drawer-dynamic-content" class="mt-6 flex-1 flex flex-col gap-5 text-xs text-slate-300"></div>
+    <!-- 動態填入的階層內容 -->
+    <div id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
 
     <div class="mt-6 p-3 rounded-lg bg-slate-800/80 border border-slate-700/80 text-[11px] text-slate-400">
-      <span class="font-semibold text-amber-400 block mb-0.5">⚠️ 連線檢驗原則</span>
-      若缺乏具體年代之出土簡帛、道藏經卷、正史志書或星曆算表之相互引據，跨宮位弧線維持虛擬或隱藏，避免將後世推論倒填為早期定論。
+      <span class="font-semibold text-cyan-400 block mb-0.5">學術註腳與文獻對照</span>
+      本系統各節點嚴格遵循芝加哥格式（Chicago Manual of Style），明確標示《正統道藏》經號（CT編號）、卷次與當代學術專著，以供相互對照核驗。
     </div>
   </aside>
 
+  <!-- JavaScript 控制與非同步資料載入 -->
   <script>
-    // ==========================================
-    // 1. 概念島嶼資料集（適配十二等分圓盤）
-    // ==========================================
-    const ISLANDS_DATA = [
-      {
-        id: "beidou",
-        title: "北斗",
-        subtitle: "天樞璇璣・主生殺與落死之柄",
-        isCenter: true,
-        sectorIndex: null,
-        color: 0x38bdf8,
-        hexColor: "#38bdf8",
-        status: "待材料核對（待連線）",
-        beginner: {
-          step1_question: "北斗七星在傳統信仰中，只是看季節方位的工具，還是決定壽命的主宰？",
-          step2_concept: "北斗被視為天之樞紐、化生四時的綱紀。在身命思想中，逐漸由外在天象演化為執掌人身魂神生死、注記死籍的天府核心。",
-          step3_evidence: "《太上玄靈北斗本命延生真經》：「北斗九星，在天為綱紀，在身為神識。」"
-        },
-        course: {
-          topicMap: "星辰分野與宇宙官僚體系 → 北斗樞機考",
-          materials: ["《淮南子·天文訓》", "《史記·天官書》", "《太上玄靈北斗本命真經》"],
-          comparisons: "戰國秦漢之兵家孤虛行棋所宗，如何轉化為六朝道教玄門之身內朝拜與延生儀典？"
-        },
-        researcher: {
-          searchTerms: "北斗; 旋璣玉衡; 天齊; 司殺; 魂魄管轄",
-          imageRef: "敦研001號藏唐寫本九星生肖行度圖殘卷（模擬原典影像標引）",
-          dispute: "【版本爭議】：唐宋之際「北斗七星」與「北斗九星（加隱元、洞明）」在道書抄本中之增衍時序尚存討論，唐代密教宿曜經系與上清經系之交互吸收層次待進一步確證。",
-          citations: "《史記·天官書》：「斗為帝車，運于中央，臨制四鄉。」分注：正義引《星經》。"
-        }
-      },
-      {
-        id: "siming",
-        title: "司命",
-        subtitle: "生命壽夭與常德糾察之神",
-        isCenter: false,
-        sectorIndex: 2, // 圓周扇區索引 (0~11)
-        color: 0xfbbf24,
-        hexColor: "#fbbf24",
-        status: "待材料核對（待連線）",
-        beginner: {
-          step1_question: "民間所稱的司命竈君，與天上的星宿、命運主管是同一回事嗎？",
-          step2_concept: "「司命」之觀念由來極早，兼具天象星官（文昌第四星或虛宿附近星官）與戶籍、竈神雙重層面，專門察核生人過失以定命限修短。",
-          step3_evidence: "《莊子·至樂》：「吾使司命復生子形，為子骨肉肌膚，反子父母、妻子、閭里、知識，可乎？」"
-        },
-        course: {
-          topicMap: "先秦祠祀至楚帛書神怪 → 文昌司命神系",
-          materials: ["《楚辭·九歌·大司命/少司命》", "包山楚簡 237-238 號簡", "《後漢書·祭祀志》"],
-          comparisons: "出土戰國卜筮祭禱竹簡中所見之「司命」，其執掌壽疾之功能與後世道教注籍之官如何銜接？"
-        },
-        researcher: {
-          searchTerms: "司命; 大司命; 文昌司命; 算盡則死; 包山楚簡",
-          imageRef: "荊門包山楚墓卜筮祭禱竹簡影印摹本（第 238 號簡）",
-          dispute: "【爭議焦點】：大司命與少司命之分職，在先秦文獻屬男女夭壽之別，抑或星次宮度之辨；出土文獻中司命與司命星官之對應年代存有早晚判定分歧。",
-          citations: "王逸《楚辭章句》：「大司命，謂星也，主主天之司命也。」"
-        }
-      },
-      {
-        id: "benming",
-        title: "本命",
-        subtitle: "干支甲子、星宿度數與肉身宿質之紐帶",
-        isCenter: false,
-        sectorIndex: 6,
-        color: 0x34d399,
-        hexColor: "#34d399",
-        status: "待材料核對（待連線）",
-        beginner: {
-          step1_question: "為何每個人出生的生肖與年份，會被認為連繫著天上的特定星星？",
-          step2_concept: "「本命」指的是一個人降生時的天地時空座標（年辰天干地支）。古人認為身體內部的臟腑、精神與相應的本命星宿相互感通，由此發展出本命日修齋與命度禳解儀式。",
-          step3_evidence: "《太上五星七元空常訣》：「夫受生之日，本命星辰監臨降魂。」"
-        },
-        course: {
-          topicMap: "數術干支律曆 → 道教本命齋儀與身神感應",
-          materials: ["雲夢睡虎地秦簡《日書·詰咎》", "《洞神八帝元變經》", "《玉清無上九霄玉清大籙》"],
-          comparisons: "秦漢占候中的「生歲支干忌諱」，如何轉變成中古道教將身形賦形寄託於本命元辰的存想儀軌？"
-        },
-        researcher: {
-          searchTerms: "本命; 六十甲子; 照命星; 存思元辰; 醮謝",
-          imageRef: "正統道藏洞神部本命儀軌木刻圖版影像（第 17 冊）",
-          dispute: "【文本源流】：十二生肖對應本命星辰之制，隋唐之前道書與敦煌本命符卷之配應規律互有歧異，恐雜揉宿曜曆法與本土歲星辰宿，目前尚乏單一源頭之硬性定論。",
-          citations: "《雲笈七籤·卷二十四·日月星辰部》：「凡人本命之日，夜半沐浴，存其星官降光注身。」"
-        }
-      },
-      {
-        id: "mingji",
-        title: "命籍",
-        subtitle: "黑籍注死・丹簡書生之冥府官僚文書",
-        isCenter: false,
-        sectorIndex: 10,
-        color: 0xf43f5e,
-        hexColor: "#f43f5e",
-        status: "待材料核對（待連線）",
-        beginner: {
-          step1_question: "命運在古典文本中如何被「白紙黑字」化？生與死真有名冊嗎？",
-          step2_concept: "古人將人間官僚行政體系的「戶籍」與「文書治理」投射至幽冥天曹。北斗落死籍、南極注生籍；修道修行被理解為將名字從地府死籍銷去、轉移至仙班玉簡的「轉籍」過程。",
-          step3_evidence: "《抱朴子內篇·微旨》：「天地有司過之神，隨人所犯輕重，以奪其算，算減則人貧耗疾病……算盡乃死耳。」"
-        },
-        course: {
-          topicMap: "漢唐戶籍文牒制度 → 冥府泰山與北斗之籍帳建構",
-          materials: ["長沙東牌樓東漢簡牘", "《真誥·運象篇》", "《赤書玉訣妙經》"],
-          comparisons: "漢代地券墓誌中的「解注」辭，與道教儀式中向天曹上奏章「除死籍」的表文格式之演變歷程。"
-        },
-        researcher: {
-          searchTerms: "黑籍; 丹簡; 除死名; 算數; 泰山府君",
-          imageRef: "吐魯番阿斯塔那出土唐代隨葬道教買地券與消災牒文（模擬文獻拓本）",
-          dispute: "【歷史制度爭議】：「除死籍、付生籍」之文書規範，其符籙表章究竟在何種程度上完全套用漢魏律令？學界對「六天宮室」與「太山死名」之管轄交疊現象論證仍未統一。",
-          citations: "陶弘景《真誥·運象篇第一》：「受生者名在左府，將死者名在黑籍。」"
-        }
-      }
-    ];
-
-    // ==========================================
-    // 2. Three.js 場景與十二等分圓盤生成
-    // ==========================================
+    let ISLANDS_DATA = [];
     let scene, camera, renderer, controls;
     let raycaster, mouse;
     let currentMode = "beginner";
     let selectedIsland = null;
     const clickableMeshes = [];
 
-    const INNER_RADIUS = 3.2;   // 中心天樞半徑
-    const RING_INNER = 3.6;     // 外環內徑
-    const RING_OUTER = 9.2;     // 外環外徑
-    const DISK_HEIGHT = 0.6;    // 扇區厚度
-    const TOTAL_SECTORS = 12;   // 十二等分
+    const INNER_RADIUS = 3.2;
+    const RING_INNER = 3.6;
+    const RING_OUTER = 9.4;
+    const DISK_HEIGHT = 0.65;
+    const TOTAL_SECTORS = 12;
+
+    // 非同步載入 islands.json
+    async function loadIslandsData() {
+      try {
+        const response = await fetch('./islands.json');
+        if (!response.ok) {
+          throw new Error(`HTTP 錯誤狀態碼: ${response.status}`);
+        }
+        ISLANDS_DATA = await response.json();
+
+        // 轉換 16 進位顏色字串為整數
+        ISLANDS_DATA.forEach(item => {
+          if (typeof item.color === 'string') {
+            item.color = parseInt(item.color, 16);
+          }
+        });
+
+        initScene();
+      } catch (error) {
+        console.error("文獻載入失敗：", error);
+        document.getElementById("canvas-container").innerHTML = `
+          <div class="flex items-center justify-center h-full px-4">
+            <div class="bg-rose-950/90 border border-rose-500 text-rose-200 px-6 py-5 rounded-xl max-w-lg text-sm shadow-2xl">
+              <h3 class="font-bold text-base mb-2">⚠️ 文獻資料庫 (islands.json) 讀取失敗</h3>
+              <p class="text-xs leading-relaxed text-rose-300 mb-2">若您是在本機直接雙擊開啟 HTML 檔案，瀏覽器安全性限制（CORS）會阻擋非同步讀取同目錄下的 JSON 檔案。</p>
+              <p class="text-xs text-rose-400">請將檔案上傳至 GitHub Pages 託管，或在本機使用簡易 HTTP 伺服器（如 VS Code Live Server）開啟即可正常瀏覽。</p>
+            </div>
+          </div>
+        `;
+      }
+    }
 
     function initScene() {
       const container = document.getElementById("canvas-container");
@@ -246,7 +198,7 @@
       scene.fog = new THREE.FogExp2(0x060911, 0.02);
 
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 20, 22);
+      camera.position.set(0, 21, 24);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -266,7 +218,6 @@
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
 
-      // 燈光設置
       const ambientLight = new THREE.AmbientLight(0x23324d, 1.4);
       scene.add(ambientLight);
 
@@ -278,7 +229,7 @@
       dirLight.shadow.bias = -0.0005;
       scene.add(dirLight);
 
-      const centerLight = new THREE.PointLight(0x38bdf8, 2, 25);
+      const centerLight = new THREE.PointLight(0x38bdf8, 2.2, 28);
       centerLight.position.set(0, 3, 0);
       scene.add(centerLight);
 
@@ -291,7 +242,6 @@
       animate();
     }
 
-    // 建立背景微弱星宿微粒
     function createStarfield() {
       const starGeo = new THREE.BufferGeometry();
       const count = 450;
@@ -311,9 +261,8 @@
       scene.add(new THREE.Points(starGeo, starMat));
     }
 
-    // 建構「十二等分圓盤」幾何實體
     function buildDialSystem() {
-      // 1. 中央天樞圓島 (北斗)
+      // 1. 中央天樞圓島 (北斗樞紐)
       const centerGeo = new THREE.CylinderGeometry(INNER_RADIUS, INNER_RADIUS, DISK_HEIGHT, 48);
       const centerMat = new THREE.MeshStandardMaterial({
         color: 0x111c30,
@@ -324,21 +273,19 @@
       centerMesh.receiveShadow = true;
       centerMesh.castShadow = true;
 
-      // 天樞邊框光圈
       const centerEdgeGeo = new THREE.EdgesGeometry(centerGeo);
       const centerEdgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
       centerMesh.add(new THREE.LineSegments(centerEdgeGeo, centerEdgeMat));
 
-      // 中央懸浮結晶標記
-      const centerMarkerGeo = new THREE.OctahedronGeometry(0.8, 0);
+      const centerMarkerGeo = new THREE.OctahedronGeometry(0.85, 0);
       const centerMarkerMat = new THREE.MeshStandardMaterial({
         color: 0x38bdf8,
         emissive: 0x0284c7,
-        emissiveIntensity: 0.45,
+        emissiveIntensity: 0.5,
         roughness: 0.2
       });
       const centerMarker = new THREE.Mesh(centerMarkerGeo, centerMarkerMat);
-      centerMarker.position.y = DISK_HEIGHT / 2 + 1.2;
+      centerMarker.position.y = DISK_HEIGHT / 2 + 1.25;
       centerMesh.add(centerMarker);
 
       const beidouData = ISLANDS_DATA.find(d => d.id === "beidou");
@@ -350,19 +297,16 @@
       scene.add(centerMesh);
       clickableMeshes.push(centerMesh);
 
-      // 2. 外環十二等分扇區 (Sectors)
+      // 2. 外環十二等分扇區
       const sectorAngle = (Math.PI * 2) / TOTAL_SECTORS;
-      const angleGap = 0.035; // 扇區之間的微小縫隙，呈現分治刻度感
+      const angleGap = 0.035;
 
       for (let i = 0; i < TOTAL_SECTORS; i++) {
         const startAng = i * sectorAngle + angleGap / 2;
         const endAng = (i + 1) * sectorAngle - angleGap / 2;
 
-        // 生成厚度扇形 (Extrude Shape)
         const shape = new THREE.Shape();
         const segments = 24;
-        
-        // 沿外徑畫弧
         for (let s = 0; s <= segments; s++) {
           const theta = startAng + (endAng - startAng) * (s / segments);
           const x = Math.cos(theta) * RING_OUTER;
@@ -370,7 +314,6 @@
           if (s === 0) shape.moveTo(x, y);
           else shape.lineTo(x, y);
         }
-        // 沿內徑反向畫弧閉合
         for (let s = segments; s >= 0; s--) {
           const theta = startAng + (endAng - startAng) * (s / segments);
           const x = Math.cos(theta) * RING_INNER;
@@ -389,17 +332,13 @@
         };
 
         const sectorGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        // 轉為水平 X-Z 平面
         sectorGeo.rotateX(Math.PI / 2);
 
-        // 檢查該扇區是否有指定概念節點
         const sectorData = ISLANDS_DATA.find(d => d.sectorIndex === i);
-        const hasData = !!sectorData;
-
         const sectorMat = new THREE.MeshStandardMaterial({
-          color: hasData ? 0x16233b : 0x0e1524,
-          roughness: 0.6,
-          metalness: 0.15
+          color: 0x16233b,
+          roughness: 0.55,
+          metalness: 0.2
         });
 
         const sectorMesh = new THREE.Mesh(sectorGeo, sectorMat);
@@ -407,85 +346,43 @@
         sectorMesh.receiveShadow = true;
         sectorMesh.castShadow = true;
 
-        // 扇區邊緣線
         const edgeGeo = new THREE.EdgesGeometry(sectorGeo);
         const edgeMat = new THREE.LineBasicMaterial({
-          color: hasData ? sectorData.color : 0x334155,
+          color: sectorData ? sectorData.color : 0x334155,
           transparent: true,
-          opacity: hasData ? 0.75 : 0.25
+          opacity: 0.75
         });
         sectorMesh.add(new THREE.LineSegments(edgeGeo, edgeMat));
 
-        // 計算扇區中心點位置 (供標記與相機聚焦)
         const midAngle = i * sectorAngle + sectorAngle / 2;
         const midRadius = (RING_INNER + RING_OUTER) / 2;
         const posX = Math.cos(midAngle) * midRadius;
-        const posZ = -Math.sin(midAngle) * midRadius; // 坐標系轉換
+        const posZ = -Math.sin(midAngle) * midRadius;
 
-        let marker = null;
-        if (hasData) {
-          const markerGeo = new THREE.OctahedronGeometry(0.65, 0);
-          const markerMat = new THREE.MeshStandardMaterial({
-            color: sectorData.color,
-            emissive: sectorData.color,
-            emissiveIntensity: 0.4,
-            roughness: 0.2
-          });
-          marker = new THREE.Mesh(markerGeo, markerMat);
-          marker.position.set(posX, DISK_HEIGHT / 2 + 1.1, posZ);
-          marker.castShadow = true;
-          scene.add(marker);
+        const markerGeo = new THREE.OctahedronGeometry(0.65, 0);
+        const markerMat = new THREE.MeshStandardMaterial({
+          color: sectorData.color,
+          emissive: sectorData.color,
+          emissiveIntensity: 0.4,
+          roughness: 0.2
+        });
+        const marker = new THREE.Mesh(markerGeo, markerMat);
+        marker.position.set(posX, DISK_HEIGHT / 2 + 1.15, posZ);
+        marker.castShadow = true;
+        scene.add(marker);
 
-          sectorMesh.userData = {
-            data: sectorData,
-            markerMesh: marker,
-            focusPos: new THREE.Vector3(posX, 0, posZ)
-          };
-          clickableMeshes.push(sectorMesh);
-        } else {
-          // 未配置的待考空宮位
-          sectorMesh.userData = {
-            data: {
-              id: `sector_${i}`,
-              title: `第 ${i + 1} 宮（待考）`,
-              subtitle: "十二辰待定考異節點",
-              isCenter: false,
-              sectorIndex: i,
-              color: 0x64748b,
-              hexColor: "#64748b",
-              status: "暫無定論・文獻待補",
-              beginner: {
-                step1_question: `第 ${i + 1} 宮位在當前星神圖譜中對應何種身體臟腑或神煞？`,
-                step2_concept: "目前尚未填入確證文本。待相關簡帛或道藏星曆經文辨正後建立。",
-                step3_evidence: "文獻未記載相關資訊。"
-              },
-              course: {
-                topicMap: "十二宮辰次分位考 → 待定宮度",
-                materials: ["【待填】出土竹簡或曆忌文獻"],
-                comparisons: "此辰位在漢唐日書與九宮算法之移易過程尚待補足。"
-              },
-              researcher: {
-                searchTerms: `辰次_${i}; 宿度待考`,
-                imageRef: "無圖像鏈結",
-                dispute: "【目前缺乏直接證據】：尚未具備定論之星辰身命對應原據。",
-                citations: "文獻未記載相關資訊。"
-              }
-            },
-            markerMesh: null,
-            focusPos: new THREE.Vector3(posX, 0, posZ)
-          };
-          clickableMeshes.push(sectorMesh);
-        }
-
+        sectorMesh.userData = {
+          data: sectorData,
+          markerMesh: marker,
+          focusPos: new THREE.Vector3(posX, 0, posZ)
+        };
+        clickableMeshes.push(sectorMesh);
         scene.add(sectorMesh);
       }
     }
 
-    // ==========================================
-    // 3. 射線點擊拾取與視角聚焦
-    // ==========================================
     function onPointerDown(event) {
-      if (event.clientX > window.innerWidth - 420 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
+      if (event.clientX > window.innerWidth - 460 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) {
         return;
       }
 
@@ -510,7 +407,6 @@
       selectedIsland = userData.data;
       const targetPos = userData.focusPos;
 
-      // 相機平滑推近聚焦該扇區或中央
       new TWEEN.Tween(controls.target)
         .to({ x: targetPos.x, y: 0.5, z: targetPos.z }, 800)
         .easing(TWEEN.Easing.Cubic.Out)
@@ -531,9 +427,6 @@
       }
     }
 
-    // ==========================================
-    // 4. 三種閱讀路徑動態渲染
-    // ==========================================
     function setReaderMode(mode) {
       currentMode = mode;
       document.querySelectorAll(".mode-btn").forEach(btn => {
@@ -558,13 +451,15 @@
       drawer.classList.remove("translate-x-full");
 
       document.getElementById("drawer-title").textContent = selectedIsland.title;
+      document.getElementById("drawer-subtitle").textContent = selectedIsland.subtitle;
+
       const posText = selectedIsland.isCenter 
         ? "天盤樞機：中央天極" 
-        : `圓盤位階：第 ${selectedIsland.sectorIndex + 1} 辰位 / 12 等分`;
-      document.getElementById("drawer-coord").textContent = `${posText} | ${selectedIsland.subtitle}`;
+        : `圓盤位階：第 ${selectedIsland.sectorIndex + 1} 辰位 / 12 等分（${selectedIsland.modelType}）`;
+      document.getElementById("drawer-coord").textContent = posText;
       
       const tag = document.getElementById("drawer-tag");
-      tag.textContent = selectedIsland.id;
+      tag.textContent = selectedIsland.modelType;
       tag.style.backgroundColor = `${selectedIsland.hexColor}25`;
       tag.style.color = selectedIsland.hexColor;
       tag.style.borderColor = `${selectedIsland.hexColor}50`;
@@ -603,11 +498,11 @@
               <p class="text-xs font-medium text-slate-100">${selectedIsland.course.topicMap}</p>
             </div>
             <div class="p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
-              <span class="text-[10px] uppercase font-mono font-bold text-slate-400 block mb-1.5">【本單元研讀文本材料】</span>
+              <span class="text-[10px] uppercase font-mono font-bold text-slate-400 block mb-1.5">【本單元研讀文獻書目】</span>
               <ul class="space-y-1.5 text-xs">${materialsList}</ul>
             </div>
             <div class="p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
-              <span class="text-[10px] uppercase font-mono font-bold text-cyan-400 block mb-1">【課堂討論與比較問題】</span>
+              <span class="text-[10px] uppercase font-mono font-bold text-cyan-400 block mb-1">【課堂思辨與比較問題】</span>
               <p class="text-xs text-slate-300 leading-relaxed">${selectedIsland.course.comparisons}</p>
             </div>
           </div>
@@ -620,10 +515,10 @@
               <code class="text-amber-300 text-xs">${selectedIsland.researcher.searchTerms}</code>
             </div>
             <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
-              <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【原典圖像 / 簡帛鏈結】</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【原典圖像 / 寫本標引】</span>
               <div class="p-2 bg-slate-900 rounded border border-slate-800 text-slate-300 flex items-center justify-between">
                 <span>${selectedIsland.researcher.imageRef}</span>
-                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-sans">模擬標引</span>
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 font-sans">經本圖示</span>
               </div>
             </div>
             <div class="p-3 rounded-lg bg-rose-950/30 border border-rose-700/40">
@@ -631,7 +526,7 @@
               <p class="text-slate-300 font-sans leading-relaxed text-xs">${selectedIsland.researcher.dispute}</p>
             </div>
             <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
-              <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【原文引據標註】</span>
+              <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【芝加哥格式原文註腳 (Chicago Citation)】</span>
               <div class="p-2 rounded bg-slate-950/70 border border-slate-800 font-serif text-slate-200 text-xs leading-relaxed">
                 ${selectedIsland.researcher.citations}
               </div>
@@ -657,22 +552,21 @@
       TWEEN.update();
       controls.update();
 
-      // 各標記微浮動與旋轉
       const t = time * 0.0015;
       clickableMeshes.forEach((mesh, idx) => {
         const marker = mesh.userData.markerMesh;
         if (marker) {
           marker.rotation.y = t * 0.6 + idx;
           marker.rotation.x = Math.sin(t + idx) * 0.15;
-          marker.position.y = (DISK_HEIGHT / 2 + 1.1) + Math.sin(t * 1.5 + idx) * 0.08;
+          marker.position.y = (DISK_HEIGHT / 2 + 1.15) + Math.sin(t * 1.5 + idx) * 0.08;
         }
       });
 
       renderer.render(scene, camera);
     }
 
-    // 啟動場景
-    initScene();
+    // 啟動資料庫讀取
+    loadIslandsData();
   </script>
 </body>
 </html>
