@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>道教科儀與思想史：星辰・命籍・身體・生命 十二辰式盤系統</title>
+  <title>道教科儀與思想史：星辰・命籍・身體・生命 式盤系統</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js, OrbitControls, TWEEN -->
@@ -50,10 +50,10 @@
         <span class="text-xs text-slate-400">中央天樞 × 十二辰位</span>
       </div>
       <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
-        宇宙胚胎、胞結沉淪與星真解脫：漢魏至宋元身命觀與命籍重構
+        道教科儀與思想史：星辰・命籍・身體・生命 式盤系統
       </h1>
       <p class="text-[11px] text-slate-300 leading-relaxed">
-        從「漢晉胚胎勒籍」、「六朝二十四結節與亦離亦合」、「隋唐敦煌星糧與十一曜」到「宋元五星內景與性命雙修」，重現道藏典籍之辯證演進。
+        中央天盤以「北斗七星」為樞紐總攝眾靈；環周分列漢魏六朝、隋唐五代敦煌文書至宋元全真內丹之身命演化網絡。
       </p>
     </div>
   </header>
@@ -75,7 +75,7 @@
   <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-60 max-h-[85vh] overflow-y-auto custom-scrollbar">
     <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">歷史流變 / 十二辰位</span>
     <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>中央天樞：北斗五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+      <span>中央天樞：北斗七星五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
     </button>
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【漢魏兩晉南北朝】</span>
@@ -135,7 +135,7 @@
 
     <!-- 標題與理論模式 -->
     <div class="mt-4">
-      <div class="text-xs font-mono text-slate-400" id="drawer-coord">圓盤位階</div>
+      <div class="text-xs font-mono text-slate-400" id="drawer-coord">天盤樞機</div>
       <h2 id="drawer-title" class="text-xl font-bold text-slate-100 mt-1">概念節點</h2>
       <p id="drawer-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
     </div>
@@ -153,8 +153,8 @@
     let selectedIsland = null;
     const clickableMeshes = [];
 
-    const INNER_RADIUS = 3.2;
-    const RING_INNER = 3.6;
+    const INNER_RADIUS = 3.4;
+    const RING_INNER = 3.8;
     const RING_OUTER = 9.4;
     const DISK_HEIGHT = 0.65;
     const TOTAL_SECTORS = 12;
@@ -227,7 +227,7 @@
       dirLight.shadow.bias = -0.0005;
       scene.add(dirLight);
 
-      const centerLight = new THREE.PointLight(0x38bdf8, 2.2, 28);
+      const centerLight = new THREE.PointLight(0x38bdf8, 2.4, 28);
       centerLight.position.set(0, 3, 0);
       scene.add(centerLight);
 
@@ -259,8 +259,64 @@
       scene.add(new THREE.Points(starGeo, starMat));
     }
 
+    // 建立北斗七星空間排列樣式
+    function createBeidouAsterism() {
+      const group = new THREE.Group();
+
+      // 北斗七星相對座標 (X, Z 空間分佈，杓身魁四星與斗柄三星)
+      const starCoords = [
+        { name: "天樞", x: -1.4, z: 0.8 },
+        { name: "天璇", x: -1.2, z: -0.6 },
+        { name: "天璣", x: 0.1,  z: -0.7 },
+        { name: "天權", x: 0.3,  z: 0.4 },
+        { name: "玉衡", x: 1.1,  z: 0.9 },
+        { name: "開陽", x: 1.7,  z: 0.5 },
+        { name: "搖光", x: 2.2,  z: -0.2 }
+      ];
+
+      const starMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.8,
+        roughness: 0.2
+      });
+
+      // 放置星曜球體
+      starCoords.forEach(pos => {
+        const starMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), starMat);
+        starMesh.position.set(pos.x, DISK_HEIGHT / 2 + 0.35, pos.z);
+        group.add(starMesh);
+      });
+
+      // 繪製七星相連之金色光軌 (天樞-天璇-天璣-天權-玉衡-開陽-搖光 及 魁四星閉合 天權-天樞)
+      const lineMat = new THREE.LineBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.85,
+        linewidth: 2
+      });
+
+      const linePoints = [
+        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
+        new THREE.Vector3(starCoords[1].x, DISK_HEIGHT / 2 + 0.35, starCoords[1].z),
+        new THREE.Vector3(starCoords[2].x, DISK_HEIGHT / 2 + 0.35, starCoords[2].z),
+        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
+        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z), // 斗魁封閉
+        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z), // 折回天權連玉衡
+        new THREE.Vector3(starCoords[4].x, DISK_HEIGHT / 2 + 0.35, starCoords[4].z),
+        new THREE.Vector3(starCoords[5].x, DISK_HEIGHT / 2 + 0.35, starCoords[5].z),
+        new THREE.Vector3(starCoords[6].x, DISK_HEIGHT / 2 + 0.35, starCoords[6].z)
+      ];
+
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+      const beidouLines = new THREE.Line(lineGeo, lineMat);
+      group.add(beidouLines);
+
+      return group;
+    }
+
     function buildDialSystem() {
-      // 1. 中央天樞圓島 (北斗樞紐)
+      // 1. 中央天樞圓盤 (天盤樞機)
       const centerGeo = new THREE.CylinderGeometry(INNER_RADIUS, INNER_RADIUS, DISK_HEIGHT, 48);
       const centerMat = new THREE.MeshStandardMaterial({
         color: 0x111c30,
@@ -275,21 +331,14 @@
       const centerEdgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
       centerMesh.add(new THREE.LineSegments(centerEdgeGeo, centerEdgeMat));
 
-      const centerMarkerGeo = new THREE.OctahedronGeometry(0.85, 0);
-      const centerMarkerMat = new THREE.MeshStandardMaterial({
-        color: 0x38bdf8,
-        emissive: 0x0284c7,
-        emissiveIntensity: 0.5,
-        roughness: 0.2
-      });
-      const centerMarker = new THREE.Mesh(centerMarkerGeo, centerMarkerMat);
-      centerMarker.position.y = DISK_HEIGHT / 2 + 1.25;
-      centerMesh.add(centerMarker);
+      // 中央天盤改用「北斗七星」實體圖式
+      const beidouGroup = createBeidouAsterism();
+      centerMesh.add(beidouGroup);
 
       const beidouData = ISLANDS_DATA.find(d => d.id === "beidou");
       centerMesh.userData = {
         data: beidouData,
-        markerMesh: centerMarker,
+        markerMesh: beidouGroup,
         focusPos: new THREE.Vector3(0, 0, 0)
       };
       scene.add(centerMesh);
@@ -452,7 +501,7 @@
       document.getElementById("drawer-subtitle").textContent = selectedIsland.subtitle;
 
       const posText = selectedIsland.isCenter 
-        ? "天盤樞機：中央天極" 
+        ? "天盤樞機：中央天極北斗七星" 
         : `圓盤位階：第 ${selectedIsland.sectorIndex + 1} 辰位 / 12 等分（${selectedIsland.modelType}）`;
       document.getElementById("drawer-coord").textContent = posText;
       
@@ -545,7 +594,16 @@
       controls.update();
 
       const t = time * 0.0015;
+
+      // 中央北斗七星整體緩慢自轉（呈現天盤斗柄隨天迴旋之象）
+      const centerObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "beidou");
+      if (centerObj && centerObj.userData.markerMesh) {
+        centerObj.userData.markerMesh.rotation.y = t * 0.2;
+      }
+
+      // 外環各辰位微浮動
       clickableMeshes.forEach((mesh, idx) => {
+        if (!mesh.userData.data || mesh.userData.data.id === "beidou") return;
         const marker = mesh.userData.markerMesh;
         if (marker) {
           marker.rotation.y = t * 0.6 + idx;
