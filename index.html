@@ -56,16 +56,16 @@
         <strong>左盤：</strong>北斗與十二辰身命演化盤（個人命籍、身神與修持）；<br>
         <strong>右盤：</strong>玄都玉京與靈寶五劫天輪（宏觀宇宙劫運、真文隱顯與大乘普度）。
       </p>
-      <!-- 雙盤視角快速跳轉列 -->
-      <div class="flex gap-2 pt-1 border-t border-slate-800">
-        <button onclick="focusOverview()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 transition-colors">
-          🌐 全覽雙盤
+      <!-- 雙盤視角快速跳轉與概要聯動列 -->
+      <div class="flex gap-2 pt-1.5 border-t border-slate-800">
+        <button onclick="focusOverview()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 transition-colors flex items-center gap-1">
+          <span>🌐 全覽雙盤</span>
         </button>
-        <button onclick="focusZodiacDisk()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] text-amber-300 transition-colors">
-          🧭 聚焦：十二辰星盤
+        <button onclick="focusZodiacDisk()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] text-amber-300 transition-colors flex items-center gap-1">
+          <span>🧭 聚焦：十二辰星盤</span>
         </button>
-        <button onclick="focusKalpaDisk()" class="px-2.5 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-[11px] text-cyan-300 transition-colors">
-          🌌 聚焦：靈寶五劫輪
+        <button onclick="focusKalpaDisk()" class="px-2.5 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-[11px] text-cyan-300 transition-colors flex items-center gap-1">
+          <span>🌌 聚焦：靈寶五劫輪</span>
         </button>
       </div>
     </div>
@@ -345,7 +345,6 @@
       dirLight.shadow.bias = -0.0005;
       scene.add(dirLight);
 
-      // 左盤中心光源與右盤中心光源
       const zodiacLight = new THREE.PointLight(0x38bdf8, 2.2, 30);
       zodiacLight.position.set(ZODIAC_CENTER.x, 4, ZODIAC_CENTER.z);
       scene.add(zodiacLight);
@@ -388,7 +387,6 @@
       scene.add(new THREE.Points(starGeo, starMat));
     }
 
-    // 建立北斗七星實體星圖
     function createBeidouAsterism() {
       const group = new THREE.Group();
 
@@ -441,7 +439,6 @@
       return group;
     }
 
-    // 建立厚度扇區模型
     function createSectorMesh(startAng, endAng, innerR, outerR, colorHex) {
       const shape = new THREE.Shape();
       const segments = 32;
@@ -493,7 +490,6 @@
       return mesh;
     }
 
-    // 建立雙盤系統（獨立中心）
     function buildDualDisks() {
       // ==========================================
       // 【左盤】：十二辰星命盤 (中心: ZODIAC_CENTER)
@@ -501,7 +497,6 @@
       const zodiacGroup = new THREE.Group();
       zodiacGroup.position.copy(ZODIAC_CENTER);
 
-      // 左盤中央天樞圓台 (北斗七星)
       const zCenterGeo = new THREE.CylinderGeometry(ZODIAC_INNER_R, ZODIAC_INNER_R, DISK_HEIGHT, 48);
       const zCenterMat = new THREE.MeshStandardMaterial({ color: 0x0f1a2e, roughness: 0.35, metalness: 0.4 });
       const zCenterMesh = new THREE.Mesh(zCenterGeo, zCenterMat);
@@ -524,7 +519,6 @@
       zodiacGroup.add(zCenterMesh);
       clickableMeshes.push(zCenterMesh);
 
-      // 左盤環周：十二生肖辰位扇區 (12 等分)
       const sectorAngle = (Math.PI * 2) / TOTAL_SECTORS;
       const angleGap = 0.035;
 
@@ -568,7 +562,6 @@
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
 
-      // 右盤中央樞紐：玄都玉京天台
       const kCenterGeo = new THREE.CylinderGeometry(KALPA_INNER_R, KALPA_INNER_R, DISK_HEIGHT, 48);
       const kCenterMat = new THREE.MeshStandardMaterial({ color: 0x1a0f2e, roughness: 0.35, metalness: 0.4 });
       const kCenterMesh = new THREE.Mesh(kCenterGeo, kCenterMat);
@@ -599,7 +592,6 @@
       kalpaGroup.add(kCenterMesh);
       clickableMeshes.push(kCenterMesh);
 
-      // 右盤環周：靈寶五劫巨型扇區 (5 等分)
       const kalpaAngle = (Math.PI * 2) / TOTAL_KALPAS;
       const kalpaGap = 0.035;
 
@@ -624,12 +616,13 @@
         kalpaGroup.add(badgeSprite);
 
         const worldFocus = KALPA_CENTER.clone().add(new THREE.Vector3(localX, 0, localZ));
-        kalpaMesh.userData = {
+        sectorMeshUserData = {
           data: kalpaData,
           markerMesh: badgeSprite,
           focusPos: worldFocus
         };
-        badgeSprite.userData = kalpaMesh.userData;
+        kalpaMesh.userData = sectorMeshUserData;
+        badgeSprite.userData = sectorMeshUserData;
 
         clickableMeshes.push(kalpaMesh);
         clickableMeshes.push(badgeSprite);
@@ -687,20 +680,47 @@
       }
     }
 
-    // 視角快速切換輔助函式
+    // 聚焦並開啟概要說明的聯動函式
     function focusOverview() {
       new TWEEN.Tween(controls.target).to({ x: 0, y: 0, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 30, z: 36 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+
+      selectedIsland = {
+        title: "道教科儀與思想史：雙盤概要說明",
+        subtitle: "左盤：十二辰身命星盤 ｜ 右盤：靈寶五劫天輪",
+        modelType: "雙盤全景總覽",
+        disk: "overview",
+        hexColor: "#38bdf8",
+        beginner: {
+          step1_question: "為什麼本系統將「十二辰星盤」與「靈寶五劫天輪」分為兩個獨立中心？",
+          step2_concept: "道教星命學包含兩大不同維度的時空範式：左盤聚焦於「個人身命、干支生年、魂魄身神與冥司命籍」，屬於中觀與微觀層面的自力修持；右盤聚焦於「宇宙大劫運度、元始真文隱顯與大乘普濟」，屬於宏觀層面的天地劫運。雙盤分置既保留各自宇宙幾何的純粹性，又展現了道教身命觀與大劫論的雙向呼應。",
+          step3_evidence: "《太上三十六部尊經·太清境中精經第八》統轄個人生死；《太上洞玄靈寶赤書玉訣妙經》統轄宇宙五劫運度。",
+          step4_narrative: "<p><strong>【道教星命與大劫雙盤架構之思想史意涵】</strong></p><p>本系統將道教思想史重構為雙中心獨立式盤：</p><p><strong>左盤（十二辰星命盤）：</strong>以北斗七星為天樞，十二辰位（子鼠至亥豬）為環周。從先秦西周天命論、王充命義、漢魏天師道三官公文，到六朝身神結節、太陰煉形，以及隋唐十一曜與宋元全真性命雙修，系統展示個人生命如何與星象、命籍展開對話與自力逆修。</p><p><strong>右盤（靈寶五劫天輪）：</strong>以玄都玉京大羅天為樞紐，五等分巨型扇區展開龍漢、延康、赤明、開皇、上皇五劫。完整梳理靈寶經派對宇宙大劫、真文隱光復位、以及大乘普濟六道苦魂的宏大救贖體系。</p>"
+        },
+        course: {
+          topicMap: "道教宇宙論雙軌結構 → 個體命祿微觀修持 與 宏觀宇宙大劫運度",
+          materials: ["《太上三十六部尊經》", "《太上洞玄靈寶赤書玉訣妙經》", "《洞玄靈寶自然九天生神章經》"],
+          comparisons: "個體命籍之「削死上生」與宇宙大劫之「天地復位、開通三象」，在道教科儀中如何形成互為體用的救贖網絡？"
+        },
+        researcher: {
+          searchTerms: "雙中心式盤; 十二辰星盤; 靈寶五劫天輪; 大劫運度; 身命同構",
+          imageRef": "正統道藏洞真部玉訣類雙盤星象與五劫壇場對照圖版",
+          dispute: "【雙軌神學範式】：避免將個體生辰祿命與宏觀五劫混為一談，雙盤獨立配置落實了道教文獻學對「個人壽夭命局」與「宇宙浩劫運度」之精確範疇區隔。"
+        }
+      };
+      renderDrawer();
     }
 
     function focusZodiacDisk() {
       new TWEEN.Tween(controls.target).to({ x: ZODIAC_CENTER.x, y: 0, z: ZODIAC_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: ZODIAC_CENTER.x, y: 22, z: ZODIAC_CENTER.z + 18 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      selectIslandById('beidou');
     }
 
     function focusKalpaDisk() {
       new TWEEN.Tween(controls.target).to({ x: KALPA_CENTER.x, y: 0, z: KALPA_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: KALPA_CENTER.x, y: 22, z: KALPA_CENTER.z + 18 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      selectIslandById('kalpa_center');
     }
 
     function setReaderMode(mode) {
@@ -749,7 +769,9 @@
       document.getElementById("drawer-subtitle").textContent = selectedIsland.subtitle;
 
       let posText = "";
-      if (selectedIsland.disk === "kalpa") {
+      if (selectedIsland.disk === "overview") {
+        posText = "【全景概要】雙盤系統總覽";
+      } else if (selectedIsland.disk === "kalpa") {
         posText = selectedIsland.isCenter 
           ? "【右盤】靈寶五劫天輪：中央玄都玉京天台" 
           : `【右盤】靈寶五劫天輪：第 ${selectedIsland.kalpaIndex + 1} 劫期【${selectedIsland.title.split('：')[0]}】`;
