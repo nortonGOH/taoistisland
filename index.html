@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>道教科儀與思想史：星辰・命籍・身體・生命 式盤系統</title>
+  <title>道教科儀與思想史：靈寶五劫天輪式盤系統</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js, OrbitControls, TWEEN -->
@@ -46,14 +46,14 @@
   <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[500px] z-10 pointer-events-none">
     <div class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">道教思想史式盤體系</span>
-        <span class="text-xs text-slate-400">中央天樞 × 十二生肖辰位</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">靈寶大劫運度專題</span>
+        <span class="text-xs text-slate-400">玄都玉京樞紐 × 靈寶五劫天輪</span>
       </div>
       <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
-        道教科儀與思想史：星辰・命籍・身體・生命 式盤系統
+        道教科儀與思想史：靈寶五劫天輪式盤系統
       </h1>
       <p class="text-[11px] text-slate-300 leading-relaxed">
-        中央天盤以「北斗七星」為樞紐總攝眾靈；環周分列十二生肖辰位，呈現秦漢考古冥官、漢魏六朝、隋唐五代敦煌文書至宋元全真內丹之身命演化網絡。
+        中央為玄都玉京真文母源；外環巨型扇區（內徑 9.7、外徑 12.5）獨立呈現靈寶五劫（龍漢、延康、赤明、開皇、上皇）之宇宙大劫運度與文獻考證。
       </p>
     </div>
   </header>
@@ -71,53 +71,29 @@
     </button>
   </div>
 
-  <!-- 核心入口速選列（依歷史流變與十二生肖配列） -->
-  <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-64 max-h-[85vh] overflow-y-auto custom-scrollbar">
-    <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">歷史流變 / 十二生肖辰位</span>
-    <button onclick="selectIslandById('beidou')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>中央天樞：北斗五斗分司</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+  <!-- 靈寶五劫天輪專屬入口速選列 -->
+  <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-68 max-h-[85vh] overflow-y-auto custom-scrollbar">
+    <span class="text-[10px] text-cyan-400 font-bold px-2 py-1 uppercase tracking-wider">靈寶五劫天輪選單</span>
+    <button onclick="selectIslandById('beidou')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>中央樞紐：玄都玉京天台</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
     </button>
+
     <div class="h-px bg-slate-800 my-1"></div>
-    <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【先秦秦漢・漢魏晉南北朝】</span>
-    <button onclick="selectIslandById('sector_0')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐭 子鼠｜先秦命論與天師從數到籍</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+    <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【外環：靈寶經派五劫期】</span>
+    <button onclick="selectIslandById('kalpa_longhan')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>🌌 龍漢劫｜真文始萌・人民淳樸</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
     </button>
-    <button onclick="selectIslandById('sector_1')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐮 丑牛｜王充命義與太平經身即宇宙</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    <button onclick="selectIslandById('kalpa_yankang')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>🌑 延康劫｜真文隱光・天地幽冥</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
-    <button onclick="selectIslandById('sector_2')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐯 寅虎｜九天胎變、司命勒籍與解承負</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    <button onclick="selectIslandById('kalpa_chiming')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>🔥 赤明劫｜赤明開光・天地復位</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
     </button>
-    <button onclick="selectIslandById('sector_3')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐰 卯兔｜二十四結節生理病理學</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    <button onclick="selectIslandById('kalpa_kaihuang')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>☀️ 開皇劫｜開通三象・天地復正</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
-    <button onclick="selectIslandById('sector_4')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐲 辰龍｜陶弘景亦離亦合與法體純潔性</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_5')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐍 巳蛇｜太陰煉形與政治命籍審判</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_6')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐴 午馬｜北斗七真與真誥存星臥斗</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-    </button>
-    <div class="h-px bg-slate-800 my-1"></div>
-    <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【六朝古靈寶與隋唐五代】</span>
-    <button onclick="selectIslandById('sector_7')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐑 未羊｜七星移度與靈寶三十五燈</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_8')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐵 申猴｜蕭吉五行大義地支配星</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_9')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐔 酉雞｜敦煌產經星糧與受生借貸</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_10')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐶 戌狗｜十一曜輸入與南極丹書步斗</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-    </button>
-    <div class="h-px bg-slate-800 my-1"></div>
-    <span class="text-[9px] text-slate-400 px-2 uppercase font-semibold">【宋元明清內丹超越】</span>
-    <button onclick="selectIslandById('sector_11')" class="px-2.5 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐗 亥豬｜全真性不死與馮道真墓七星冠</span><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+    <button onclick="selectIslandById('kalpa_shanghuang')" class="px-2.5 py-1.5 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>✨ 上皇劫｜人心日偽・廣行救度</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
     </button>
   </div>
 
@@ -126,43 +102,36 @@
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
         <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
-        <span id="drawer-status" class="text-[11px] text-amber-400/90 font-medium">文獻已審查</span>
+        <span id="drawer-status" class="text-[11px] text-cyan-400 font-medium">考證已審查</span>
       </div>
       <button onclick="closeDrawer()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
 
-    <!-- 標題與理論模式 -->
     <div class="mt-4">
-      <div class="text-xs font-mono text-slate-400" id="drawer-coord">天盤樞機</div>
-      <h2 id="drawer-title" class="text-xl font-bold text-slate-100 mt-1">概念節點</h2>
+      <div class="text-xs font-mono text-slate-400" id="drawer-coord">天輪樞機</div>
+      <h2 id="drawer-title" class="text-xl font-bold text-slate-100 mt-1">劫期節點</h2>
       <p id="drawer-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
     </div>
 
-    <!-- 動態填入的階層內容 -->
     <div id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
   </aside>
 
-  <!-- 中央彈出式對話方塊 (Modal Dialog for Step 4 Narrative) -->
+  <!-- 中央彈出式對話方塊 (Modal Dialog) -->
   <div id="narrative-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-200">
-    <div class="relative w-full max-w-2xl bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-      <!-- 彈窗頂部欄 -->
+    <div class="relative w-full max-w-2xl bg-slate-900/95 border border-cyan-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
         <div class="flex items-center gap-2.5">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">步驟四：深度論述</span>
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">步驟四：深度論述</span>
           <h3 id="modal-title" class="text-sm font-bold text-slate-100">文獻專題闡釋</h3>
         </div>
         <button onclick="closeNarrativeModal()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
-      <!-- 彈窗內容區 -->
-      <div id="modal-body" class="p-6 overflow-y-auto custom-scrollbar text-sm text-slate-200 leading-relaxed space-y-3.5 font-sans">
-        <!-- 內容動態注入 -->
-      </div>
-      <!-- 彈窗底部欄 -->
+      <div id="modal-body" class="p-6 overflow-y-auto custom-scrollbar text-sm text-slate-200 leading-relaxed space-y-3.5 font-sans"></div>
       <div class="flex justify-end px-6 py-3 border-t border-slate-800 bg-slate-950/40">
         <button onclick="closeNarrativeModal()" class="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 transition-colors">
           關閉
@@ -171,7 +140,7 @@
     </div>
   </div>
 
-  <!-- JavaScript 控制與非同步資料載入 -->
+  <!-- JavaScript 控制與獨立五劫天輪生成 -->
   <script>
     let ISLANDS_DATA = [];
     let scene, camera, renderer, controls;
@@ -180,28 +149,22 @@
     let selectedIsland = null;
     const clickableMeshes = [];
 
-    const INNER_RADIUS = 3.4;
-    const RING_INNER = 3.8;
-    const RING_OUTER = 9.4;
-    const DISK_HEIGHT = 0.65;
-    const TOTAL_SECTORS = 12;
+    // 天輪幾何尺寸：中央天樞半徑 3.8，外環靈寶五劫扇區 內徑 9.7、外徑 12.5（無十二辰環）
+    const INNER_RADIUS = 3.8;
+    const KALPA_RING_INNER = 9.7;
+    const KALPA_RING_OUTER = 12.5;
+    const DISK_HEIGHT = 0.7;
+    const TOTAL_KALPAS = 5;
 
-    const ZODIAC_LIST = [
-      { branch: "子", animal: "鼠", emoji: "🐭" },
-      { branch: "丑", animal: "牛", emoji: "🐮" },
-      { branch: "寅", animal: "虎", emoji: "🐯" },
-      { branch: "卯", animal: "兔", emoji: "🐰" },
-      { branch: "辰", animal: "龍", emoji: "🐲" },
-      { branch: "巳", animal: "蛇", emoji: "🐍" },
-      { branch: "午", animal: "馬", emoji: "🐴" },
-      { branch: "未", animal: "羊", emoji: "🐑" },
-      { branch: "申", animal: "猴", emoji: "🐵" },
-      { branch: "酉", animal: "雞", emoji: "🐔" },
-      { branch: "戌", animal: "狗", emoji: "🐶" },
-      { branch: "亥", animal: "豬", emoji: "🐗" }
+    const KALPA_BADGES = [
+      { id: "kalpa_longhan", name: "龍漢", emoji: "🌌", color: "#38bdf8" },
+      { id: "kalpa_yankang", name: "延康", emoji: "🌑", color: "#94a3b8" },
+      { id: "kalpa_chiming", name: "赤明", emoji: "🔥", color: "#f97316" },
+      { id: "kalpa_kaihuang", name: "開皇", emoji: "☀️", color: "#10b981" },
+      { id: "kalpa_shanghuang", name: "上皇", emoji: "✨", color: "#a855f7" }
     ];
 
-    function createZodiacBadgeTexture(zodiac, colorHex) {
+    function createBadgeTexture(emoji, text, colorHex) {
       const canvas = document.createElement("canvas");
       canvas.width = 256;
       canvas.height = 256;
@@ -209,7 +172,7 @@
 
       ctx.beginPath();
       ctx.arc(128, 128, 110, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.fillStyle = "rgba(15, 23, 42, 0.9)";
       ctx.fill();
       ctx.lineWidth = 8;
       ctx.strokeStyle = colorHex;
@@ -224,11 +187,11 @@
       ctx.font = "80px sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(zodiac.emoji, 128, 105);
+      ctx.fillText(emoji, 128, 105);
 
-      ctx.font = "bold 40px sans-serif";
+      ctx.font = "bold 38px sans-serif";
       ctx.fillStyle = colorHex;
-      ctx.fillText(`${zodiac.branch}・${zodiac.animal}`, 128, 185);
+      ctx.fillText(text, 128, 185);
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
@@ -251,13 +214,12 @@
 
         initScene();
       } catch (error) {
-        console.error("文獻載入失敗：", error);
+        console.error("資料載入失敗：", error);
         document.getElementById("canvas-container").innerHTML = `
           <div class="flex items-center justify-center h-full px-4">
             <div class="bg-rose-950/90 border border-rose-500 text-rose-200 px-6 py-5 rounded-xl max-w-lg text-sm shadow-2xl">
               <h3 class="font-bold text-base mb-2">⚠️ 資料庫 (islands.json) 讀取失敗</h3>
-              <p class="text-xs leading-relaxed text-rose-300 mb-2">若您是在本機直接雙擊開啟 HTML 檔案，瀏覽器安全性限制（CORS）會阻擋非同步讀取同目錄下的 JSON 檔案。</p>
-              <p class="text-xs text-rose-400">請將檔案上傳至 GitHub Pages 託管，或在本機使用簡易 HTTP 伺服器開啟。</p>
+              <p class="text-xs leading-relaxed text-rose-300 mb-2">請確認本機有開啟 HTTP 伺服器，或已正確發布至 GitHub Pages。</p>
             </div>
           </div>
         `;
@@ -269,10 +231,10 @@
 
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0x060911);
-      scene.fog = new THREE.FogExp2(0x060911, 0.02);
+      scene.fog = new THREE.FogExp2(0x060911, 0.016);
 
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(0, 21, 24);
+      camera.position.set(0, 26, 30);
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -286,25 +248,25 @@
       controls.dampingFactor = 0.06;
       controls.maxPolarAngle = Math.PI / 2 - 0.05;
       controls.minDistance = 6;
-      controls.maxDistance = 55;
+      controls.maxDistance = 75;
       controls.target.set(0, 0, 0);
 
       raycaster = new THREE.Raycaster();
       mouse = new THREE.Vector2();
 
-      const ambientLight = new THREE.AmbientLight(0x23324d, 1.4);
+      const ambientLight = new THREE.AmbientLight(0x23324d, 1.5);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xe2e8f0, 1.6);
-      dirLight.position.set(12, 25, 14);
+      const dirLight = new THREE.DirectionalLight(0xe2e8f0, 1.8);
+      dirLight.position.set(15, 30, 18);
       dirLight.castShadow = true;
       dirLight.shadow.mapSize.width = 2048;
       dirLight.shadow.mapSize.height = 2048;
       dirLight.shadow.bias = -0.0005;
       scene.add(dirLight);
 
-      const centerLight = new THREE.PointLight(0x38bdf8, 2.4, 28);
-      centerLight.position.set(0, 3, 0);
+      const centerLight = new THREE.PointLight(0x38bdf8, 2.8, 35);
+      centerLight.position.set(0, 4, 0);
       scene.add(centerLight);
 
       createStarfield();
@@ -324,12 +286,12 @@
 
     function createStarfield() {
       const starGeo = new THREE.BufferGeometry();
-      const count = 450;
+      const count = 600;
       const positions = new Float32Array(count * 3);
       for (let i = 0; i < count * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 140;
-        positions[i + 1] = Math.random() * 50 - 5;
-        positions[i + 2] = (Math.random() - 0.5) * 140;
+        positions[i] = (Math.random() - 0.5) * 180;
+        positions[i + 1] = Math.random() * 70 - 5;
+        positions[i + 2] = (Math.random() - 0.5) * 180;
       }
       starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
       const starMat = new THREE.PointsMaterial({
@@ -341,170 +303,129 @@
       scene.add(new THREE.Points(starGeo, starMat));
     }
 
-    function createBeidouAsterism() {
-      const group = new THREE.Group();
+    // 建立厚度扇區模型
+    function createSectorMesh(startAng, endAng, innerR, outerR, colorHex) {
+      const shape = new THREE.Shape();
+      const segments = 32;
+      for (let s = 0; s <= segments; s++) {
+        const theta = startAng + (endAng - startAng) * (s / segments);
+        const x = Math.cos(theta) * outerR;
+        const y = Math.sin(theta) * outerR;
+        if (s === 0) shape.moveTo(x, y);
+        else shape.lineTo(x, y);
+      }
+      for (let s = segments; s >= 0; s--) {
+        const theta = startAng + (endAng - startAng) * (s / segments);
+        const x = Math.cos(theta) * innerR;
+        const y = Math.sin(theta) * innerR;
+        shape.lineTo(x, y);
+      }
+      shape.closePath();
 
-      const starCoords = [
-        { name: "天樞", x: -1.4, z: 0.8 },
-        { name: "天璇", x: -1.2, z: -0.6 },
-        { name: "天璣", x: 0.1,  z: -0.7 },
-        { name: "天權", x: 0.3,  z: 0.4 },
-        { name: "玉衡", x: 1.1,  z: 0.9 },
-        { name: "開陽", x: 1.7,  z: 0.5 },
-        { name: "搖光", x: 2.2,  z: -0.2 }
-      ];
+      const extrudeSettings = {
+        depth: DISK_HEIGHT,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.06,
+        bevelThickness: 0.06
+      };
 
-      const starMat = new THREE.MeshStandardMaterial({
-        color: 0x38bdf8,
-        emissive: 0x0284c7,
-        emissiveIntensity: 0.8,
-        roughness: 0.2
+      const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geo.rotateX(Math.PI / 2);
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: 0x111c30,
+        roughness: 0.5,
+        metalness: 0.25
       });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.y = DISK_HEIGHT / 2;
+      mesh.receiveShadow = true;
+      mesh.castShadow = true;
 
-      starCoords.forEach(pos => {
-        const starMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), starMat);
-        starMesh.position.set(pos.x, DISK_HEIGHT / 2 + 0.35, pos.z);
-        group.add(starMesh);
-      });
-
-      const lineMat = new THREE.LineBasicMaterial({
-        color: 0x38bdf8,
+      const edgeGeo = new THREE.EdgesGeometry(geo);
+      const edgeMat = new THREE.LineBasicMaterial({
+        color: colorHex,
         transparent: true,
-        opacity: 0.85,
-        linewidth: 2
+        opacity: 0.85
       });
+      mesh.add(new THREE.LineSegments(edgeGeo, edgeMat));
 
-      const linePoints = [
-        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
-        new THREE.Vector3(starCoords[1].x, DISK_HEIGHT / 2 + 0.35, starCoords[1].z),
-        new THREE.Vector3(starCoords[2].x, DISK_HEIGHT / 2 + 0.35, starCoords[2].z),
-        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
-        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
-        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
-        new THREE.Vector3(starCoords[4].x, DISK_HEIGHT / 2 + 0.35, starCoords[4].z),
-        new THREE.Vector3(starCoords[5].x, DISK_HEIGHT / 2 + 0.35, starCoords[5].z),
-        new THREE.Vector3(starCoords[6].x, DISK_HEIGHT / 2 + 0.35, starCoords[6].z)
-      ];
-
-      const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
-      const beidouLines = new THREE.Line(lineGeo, lineMat);
-      group.add(beidouLines);
-
-      return group;
+      return mesh;
     }
 
     function buildDialSystem() {
-      // 1. 中央天盤樞機 (北斗七星)
+      // 1. 中央玄都玉京天樞樞紐圓台 (不含十二辰宮)
       const centerGeo = new THREE.CylinderGeometry(INNER_RADIUS, INNER_RADIUS, DISK_HEIGHT, 48);
       const centerMat = new THREE.MeshStandardMaterial({
-        color: 0x111c30,
-        roughness: 0.4,
-        metalness: 0.3
+        color: 0x0f1a2e,
+        roughness: 0.35,
+        metalness: 0.4
       });
       const centerMesh = new THREE.Mesh(centerGeo, centerMat);
       centerMesh.receiveShadow = true;
       centerMesh.castShadow = true;
 
       const centerEdgeGeo = new THREE.EdgesGeometry(centerGeo);
-      const centerEdgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.8 });
+      const centerEdgeMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
       centerMesh.add(new THREE.LineSegments(centerEdgeGeo, centerEdgeMat));
 
-      const beidouGroup = createBeidouAsterism();
-      centerMesh.add(beidouGroup);
+      // 中央懸浮八面體金光結晶
+      const crystalGeo = new THREE.OctahedronGeometry(1.1, 0);
+      const crystalMat = new THREE.MeshStandardMaterial({
+        color: 0x38bdf8,
+        emissive: 0x0284c7,
+        emissiveIntensity: 0.7,
+        roughness: 0.15
+      });
+      const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
+      crystalMesh.position.y = DISK_HEIGHT / 2 + 1.4;
+      centerMesh.add(crystalMesh);
 
       const beidouData = ISLANDS_DATA.find(d => d.id === "beidou");
       centerMesh.userData = {
         data: beidouData,
-        markerMesh: beidouGroup,
+        markerMesh: crystalMesh,
         focusPos: new THREE.Vector3(0, 0, 0)
       };
       scene.add(centerMesh);
       clickableMeshes.push(centerMesh);
 
-      // 2. 外環十二生肖辰位扇區
-      const sectorAngle = (Math.PI * 2) / TOTAL_SECTORS;
-      const angleGap = 0.035;
+      // 2. 獨立環：靈寶五劫天輪 (內徑 9.7、外徑 12.5，五等分巨型扇區)
+      const kalpaAngle = (Math.PI * 2) / TOTAL_KALPAS;
+      const kalpaGap = 0.035;
 
-      for (let i = 0; i < TOTAL_SECTORS; i++) {
-        const startAng = i * sectorAngle + angleGap / 2;
-        const endAng = (i + 1) * sectorAngle - angleGap / 2;
+      for (let k = 0; k < TOTAL_KALPAS; k++) {
+        const startAng = k * kalpaAngle + kalpaGap / 2;
+        const endAng = (k + 1) * kalpaAngle - kalpaGap / 2;
 
-        const shape = new THREE.Shape();
-        const segments = 24;
-        for (let s = 0; s <= segments; s++) {
-          const theta = startAng + (endAng - startAng) * (s / segments);
-          const x = Math.cos(theta) * RING_OUTER;
-          const y = Math.sin(theta) * RING_OUTER;
-          if (s === 0) shape.moveTo(x, y);
-          else shape.lineTo(x, y);
-        }
-        for (let s = segments; s >= 0; s--) {
-          const theta = startAng + (endAng - startAng) * (s / segments);
-          const x = Math.cos(theta) * RING_INNER;
-          const y = Math.sin(theta) * RING_INNER;
-          shape.lineTo(x, y);
-        }
-        shape.closePath();
+        const kalpaData = ISLANDS_DATA.find(d => d.kalpaIndex === k);
+        const kalpaMesh = createSectorMesh(startAng, endAng, KALPA_RING_INNER, KALPA_RING_OUTER, kalpaData ? kalpaData.hexColor : "#38bdf8");
 
-        const extrudeSettings = {
-          depth: DISK_HEIGHT,
-          bevelEnabled: true,
-          bevelSegments: 2,
-          steps: 1,
-          bevelSize: 0.05,
-          bevelThickness: 0.05
-        };
-
-        const sectorGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-        sectorGeo.rotateX(Math.PI / 2);
-
-        const sectorData = ISLANDS_DATA.find(d => d.sectorIndex === i);
-        const sectorMat = new THREE.MeshStandardMaterial({
-          color: 0x16233b,
-          roughness: 0.55,
-          metalness: 0.2
-        });
-
-        const sectorMesh = new THREE.Mesh(sectorGeo, sectorMat);
-        sectorMesh.position.y = DISK_HEIGHT / 2;
-        sectorMesh.receiveShadow = true;
-        sectorMesh.castShadow = true;
-
-        const edgeGeo = new THREE.EdgesGeometry(sectorGeo);
-        const edgeMat = new THREE.LineBasicMaterial({
-          color: sectorData ? sectorData.color : 0x334155,
-          transparent: true,
-          opacity: 0.75
-        });
-        sectorMesh.add(new THREE.LineSegments(edgeGeo, edgeMat));
-
-        const midAngle = i * sectorAngle + sectorAngle / 2;
-        const midRadius = (RING_INNER + RING_OUTER) / 2;
+        const midAngle = k * kalpaAngle + kalpaAngle / 2;
+        const midRadius = (KALPA_RING_INNER + KALPA_RING_OUTER) / 2;
         const posX = Math.cos(midAngle) * midRadius;
         const posZ = -Math.sin(midAngle) * midRadius;
 
-        const zodiac = ZODIAC_LIST[i];
-        const badgeTexture = createZodiacBadgeTexture(zodiac, sectorData ? sectorData.hexColor : "#fbbf24");
-        const spriteMat = new THREE.SpriteMaterial({
-          map: badgeTexture,
-          transparent: true,
-          depthTest: true
-        });
+        const kBadge = KALPA_BADGES[k];
+        const badgeTexture = createBadgeTexture(kBadge.emoji, `${kBadge.name}劫`, kalpaData ? kalpaData.hexColor : "#38bdf8");
+        const spriteMat = new THREE.SpriteMaterial({ map: badgeTexture, transparent: true, depthTest: true });
         const badgeSprite = new THREE.Sprite(spriteMat);
-        badgeSprite.scale.set(1.4, 1.4, 1.0);
-        badgeSprite.position.set(posX, DISK_HEIGHT / 2 + 1.25, posZ);
+        badgeSprite.scale.set(1.9, 1.9, 1.0);
+        badgeSprite.position.set(posX, DISK_HEIGHT / 2 + 1.5, posZ);
         scene.add(badgeSprite);
 
-        sectorMesh.userData = {
-          data: sectorData,
+        kalpaMesh.userData = {
+          data: kalpaData,
           markerMesh: badgeSprite,
           focusPos: new THREE.Vector3(posX, 0, posZ)
         };
-        badgeSprite.userData = sectorMesh.userData;
+        badgeSprite.userData = kalpaMesh.userData;
 
-        clickableMeshes.push(sectorMesh);
+        clickableMeshes.push(kalpaMesh);
         clickableMeshes.push(badgeSprite);
-        scene.add(sectorMesh);
+        scene.add(kalpaMesh);
       }
     }
 
@@ -543,7 +464,7 @@
         .start();
 
       new TWEEN.Tween(camera.position)
-        .to({ x: targetPos.x + 5, y: 8, z: targetPos.z + 8 }, 800)
+        .to({ x: targetPos.x + 6, y: 9, z: targetPos.z + 10 }, 800)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
@@ -577,7 +498,7 @@
     function openNarrativeModal() {
       if (!selectedIsland) return;
       const modal = document.getElementById("narrative-modal");
-      document.getElementById("modal-title").textContent = `${selectedIsland.title}・深度論述`;
+      document.getElementById("modal-title").textContent = `${selectedIsland.title}・深度考證論述`;
       document.getElementById("modal-body").innerHTML = selectedIsland.beginner.step4_narrative || "<p>暫無詳細論述。</p>";
       modal.classList.remove("hidden");
     }
@@ -602,10 +523,9 @@
       document.getElementById("drawer-title").textContent = selectedIsland.title;
       document.getElementById("drawer-subtitle").textContent = selectedIsland.subtitle;
 
-      let posText = "天盤樞機：中央天極北斗七星";
-      if (!selectedIsland.isCenter) {
-        const zodiac = ZODIAC_LIST[selectedIsland.sectorIndex];
-        posText = `圓盤位階：第 ${selectedIsland.sectorIndex + 1} 辰位【${zodiac.emoji} ${zodiac.branch}・${zodiac.animal}】（${selectedIsland.modelType}）`;
+      let posText = "天輪樞機：玄都玉京天台";
+      if (selectedIsland.isKalpa) {
+        posText = `靈寶大劫天輪：第 ${selectedIsland.kalpaIndex + 1} 劫期【${selectedIsland.title.split('：')[0]}】（${selectedIsland.modelType}）`;
       }
       document.getElementById("drawer-coord").textContent = posText;
       
@@ -635,14 +555,13 @@
                 ${selectedIsland.beginner.step3_evidence}
               </blockquote>
             </div>
-            <!-- 步驟四：點選彈跳出中央對話方塊 -->
             <div class="pt-1">
-              <button onclick="openNarrativeModal()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-amber-600/30 to-amber-500/20 border border-amber-500/50 hover:border-amber-400 text-amber-200 hover:text-white transition-all shadow-lg flex items-center justify-between group">
+              <button onclick="openNarrativeModal()" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500/20 via-cyan-600/30 to-cyan-500/20 border border-cyan-500/50 hover:border-cyan-400 text-cyan-200 hover:text-white transition-all shadow-lg flex items-center justify-between group">
                 <span class="text-xs font-bold flex items-center gap-2">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 group-hover:scale-125 transition-transform"></span>
-                  【步驟四：內容敘述】點擊開啟深度論述對話方塊
+                  <span class="w-2 h-2 rounded-full bg-cyan-400 group-hover:scale-125 transition-transform"></span>
+                  【步驟四：內容敘述】開啟專題考證對話方塊
                 </span>
-                <svg class="w-4 h-4 text-amber-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                 </svg>
               </button>
@@ -651,13 +570,13 @@
         `;
       } else if (currentMode === "course") {
         const materialsList = selectedIsland.course.materials
-          .map(m => `<li class="font-serif text-slate-200 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${m}</li>`)
+          .map(m => `<li class="font-serif text-slate-200 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>${m}</li>`)
           .join("");
 
         contentBox.innerHTML = `
           <div class="space-y-4">
-            <div class="p-3.5 rounded-lg bg-amber-950/30 border border-amber-600/40">
-              <span class="text-[10px] uppercase font-mono font-bold text-amber-400 block mb-1">【課程主題地圖位階】</span>
+            <div class="p-3.5 rounded-lg bg-cyan-950/30 border border-cyan-600/40">
+              <span class="text-[10px] uppercase font-mono font-bold text-cyan-400 block mb-1">【課程主題地圖位階】</span>
               <p class="text-xs font-medium text-slate-100">${selectedIsland.course.topicMap}</p>
             </div>
             <div class="p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
@@ -665,7 +584,7 @@
               <ul class="space-y-1.5 text-xs">${materialsList}</ul>
             </div>
             <div class="p-3.5 rounded-lg bg-slate-800/60 border border-slate-700/60">
-              <span class="text-[10px] uppercase font-mono font-bold text-cyan-400 block mb-1">【課堂思辨與比較問題】</span>
+              <span class="text-[10px] uppercase font-mono font-bold text-cyan-300 block mb-1">【課堂思辨與比較問題】</span>
               <p class="text-xs text-slate-300 leading-relaxed">${selectedIsland.course.comparisons}</p>
             </div>
           </div>
@@ -675,7 +594,7 @@
           <div class="space-y-4 font-mono text-[11px]">
             <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
               <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【索引檢索詞 (Search Terms)】</span>
-              <code class="text-amber-300 text-xs">${selectedIsland.researcher.searchTerms}</code>
+              <code class="text-cyan-300 text-xs">${selectedIsland.researcher.searchTerms}</code>
             </div>
             <div class="p-3 rounded-lg bg-slate-800/80 border border-slate-700">
               <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1 font-sans">【原典圖像 / 寫本標引】</span>
@@ -711,16 +630,19 @@
 
       const t = time * 0.0015;
 
+      // 中央結晶微轉動
       const centerObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "beidou");
       if (centerObj && centerObj.userData.markerMesh) {
-        centerObj.userData.markerMesh.rotation.y = t * 0.2;
+        centerObj.userData.markerMesh.rotation.y = t * 0.4;
+        centerObj.userData.markerMesh.rotation.x = Math.sin(t) * 0.2;
       }
 
+      // 外環靈寶五劫徽章呼吸浮動
       clickableMeshes.forEach((mesh, idx) => {
         if (!mesh.userData.data || mesh.userData.data.id === "beidou") return;
         const marker = mesh.userData.markerMesh;
         if (marker && marker.isSprite) {
-          marker.position.y = (DISK_HEIGHT / 2 + 1.25) + Math.sin(t * 1.5 + idx) * 0.08;
+          marker.position.y = (DISK_HEIGHT / 2 + 1.5) + Math.sin(t * 1.5 + idx) * 0.09;
         }
       });
 
