@@ -177,3 +177,10 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 .wuqi-across-panel th,.wuqi-across-panel td { padding:8px 5px; text-align:left; border-bottom:1px solid #8899bb33; vertical-align:top; }
 .wuqi-across-panel caption { padding:9px 0; text-align:left; color:#b2c3de; font-size:12px; }
 .wuqi-across-panel tr[data-selected="true"] { background:#cfb7771a; }
+
+/* Collapse the entire introduction beyond the left edge; retain a compact return control. */
+#left-panel { transition: transform 300ms ease; }
+.left-panel-collapsed #left-panel { transform: translateX(calc(-100% - 40px)); pointer-events: none; }
+#left-panel-trigger { position:fixed;left:0;top:16px;z-index:45;padding:10px 9px;min-height:44px;color:#e0e7ff;background:rgba(15,23,42,.96);border:1px solid #475569;border-left:0;border-radius:0 10px 10px 0;box-shadow:0 4px 16px #02061780; }
+.text-view header.left-panel-collapsed { height:0; padding:0; }
+.text-view .left-panel-collapsed #left-panel { position:absolute;top:0;left:0; }

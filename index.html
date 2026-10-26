@@ -44,6 +44,7 @@
   <div id="canvas-container" class="absolute inset-0"></div>
 
   <!-- 【左側面板】：已改為「多層次道教思想史」簡約頂部與可收放容器 -->
+  <button id="left-panel-trigger" type="button" hidden aria-label="展開多層次道教思想史說明" aria-controls="left-panel" aria-expanded="false" onclick="toggleLeftPanel()">說明 ›</button>
   <header class="absolute top-4 left-4 z-20 pointer-events-none">
     <div id="left-panel" class="bg-slate-900/95 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto w-[calc(100vw-2rem)] sm:w-[560px] md:w-[620px] transition-all duration-300">
       
@@ -52,7 +53,7 @@
         <h1 class="text-base font-bold text-slate-100 tracking-wide leading-snug">
           多層次道教思想史
         </h1>
-        <button id="btn-toggle-left" aria-expanded="true" aria-controls="left-panel-content" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs">
+        <button id="btn-toggle-left" aria-expanded="true" aria-controls="left-panel" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs">
           <span id="left-collapse-text">收合說明</span>
           <svg id="left-collapse-icon" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7-7" />
@@ -340,21 +341,17 @@
     let dynamicYujingAura = null;
 
     function toggleLeftPanel() {
-      const content = document.getElementById("left-panel-content");
-      const icon = document.getElementById("left-collapse-icon");
-      const text = document.getElementById("left-collapse-text");
-      isLeftPanelCollapsed = !isLeftPanelCollapsed;
-      document.getElementById('btn-toggle-left').setAttribute('aria-expanded', String(!isLeftPanelCollapsed));
-
-      if (isLeftPanelCollapsed) {
-        content.style.display = "none";
-        icon.style.transform = "rotate(180deg)";
-        if (text) text.textContent = "展開說明";
-      } else {
-        content.style.display = "block";
-        icon.style.transform = "rotate(0deg)";
-        if (text) text.textContent = "收合說明";
-      }
+      const panel=document.getElementById('left-panel');
+      const trigger=document.getElementById('left-panel-trigger');
+      const shouldReturnFocus=panel.contains(document.activeElement);
+      isLeftPanelCollapsed=!isLeftPanelCollapsed;
+      panel.closest('header').classList.toggle('left-panel-collapsed',isLeftPanelCollapsed);
+      panel.setAttribute('aria-hidden',String(isLeftPanelCollapsed));
+      panel.inert=isLeftPanelCollapsed;
+      trigger.hidden=!isLeftPanelCollapsed;
+      document.getElementById('btn-toggle-left').setAttribute('aria-expanded',String(!isLeftPanelCollapsed));
+      if(isLeftPanelCollapsed && shouldReturnFocus)trigger.focus();
+      if(!isLeftPanelCollapsed)document.getElementById('btn-toggle-left').focus();
     }
 
     function toggleRightPanel() {
@@ -534,7 +531,7 @@
         if (!window.THREE || !THREE.OrbitControls || !window.TWEEN) throw new Error('3D 元件未載入');
         initScene();
         sceneReady = true;
-        setLoadStatus('3D 已就緒。亦可切換文字閱讀。');
+        setLoadStatus('');
         renderer.domElement.addEventListener('webglcontextlost', event => {
           event.preventDefault();
           sceneReady = false;
@@ -1243,7 +1240,7 @@
     }
 
     function onPointerDown(event) {
-      if (event.target.closest?.("header, #right-panel, #right-panel-trigger, #reader-modes, #side-drawer, #load-status")) return;
+      if (event.target.closest?.("header, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes, #side-drawer, #load-status")) return;
       if (!document.getElementById("narrative-modal").classList.contains("hidden")) return;
 
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -1565,7 +1562,7 @@
       removeOutboundLinks(document.getElementById("modal-body"));
       modalReturnFocus = document.activeElement;
       modal.classList.remove("hidden");
-      document.querySelectorAll('header, #right-panel, #right-panel-trigger, #side-drawer, #reader-modes').forEach(el => el.inert = true);
+      document.querySelectorAll('header, #left-panel-trigger, #right-panel, #right-panel-trigger, #side-drawer, #reader-modes').forEach(el => el.inert = true);
       modal.querySelector('button').focus();
     }
 
@@ -1573,7 +1570,7 @@
       const modal = document.getElementById('narrative-modal');
       if (modal.classList.contains('hidden')) return;
       modal.classList.add('hidden');
-      document.querySelectorAll('header, #right-panel, #right-panel-trigger, #reader-modes').forEach(el => el.inert = false);
+      document.querySelectorAll('header, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes').forEach(el => el.inert = false);
       document.getElementById('side-drawer').inert = !selectedIsland;
       if (modalReturnFocus?.isConnected) modalReturnFocus.focus();
     }
@@ -1811,6 +1808,7 @@
     function setLoadStatus(message, error = false) {
       const status = document.getElementById('load-status');
       status.textContent = message;
+      status.hidden = !message;
       status.dataset.error = String(error);
     }
 

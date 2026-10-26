@@ -6,6 +6,17 @@ const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http:
 const b=await chromium.launch({...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await b.newPage({viewport:{width:1440,height:960}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
 await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady).catch(e=>{console.error('Scene initialization errors:',errors);throw e;});
+assert.equal(await p.locator('#load-status').isVisible(),false);
+for(const width of [1440,390]){
+ await p.setViewportSize({width,height:960});
+ if(await p.locator('#left-panel-trigger').isVisible())await p.locator('#left-panel-trigger').click();
+ await p.locator('#btn-toggle-left').click();await p.waitForFunction(()=>document.getElementById('left-panel').getBoundingClientRect().right<=0);
+ const bounds=await p.locator('#left-panel').boundingBox();assert(bounds.x+bounds.width<=0,'Panel remains on screen');
+ assert(await p.locator('#left-panel-trigger').isVisible());
+ await p.locator('#left-panel-trigger').click();await p.waitForFunction(()=>document.getElementById('left-panel').getBoundingClientRect().x>=0);
+}
+await p.setViewportSize({width:1440,height:960});
+const core=await p.evaluate(()=>{const g=scene.getObjectByName('sanqing-realms');return {localZ:g.position.z,worldZ:g.getWorldPosition(new THREE.Vector3()).z,axisZ:COSMOLOGY_CENTER.z};});assert.equal(core.localZ,0);assert.equal(core.worldZ,core.axisZ);
 for(const id of ['proto_center','proto_east','proto_south','proto_west','proto_north']) {
  await p.evaluate(id=>selectIslandById(id),id);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
  const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});

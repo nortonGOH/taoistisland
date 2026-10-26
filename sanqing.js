@@ -29,23 +29,23 @@ function buildSanqingRealms(parent) {
   if (!data?.sanqing) return;
   const group = new THREE.Group();
   group.name = 'sanqing-realms';
-  group.position.set(0,22,4.5);
+  group.position.set(0,22,0);
   parent.add(group);
-  const bridgeCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,28.4,2.5),new THREE.Vector3(0,27.2,3.6),new THREE.Vector3(0,25.7,4.7)]);
+  const bridgeCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,28.4,0),new THREE.Vector3(0,27.2,0),new THREE.Vector3(0,25.7,0)]);
   const bridge=new THREE.Mesh(new THREE.TubeGeometry(bridgeCurve,32,0.055,8,false),new THREE.MeshBasicMaterial({color:'#f5d58c',transparent:true,opacity:0.55}));
   bridge.name='daluo-sanqing-bridge';parent.add(bridge);
-  const focus = new THREE.Vector3(COSMOLOGY_CENTER.x,23.5,COSMOLOGY_CENTER.z+4.5);
+  const focus = new THREE.Vector3(COSMOLOGY_CENTER.x,23.5,COSMOLOGY_CENTER.z);
   function clickable(object,key=null) {
     object.userData = {data,focusPos:focus,sanqingKey:key,focusObject:object};
     if(object.isSprite) object.userData.markerMesh=object;
     clickableMeshes.push(object);
     return object;
   }
-  const sourcePos = new THREE.Vector3(0,3.7,0.2);
+  const sourcePos = new THREE.Vector3(0,3.7,0);
   const source = new THREE.Mesh(new THREE.SphereGeometry(0.56,32,24),new THREE.MeshStandardMaterial({color:'#fff7cc',emissive:'#facc15',emissiveIntensity:1.7,roughness:0.2}));
   source.position.copy(sourcePos); group.add(clickable(source));
   const sourceLabel=sanqingText(['大羅一炁','三炁分化・模式 A 示意'],'#fde68a',1024,300);
-  sourceLabel.position.set(0,4.9,0.2); sourceLabel.scale.set(5,1.46,1); group.add(clickable(sourceLabel));
+  sourceLabel.position.set(0,4.9,0); sourceLabel.scale.set(5,1.46,1); group.add(clickable(sourceLabel));
   data.sanqing.realms.forEach((realm,index)=>{
     // One rear vertex and two forward vertices, all within the fifth layer.
     const vertices = [[0,0.35,-3.4],[-4.6,-0.25,3.2],[4.6,-0.25,3.2]];
