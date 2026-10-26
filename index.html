@@ -45,26 +45,19 @@
   <!-- 【左側導言面板】可收放容器 -->
   <header class="absolute top-4 left-4 z-20 pointer-events-none">
     <div id="left-panel" class="bg-slate-900/95 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto w-[calc(100vw-2rem)] sm:w-[560px] md:w-[620px] transition-all duration-300">
-      
-      <!-- 頂部列：標籤與收合切換按鈕 -->
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">靈寶空間全息對稱體系</span>
-          <span class="text-xs text-slate-400 hidden sm:inline">風澤洞虛 ‧ 金剛乘天 ‧ 上接大羅</span>
-        </div>
-        <!-- 左側面板收合鈕 -->
-        <button id="btn-toggle-left" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs">
+    
+      <!-- 頂部列：標題與收合切換按鈕 -->
+      <div class="flex items-center justify-between mb-1">
+        <h1 class="text-base font-bold text-slate-100 tracking-wide leading-snug">
+          多層次道教思想史
+        </h1>
+        <button onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs" title="收合/展開說明">
           <span id="left-collapse-text">收合說明</span>
           <svg id="left-collapse-icon" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7-7" />
           </svg>
         </button>
       </div>
-
-      <!-- 標題 -->
-      <h1 class="text-sm font-bold text-slate-100 tracking-wide mt-2 leading-snug">
-        道教科儀與思想史：靈寶多維宇宙空間系統
-      </h1>
 
       <!-- 可收合之主體內容（文字說明與視角快捷按鈕） -->
       <div id="left-panel-content" class="transition-all duration-300">
