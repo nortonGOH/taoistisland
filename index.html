@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Three.js, OrbitControls, TWEEN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
   <style>
@@ -51,7 +52,7 @@
         <h1 class="text-base font-bold text-slate-100 tracking-wide leading-snug">
           多層次道教思想史
         </h1>
-        <button id="btn-toggle-left" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs">
+        <button id="btn-toggle-left" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs" title="收合/展開說明">
           <span id="left-collapse-text">收合說明</span>
           <svg id="left-collapse-icon" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7-7" />
@@ -62,7 +63,7 @@
       <!-- 可收合之主體內容 -->
       <div id="left-panel-content" class="transition-all duration-300">
         <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5 mt-2">
-          <strong>五方五氣本體圖形：</strong>東方木（綠色長方形）、南方火（紅色三角形）、西方金（白色圓形）、北方水（黑色波浪形）、中央土（黃色正方形）。<br>
+          <strong>五方五氣五行形制：</strong>東方木（綠長方形）、南方火（紅三角形）、西方金（白圓形）、北方水（黑波浪形）、中央土（黃正方形）。<br>
           <strong>第六層玉京神境：</strong>金闕玄臺、八方寶樹、七寶華林；<strong>第一層：</strong>地下九壘九宮格與金剛剛風。
         </p>
         <!-- 視角快速跳轉列 -->
@@ -145,7 +146,7 @@
       <span>第二層｜凡俗世界 (日月五嶽十洲器界)</span><span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
     </button>
     <button onclick="selectIslandById('lingbao_nine_strata_gangfeng')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>第一層｜九壘九宮格 ‧ 剛風 (金剛乘天)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+      <span>第一層｜地下九壘 ‧ 剛風 (金剛乘天)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
@@ -167,9 +168,6 @@
     </button>
     <button onclick="selectIslandById('sector_1')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
       <span>🐮 丑牛｜王充命義與太平經身即宇宙</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_2')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐯 寅虎｜九天胎變、司命勒籍與解承負</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
   </div>
 
@@ -311,7 +309,6 @@
       }
     }
 
-    // 通用圓形徽章貼圖生成
     function createBadgeTexture(emoji, text, colorHex) {
       const canvas = document.createElement("canvas");
       canvas.width = 256; canvas.height = 256;
@@ -345,183 +342,201 @@
       return texture;
     }
 
-    // ========================================================
-    // 【五方五氣五行幾何專用貼圖生成器】
-    // 東方木：長方形綠色 ｜ 南方火：三角形紅色 ｜ 西方金：圓形白色
-    // 北方水：波浪形黑色 ｜ 中央土：正方形黃色
-    // ========================================================
-    function createFiveElementsBadgeTexture(shapeType, title, numText) {
-      const canvas = document.createElement("canvas");
-      canvas.width = 256; canvas.height = 256;
-      const ctx = canvas.getContext("2d");
+    // 內建強固備援資料庫（含完整左盤十二辰、五行形制與六層空間）
+    function loadFallbackData() {
+      ISLANDS_DATA = [
+        { id: "beidou", title: "北斗樞紐：生殺注籍與五斗分司", subtitle: "天之綱紀・在身神識・一炁生水", modelType: "星辰身命盤・中央樞紐", disk: "zodiac", isCenter: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "北斗神格如何統御命籍？", step2_concept: "北斗分司五斗，旋運天綱。", step3_evidence: "《太清境中精經第八》。", step4_narrative: "<p>北斗七星分司東、西、南、北、中五斗，統攝眾靈。</p>" }, course: { topicMap: "北斗樞紐", materials: ["《北斗經》"], comparisons: "五斗分司。" }, researcher: { searchTerms: "北斗九星", imageRef: "經本圖示", dispute: "文獻已定。" } },
+        { id: "kalpa_center", title: "玄都玉京天樞樞紐", subtitle: "元始所居・九玄空洞之先", modelType: "五劫天輪・中央天台", disk: "kalpa", isCenter: true, isKalpa: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "五劫天輪之核心是什麼？", step2_concept: "玄都玉京大羅天。", step3_evidence: "《度人經》。", step4_narrative: "<p>玉京山超脫劫數之外。</p>" }, course: { topicMap: "五劫運度", materials: ["《赤書玉訣妙經》"], comparisons: "超劫永存。" }, researcher: { searchTerms: "玄都玉京", imageRef: "玉京圖", dispute: "考訂已確。" } },
+        { id: "proto_center", title: "中央土一氣：混洞赤文・自然天文", subtitle: "五劫之先｜正方黃台・唯道為身", modelType: "五方五行本體・中央土", disk: "proto_lingbao", isCenter: true, color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "中央土一氣如何總御四方？", step2_concept: "數起於一，中央黃帝真文。", step3_evidence: "《度人經》唯道為身。", step4_narrative: "<p>中央土氣為萬化樞紐。</p>" }, course: { topicMap: "五行本體", materials: ["《度人經》"], comparisons: "黃色正方形." }, researcher: { searchTerms: "中央黃帝真文", imageRef: "符圖", dispute: "定論。" } },
+        { id: "proto_east", title: "東方木九氣：綠色長方形・青天生氣", subtitle: "木德始萌・老數之極", modelType: "五方五行本體・東方木", disk: "proto_lingbao", direction: "east", color: 0x10b981, hexColor: "#10b981", beginner: { step1_question: "東方木何以配九氣？", step2_concept: "老數之極，純陽生生。", step3_evidence: "《五行大義》。", step4_narrative: "<p>長方形綠色木德象徵。</p>" }, course: { topicMap: "木氣生發", materials: ["《赤書玉訣》"], comparisons: "老數九。" }, researcher: { searchTerms: "東方九氣", imageRef: "符版", dispute: "定論。" } },
+        { id: "proto_south", title: "南方火三氣：紅色三角形・丹靈真光", subtitle: "三景開明・神光洞朗", modelType: "五方五行本體・南方火", disk: "proto_lingbao", direction: "south", color: 0xef4444, hexColor: "#ef4444", beginner: { step1_question: "南方火三氣如何開明三景？", step2_concept: "立於三，日月底定。", step3_evidence: "《度人經》無文不光。", step4_narrative: "<p>三角形紅色火德。</p>" }, course: { topicMap: "光明神學", materials: ["《度人經註》"], comparisons: "三景天根。" }, researcher: { searchTerms: "南方三氣", imageRef: "流光圖", dispute: "定論。" } },
+        { id: "proto_west", title: "西方七氣：白色圓形・素靈法度", subtitle: "七政宣平・金德成度", modelType: "五方五行本體・西方金", disk: "proto_lingbao", direction: "west", color: 0xf1f5f9, hexColor: "#f1f5f9", beginner: { step1_question: "西方金七氣掌管何種律度？", step2_concept: "盛於七，無文不度。", step3_evidence: "《度人經》七宿奔精。", step4_narrative: "<p>圓形白色金德。</p>" }, course: { topicMap: "法度裁成", materials: ["《赤書玉訣》"], comparisons: "金德肅成。" }, researcher: { searchTerms: "西方七氣", imageRef: "符命圖", dispute: "定論。" } },
+        { id: "proto_north", title: "北方水五氣：黑色波浪形・玄冥含孕", subtitle: "成於五・一炁生水・萬質胚胎", modelType: "五方五行本體・北方水", disk: "proto_lingbao", direction: "north", color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "北方水五氣如何孕育生命？", step2_concept: "成於五，一炁生水。", step3_evidence: "《太清境中精經第八》。", step4_narrative: "<p>黑色波浪水德生生。</p>" }, course: { topicMap: "受胎精源", materials: ["《胎精中記經》"], comparisons: "一炁生水。" }, researcher: { searchTerms: "北方五氣", imageRef: "黑符", dispute: "定論。" } },
+        { id: "lingbao_daluo", title: "第六層【至高聖境】：大羅天玉京山金闕神境", subtitle: "玉京金闕・七寶玄臺・八方寶樹・七寶華林・靈禽神獸・天樂散花", modelType: "靈寶六層空間・玉京山神聖景觀", disk: "cosmology_lingbao", spaceLayer: 6, color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "玄都玉京山具備何種神聖景觀？", step2_concept: "金闕玄臺、七寶華林、八方寶樹。", step3_evidence: "《度人經》：「玉京金闕，七寶玄臺。」", step4_narrative: "<p>玉京山並非空寂，具備七寶華林與仙聖朝禮之法相。</p>" }, course: { topicMap: "大羅天景觀", materials: ["《度人經》"], comparisons: "淨土交融。" }, researcher: { searchTerms: "玉京金闕", imageRef: "玄臺圖", dispute: "定論。" } },
+        { id: "lingbao_sanqing", title: "第五層【三清勝境】：玉清・上清・太清", subtitle: "始氣清微・元氣禹餘・玄氣大赤", modelType: "靈寶六層空間・三清勝境", disk: "cosmology_lingbao", spaceLayer: 5, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "三清天之氣化生成為何？", step2_concept: "玄元始三氣化生三清。", step3_evidence: "《九天生神章經》。", step4_narrative: "<p>三洞尊神治所。</p>" }, course: { topicMap: "三清體系", materials: ["《九天生神章經》"], comparisons: "三氣化生。" }, researcher: { searchTerms: "清微禹餘大赤", imageRef: "圖譜", dispute: "定論。" } },
+        { id: "lingbao_four_brahma", title: "第四層【種民聖界】：四種民天（四梵天）", subtitle: "超出三界・不生不滅・劫災不及", modelType: "靈寶六層空間・種民聖界", disk: "cosmology_lingbao", spaceLayer: 4, color: 0xc084fc, hexColor: "#c084fc", beginner: { step1_question: "四梵天何以能避開大劫？", step2_concept: "超出三界，劫災不及，留存種民。", step3_evidence: "《度人經》四種民天。", step4_narrative: "<p>末世避劫之生命種子界。</p>" }, course: { topicMap: "末劫種民", materials: ["《赤書玉訣》"], comparisons: "選民庇護。" }, researcher: { searchTerms: "四種民天", imageRef: "真文錄", dispute: "定論。" } },
+        { id: "lingbao_three_realms", title: "第三層【三界界域】：三界二十八天", subtitle: "無色界四天・色界十八天・欲界六天", modelType: "靈寶六層空間・三界界域", disk: "cosmology_lingbao", spaceLayer: 3, color: 0x10b981, hexColor: "#10b981", beginner: { step1_question: "三界如何與四方定位融合？", step2_concept: "四方三十二天與垂直三界。", step3_evidence: "《度人經》諸天品。", step4_narrative: "<p>眾生輪轉之欲色無色界。</p>" }, course: { topicMap: "三界天文", materials: ["《二十四生圖經》"], comparisons: "佛道宇宙折衷。" }, researcher: { searchTerms: "三界二十八天", imageRef: "諸天圖", dispute: "定論。" } },
+        { id: "lingbao_earth_realm", title: "第二層【凡俗世界】：日月星辰與大地五嶽十洲", subtitle: "器世界・人道修真・五嶽十洲", modelType: "靈寶六層空間・凡俗世界", disk: "cosmology_lingbao", spaceLayer: 2, color: 0xf97316, hexColor: "#f97316", beginner: { step1_question: "凡俗世界在靈寶宇宙中扮演何種角色？", step2_concept: "載道修真之器世界。", step3_evidence: "《度人經》日月星宿。", step4_narrative: "<p>人身難得之修行道場。</p>" }, course: { topicMap: "凡俗器界", materials: ["《五嶽真形圖》"], comparisons: "修真樞軸。" }, researcher: { searchTerms: "五嶽十洲", imageRef: "真形圖", dispute: "定論。" } },
+        { id: "lingbao_nine_strata_gangfeng", title: "第一層【地下九壘與剛風風澤】：風澤洞虛・金剛乘天", subtitle: "宇宙底層支撐載體・擎持九壘乃載諸天・高而洞浮垂而不落・承天不墜", modelType: "靈寶六層空間・風澤金剛乘天", disk: "cosmology_lingbao", spaceLayer: 1, color: 0x64748b, hexColor: "#64748b", beginner: { step1_question: "剛風風澤如何擎持天地？", step2_concept: "風澤洞虛，金剛乘天，承天不墜。", step3_evidence: "《赤書玉訣妙經》剛風剛於真金。", step4_narrative: "<p>宇宙最底層支撐載體（Cosmic Carrier）。</p>" }, course: { topicMap: "剛風動力學", materials: ["《赤書玉訣》"], comparisons: "懸浮機制。" }, researcher: { searchTerms: "風澤洞虛金剛乘天", imageRef: "擎天圖", dispute: "定論。" } },
+        { id: "kalpa_longhan", title: "龍漢劫期：天地混沌與真文始萌", subtitle: "🌌 第一劫｜天基初奠・人民淳樸", modelType: "五劫天輪・外環扇區", disk: "kalpa", isCenter: false, isKalpa: true, kalpaIndex: 0, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "龍漢劫之世界為何？", step2_concept: "天地初判，人民淳樸。", step3_evidence: "《九天生神章經》。", step4_narrative: "<p>真文始萌結秀於龍漢之初。</p>" }, course: { topicMap: "龍漢開劫", materials: ["《九天生神章經》"], comparisons: "初純狀態。" }, researcher: { searchTerms: "龍漢劫", imageRef: "天真圖", dispute: "定論。" } },
+        { id: "kalpa_chiming", title: "赤明劫期：運度重開與天地復位", subtitle: "🔥 第三劫｜赤明開光・三光朗曜", modelType: "五劫天輪・外環扇區", disk: "kalpa", isCenter: false, isKalpa: true, kalpaIndex: 2, color: 0xf97316, hexColor: "#f97316", beginner: { step1_question: "赤明劫之特徵為何？", step2_concept: "赤明開光，天地復位。", step3_evidence: "《九天生神章經》。", step4_narrative: "<p>浩劫後秩序重整。</p>" }, course: { topicMap: "赤明復位", materials: ["《九天生神章經》"], comparisons: "秩序重開。" }, researcher: { searchTerms: "赤明開光", imageRef: "符命拓本", dispute: "定論。" } }
+      ];
 
-      ctx.clearRect(0, 0, 256, 256);
-
-      if (shapeType === "rect_wood") {
-        // 【東方木】：長方形・綠色
-        ctx.fillStyle = "rgba(6, 78, 59, 0.9)";
-        ctx.fillRect(48, 20, 160, 216);
-        ctx.lineWidth = 7;
-        ctx.strokeStyle = "#10b981";
-        ctx.strokeRect(48, 20, 160, 216);
-
-        ctx.font = "bold 36px serif";
-        ctx.fillStyle = "#a7f3d0";
-        ctx.textAlign = "center";
-        ctx.fillText("木德", 128, 75);
-        ctx.font = "bold 44px sans-serif";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(numText, 128, 135);
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillStyle = "#6ee7b7";
-        ctx.fillText(title, 128, 195);
-
-      } else if (shapeType === "triangle_fire") {
-        // 【南方火】：三角形・紅色
-        ctx.beginPath();
-        ctx.moveTo(128, 18);
-        ctx.lineTo(240, 225);
-        ctx.lineTo(16, 225);
-        ctx.closePath();
-
-        ctx.fillStyle = "rgba(127, 29, 29, 0.9)";
-        ctx.fill();
-        ctx.lineWidth = 7;
-        ctx.strokeStyle = "#ef4444";
-        ctx.stroke();
-
-        ctx.font = "bold 32px serif";
-        ctx.fillStyle = "#fecaca";
-        ctx.textAlign = "center";
-        ctx.fillText("火德", 128, 100);
-        ctx.font = "bold 44px sans-serif";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillText(numText, 128, 150);
-        ctx.font = "bold 22px sans-serif";
-        ctx.fillStyle = "#fca5a5";
-        ctx.fillText(title, 128, 198);
-
-      } else if (shapeType === "circle_metal") {
-        // 【西方金】：圓形・白色
-        ctx.beginPath();
-        ctx.arc(128, 128, 108, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(241, 245, 249, 0.92)";
-        ctx.fill();
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "#ffffff";
-        ctx.stroke();
-
-        ctx.font = "bold 34px serif";
-        ctx.fillStyle = "#334155";
-        ctx.textAlign = "center";
-        ctx.fillText("金德", 128, 80);
-        ctx.font = "bold 46px sans-serif";
-        ctx.fillStyle = "#0f172a";
-        ctx.fillText(numText, 128, 138);
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillStyle = "#475569";
-        ctx.fillText(title, 128, 190);
-
-      } else if (shapeType === "wave_water") {
-        // 【北方水】：波浪形・黑色 (黑底水波、深海玄冥)
-        ctx.beginPath();
-        ctx.arc(128, 128, 108, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(2, 6, 23, 0.95)";
-        ctx.fill();
-        ctx.lineWidth = 7;
-        ctx.strokeStyle = "#38bdf8"; // 水藍色邊緣光暈凸顯黑色水德
-        ctx.stroke();
-
-        // 繪製水德三層波浪符號 〰️
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = "#38bdf8";
-        for (let waveY = 80; waveY <= 140; waveY += 30) {
-          ctx.beginPath();
-          ctx.moveTo(40, waveY);
-          ctx.bezierCurveTo(80, waveY - 20, 110, waveY + 20, 150, waveY);
-          ctx.bezierCurveTo(180, waveY - 20, 200, waveY + 15, 216, waveY);
-          ctx.stroke();
-        }
-
-        ctx.font = "bold 34px serif";
-        ctx.fillStyle = "#e0f2fe";
-        ctx.textAlign = "center";
-        ctx.fillText(numText, 128, 160);
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillStyle = "#7dd3fc";
-        ctx.fillText(title, 128, 205);
-
-      } else if (shapeType === "square_earth") {
-        // 【中央土】：正方形・黃色
-        ctx.fillStyle = "rgba(234, 179, 8, 0.92)";
-        ctx.fillRect(25, 25, 206, 206);
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "#fef08a";
-        ctx.strokeRect(25, 25, 206, 206);
-
-        ctx.font = "bold 36px serif";
-        ctx.fillStyle = "#713f12";
-        ctx.textAlign = "center";
-        ctx.fillText("土德", 128, 75);
-        ctx.font = "bold 46px sans-serif";
-        ctx.fillStyle = "#422006";
-        ctx.fillText(numText, 128, 135);
-        ctx.font = "bold 24px sans-serif";
-        ctx.fillStyle = "#78350f";
-        ctx.fillText(title, 128, 195);
+      // 補齊十二辰位完整資料
+      for (let i = 0; i < 12; i++) {
+        ISLANDS_DATA.push({
+          id: `sector_${i}`,
+          title: `第 ${i+1} 辰位｜${ZODIAC_LIST[i].branch}・${ZODIAC_LIST[i].animal}・星命樞紐`,
+          subtitle: `左盤身命宮位（${ZODIAC_LIST[i].emoji}）`,
+          modelType: "星辰身命盤・中環辰位",
+          disk: "zodiac",
+          isCenter: false,
+          isKalpa: false,
+          sectorIndex: i,
+          color: 0xf59e0b,
+          hexColor: "#f59e0b",
+          beginner: { step1_question: `此辰位在星命學中對應何種身命奧義？`, step2_concept: `十二辰地支散而為人之命，繫於北斗。`, step3_evidence: `《五行大義》引《黃帝斗圖》。`, step4_narrative: `<p>詳見文獻與道藏考證。</p>` },
+          course: { topicMap: "十二辰與北斗本命", materials: ["《五行大義》", "敦煌北斗圖"], comparisons: "生肖繫於北斗。" },
+          researcher: { searchTerms: "黃帝斗圖; 北斗本命", imageRef: "星辰圖", dispute: "定論。" }
+        });
       }
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      return texture;
     }
 
-    function createNaturalTianshuTexture() {
-      const canvas = document.createElement("canvas");
-      canvas.width = 512; canvas.height = 512;
-      const ctx = canvas.getContext("2d");
-
-      // 正方形底框（呼應中央土之正方）
-      ctx.fillStyle = "rgba(202, 138, 4, 0.95)";
-      ctx.fillRect(30, 30, 452, 452);
-      ctx.lineWidth = 10;
-      ctx.strokeStyle = "#fef08a";
-      ctx.strokeRect(30, 30, 452, 452);
-
-      // 內部自然天文赤文雲篆
-      const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 220);
-      grad.addColorStop(0, "rgba(220, 38, 38, 0.95)"); // 混洞赤文
-      grad.addColorStop(0.7, "rgba(161, 98, 7, 0.85)");
-      grad.addColorStop(1, "rgba(66, 32, 6, 0.6)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(45, 45, 422, 422);
-
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = "#fef08a";
-      ctx.strokeRect(60, 60, 392, 392);
-
-      ctx.font = "bold 56px serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "#facc15";
-      ctx.shadowBlur = 18;
-      ctx.fillText("混洞赤文", 256, 210);
-      ctx.font = "bold 32px serif";
-      ctx.fillStyle = "#fef08a";
-      ctx.fillText("中央土一氣・唯道為身", 256, 285);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.needsUpdate = true;
-      return texture;
+    async function loadIslandsData() {
+      loadFallbackData(); // 優先載入強固內建資料，確保 3D 渲染絕不中斷
+      try {
+        const response = await fetch('./islands.json');
+        if (response.ok) {
+          const extData = await response.json();
+          extData.forEach(item => {
+            if (typeof item.color === 'string') item.color = parseInt(item.color, 16);
+          });
+          if (extData.length > 0) ISLANDS_DATA = extData;
+        }
+      } catch (err) {
+        console.warn("外部 islands.json 略過，採用內建完整文獻資料庫。");
+      }
+      initScene();
     }
 
-    // 構建【靈寶第六層：玉京山金闕神聖景觀】3D 模型
+    function initScene() {
+      const container = document.getElementById("canvas-container");
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x060911);
+      scene.fog = new THREE.FogExp2(0x060911, 0.012);
+
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 38, 48);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.maxPolarAngle = Math.PI / 2 - 0.05;
+      controls.minDistance = 6;
+      controls.maxDistance = 140;
+
+      raycaster = new THREE.Raycaster();
+      mouse = new THREE.Vector2();
+
+      const ambientLight = new THREE.AmbientLight(0x23324d, 1.6);
+      scene.add(ambientLight);
+
+      const dirLight = new THREE.DirectionalLight(0xe2e8f0, 1.8);
+      dirLight.position.set(0, 45, 25);
+      scene.add(dirLight);
+
+      const zLight = new THREE.PointLight(0x38bdf8, 2.2, 32);
+      zLight.position.set(ZODIAC_CENTER.x, 4, ZODIAC_CENTER.z);
+      scene.add(zLight);
+
+      const kLight = new THREE.PointLight(0xa855f7, 2.2, 32);
+      kLight.position.set(KALPA_CENTER.x, 3, KALPA_CENTER.z);
+      scene.add(kLight);
+
+      const protoLight = new THREE.PointLight(0xfacc15, 2.6, 26);
+      protoLight.position.set(KALPA_CENTER.x, PROTO_HEIGHT + 3, KALPA_CENTER.z);
+      scene.add(protoLight);
+
+      const cosmoLight = new THREE.PointLight(0xfef08a, 2.8, 55);
+      cosmoLight.position.set(COSMOLOGY_CENTER.x, 30, COSMOLOGY_CENTER.z);
+      scene.add(cosmoLight);
+
+      createStarfield();
+      buildSceneSystems();
+
+      window.addEventListener("resize", onWindowResize);
+      window.addEventListener("pointerdown", onPointerDown);
+      window.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNarrativeModal(); });
+
+      animate();
+    }
+
+    function createStarfield() {
+      const starGeo = new THREE.BufferGeometry();
+      const count = 900;
+      const positions = new Float32Array(count * 3);
+      for (let i = 0; i < count * 3; i += 3) {
+        positions[i] = (Math.random() - 0.5) * 280;
+        positions[i + 1] = Math.random() * 110 - 20;
+        positions[i + 2] = (Math.random() - 0.5) * 280;
+      }
+      starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0x94a3b8, size: 0.22, transparent: true, opacity: 0.55 });
+      scene.add(new THREE.Points(starGeo, starMat));
+    }
+
+    function createBeidouAsterism() {
+      const group = new THREE.Group();
+      const starCoords = [
+        { name: "天樞", x: -1.3, z: 0.8 },
+        { name: "天璇", x: -1.1, z: -0.6 },
+        { name: "天璣", x: 0.1,  z: -0.7 },
+        { name: "天權", x: 0.3,  z: 0.4 },
+        { name: "玉衡", x: 1.1,  z: 0.8 },
+        { name: "開陽", x: 1.6,  z: 0.4 },
+        { name: "搖光", x: 2.1,  z: -0.2 }
+      ];
+
+      const starMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.85 });
+      starCoords.forEach(pos => {
+        const starMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), starMat);
+        starMesh.position.set(pos.x, DISK_HEIGHT / 2 + 0.35, pos.z);
+        group.add(starMesh);
+      });
+
+      const linePoints = [
+        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
+        new THREE.Vector3(starCoords[1].x, DISK_HEIGHT / 2 + 0.35, starCoords[1].z),
+        new THREE.Vector3(starCoords[2].x, DISK_HEIGHT / 2 + 0.35, starCoords[2].z),
+        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
+        new THREE.Vector3(starCoords[0].x, DISK_HEIGHT / 2 + 0.35, starCoords[0].z),
+        new THREE.Vector3(starCoords[3].x, DISK_HEIGHT / 2 + 0.35, starCoords[3].z),
+        new THREE.Vector3(starCoords[4].x, DISK_HEIGHT / 2 + 0.35, starCoords[4].z),
+        new THREE.Vector3(starCoords[5].x, DISK_HEIGHT / 2 + 0.35, starCoords[5].z),
+        new THREE.Vector3(starCoords[6].x, DISK_HEIGHT / 2 + 0.35, starCoords[6].z)
+      ];
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(linePoints);
+      group.add(new THREE.Line(lineGeo, new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 })));
+      return group;
+    }
+
+    function createSectorMesh(startAng, endAng, innerR, outerR, colorHex) {
+      const shape = new THREE.Shape();
+      const segments = 32;
+      for (let s = 0; s <= segments; s++) {
+        const theta = startAng + (endAng - startAng) * (s / segments);
+        const x = Math.cos(theta) * outerR; const y = Math.sin(theta) * outerR;
+        if (s === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+      }
+      for (let s = segments; s >= 0; s--) {
+        const theta = startAng + (endAng - startAng) * (s / segments);
+        const x = Math.cos(theta) * innerR; const y = Math.sin(theta) * innerR;
+        shape.lineTo(x, y);
+      }
+      shape.closePath();
+
+      const extrudeSettings = { depth: DISK_HEIGHT, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.05, bevelThickness: 0.05 };
+      const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      geo.rotateX(Math.PI / 2);
+
+      const mat = new THREE.MeshStandardMaterial({ color: 0x111c30, roughness: 0.55, metalness: 0.25 });
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.y = DISK_HEIGHT / 2;
+      mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: colorHex, transparent: true, opacity: 0.8 })));
+      return mesh;
+    }
+
     function buildYujingSanctuary(cosmoGroup, baseY) {
       const yujingGroup = new THREE.Group();
       yujingGroup.position.y = baseY;
 
-      // 七寶玄臺
       const platformGeo1 = new THREE.CylinderGeometry(5.2, 5.5, 0.45, 8);
       const platformMat1 = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.5 });
       const p1 = new THREE.Mesh(platformGeo1, platformMat1);
@@ -541,14 +556,8 @@
       p3.add(new THREE.LineSegments(new THREE.EdgesGeometry(platformGeo3), new THREE.LineBasicMaterial({ color: 0xfef08a, opacity: 0.95 })));
       yujingGroup.add(p3);
 
-      // 玉京金闕殿宇
       const palaceBaseGeo = new THREE.BoxGeometry(1.6, 1.2, 1.6);
-      const palaceMat = new THREE.MeshStandardMaterial({
-        color: 0x451a03,
-        emissive: 0x78350f,
-        emissiveIntensity: 0.6,
-        roughness: 0.2
-      });
+      const palaceMat = new THREE.MeshStandardMaterial({ color: 0x451a03, emissive: 0x78350f, emissiveIntensity: 0.6, roughness: 0.2 });
       const palace = new THREE.Mesh(palaceBaseGeo, palaceMat);
       palace.position.y = 1.85;
       palace.add(new THREE.LineSegments(new THREE.EdgesGeometry(palaceBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15 })));
@@ -565,40 +574,31 @@
       orb.position.y = 3.65;
       yujingGroup.add(orb);
 
-      // 八株七寶樹
       const treeAngles = [
-        { ang: 0, text: "東方寶樹", color: "#10b981" },
-        { ang: Math.PI / 4, text: "東南寶樹", color: "#34d399" },
-        { ang: Math.PI / 2, text: "南方寶樹", color: "#f97316" },
-        { ang: (3 * Math.PI) / 4, text: "西南寶樹", color: "#fb923c" },
-        { ang: Math.PI, text: "西方寶樹", color: "#e2e8f0" },
-        { ang: (5 * Math.PI) / 4, text: "西北寶樹", color: "#cbd5e1" },
-        { ang: (3 * Math.PI) / 2, text: "北方寶樹", color: "#38bdf8" },
-        { ang: (7 * Math.PI) / 4, text: "東北寶樹", color: "#60a5fa" }
+        { ang: 0, color: "#10b981" }, { ang: Math.PI / 4, color: "#34d399" },
+        { ang: Math.PI / 2, color: "#f97316" }, { ang: (3 * Math.PI) / 4, color: "#fb923c" },
+        { ang: Math.PI, color: "#e2e8f0" }, { ang: (5 * Math.PI) / 4, color: "#cbd5e1" },
+        { ang: (3 * Math.PI) / 2, color: "#38bdf8" }, { ang: (7 * Math.PI) / 4, color: "#60a5fa" }
       ];
 
       treeAngles.forEach(tree => {
         const dist = 4.6;
         const tx = Math.cos(tree.ang) * dist;
         const tz = Math.sin(tree.ang) * dist;
-
         const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 1.6, 8), new THREE.MeshStandardMaterial({ color: 0x065f46 }));
         trunk.position.set(tx, 0.8, tz);
         yujingGroup.add(trunk);
-
         const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(0.65, 0), new THREE.MeshStandardMaterial({ color: tree.color, emissive: tree.color, emissiveIntensity: 0.65, transparent: true, opacity: 0.88 }));
         crown.position.set(tx, 1.8, tz);
         yujingGroup.add(crown);
       });
 
-      // 七寶華林光相層
       const hualinRingGeo = new THREE.RingGeometry(5.6, 7.4, 48);
       dynamicYujingAura = new THREE.Mesh(hualinRingGeo, new THREE.MeshStandardMaterial({ color: 0xfef08a, emissive: 0xca8a04, emissiveIntensity: 0.5, transparent: true, opacity: 0.35, side: THREE.DoubleSide }));
       dynamicYujingAura.rotation.x = Math.PI / 2;
       dynamicYujingAura.position.y = 0.1;
       yujingGroup.add(dynamicYujingAura);
 
-      // 仙聖散花天花粒子系統
       const petalCount = 80;
       const petalPos = new Float32Array(petalCount * 3);
       for (let i = 0; i < petalCount * 3; i += 3) {
@@ -613,7 +613,6 @@
       dynamicPetalParticles = new THREE.Points(petalGeo, new THREE.PointsMaterial({ color: 0xf472b6, size: 0.22, transparent: true, opacity: 0.85 }));
       yujingGroup.add(dynamicPetalParticles);
 
-      // 綁定點擊事件
       const daluoData = ISLANDS_DATA.find(d => d.id === "lingbao_daluo");
       const focusWorldPos = COSMOLOGY_CENTER.clone().add(new THREE.Vector3(0, baseY + 2.2, 3.0));
       const yujingUserData = { data: daluoData, markerMesh: palace, focusPos: focusWorldPos };
@@ -625,12 +624,10 @@
       cosmoGroup.add(yujingGroup);
     }
 
-    // 建立【靈寶空間體系】立體六層塔
     function buildLingbaoSixLayers() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
 
-      // 第六層玉京神境
       buildYujingSanctuary(cosmoGroup, 28);
 
       const daluoData = ISLANDS_DATA.find(d => d.id === "lingbao_daluo");
@@ -646,7 +643,6 @@
       clickableMeshes.push(daluoMainSprite);
       cosmoGroup.add(daluoMainSprite);
 
-      // 第 2~5 層圓台
       const midLayers = [
         { id: "lingbao_sanqing",     y: 22, radius: 3.6, color: "#38bdf8", text: "第五層【三清勝境】清微・禹餘・大赤", emoji: "☁️" },
         { id: "lingbao_four_brahma", y: 16, radius: 5.0, color: "#c084fc", text: "第四層【種民聖界】四種民天 (避劫)", emoji: "✨" },
@@ -684,7 +680,6 @@
         cosmoGroup.add(ringMesh);
       });
 
-      // 第一層地下九壘九宮格 (Y = -8)
       const gridY = -8;
       const cellSize = 3.2;
       const cellGap = 0.4;
@@ -740,7 +735,6 @@
       strataMainSprite.userData = { data: strataNodeData, markerMesh: strataMainSprite, focusPos: strataMainWorldPos };
       clickableMeshes.push(strataMainSprite);
 
-      // 天地對稱動態法理光索
       const rayPoints = [
         new THREE.Vector3(0, 28, 0), new THREE.Vector3(-totalOffset, gridY, -totalOffset),
         new THREE.Vector3(0, 28, 0), new THREE.Vector3(totalOffset, gridY, -totalOffset),
@@ -752,7 +746,6 @@
       symmetryLines.computeLineDistances();
       cosmoGroup.add(symmetryLines);
 
-      // 風澤洞虛・金剛乘天 懸浮支撐力學場
       const gangfengRingGeo = new THREE.TorusGeometry(10.8, 0.45, 16, 64);
       dynamicGangfengRing = new THREE.Mesh(gangfengRingGeo, new THREE.MeshStandardMaterial({ color: 0xe2e8f0, emissive: 0x94a3b8, emissiveIntensity: 0.95, roughness: 0.1 }));
       dynamicGangfengRing.rotation.x = Math.PI / 2;
@@ -797,7 +790,7 @@
     function buildSceneSystems() {
       buildLingbaoSixLayers();
 
-      // 左盤：十二辰星盤
+      // 左盤：十二辰星命盤
       const zGroup = new THREE.Group();
       zGroup.position.copy(ZODIAC_CENTER);
 
@@ -891,21 +884,15 @@
       const protoGroup = new THREE.Group();
       protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
 
-      // 支撐盤面（八角金玉雲台）
       const pBaseGeo = new THREE.CylinderGeometry(5.8, 5.8, 0.2, 48);
       const pBaseMat = new THREE.MeshStandardMaterial({ color: 0x221a08, transparent: true, opacity: 0.65, roughness: 0.3 });
       const pBaseMesh = new THREE.Mesh(pBaseGeo, pBaseMat);
       pBaseMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(pBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15, opacity: 0.7 })));
       protoGroup.add(pBaseMesh);
 
-      // 1. 【中央土・一氣】：黃色正方形台座與正方赤篆
+      // 中央土一氣：黃色正方形台座與正方赤篆
       const cBoxGeo = new THREE.BoxGeometry(3.6, 0.35, 3.6);
-      const cBoxMat = new THREE.MeshStandardMaterial({
-        color: 0xca8a04,
-        emissive: 0x854d0e,
-        emissiveIntensity: 0.6,
-        roughness: 0.25
-      });
+      const cBoxMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, emissive: 0x854d0e, emissiveIntensity: 0.6, roughness: 0.25 });
       const cBoxMesh = new THREE.Mesh(cBoxGeo, cBoxMat);
       cBoxMesh.position.set(0, 0.2, 0);
       cBoxMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(cBoxGeo), new THREE.LineBasicMaterial({ color: 0xfef08a, opacity: 0.95 })));
@@ -925,79 +912,26 @@
       clickableMeshes.push(cBoxMesh);
       clickableMeshes.push(tianshuSprite);
 
-      // 2. 【四方五行特定形制台座與徽章】
-      // 東木（綠色長方形）、南火（紅色三角形）、西金（白色圓形）、北水（黑色波浪形）
+      // 四方五行特定形制台座與徽章
       const elementsSetup = [
-        {
-          id: "proto_east",
-          angle: 0,
-          dist: 4.6,
-          shapeType: "rect_wood",
-          title: "東方青天九氣",
-          numText: "木九",
-          color: "#10b981",
-          // 3D 台座：長方體
-          createGeo: () => new THREE.BoxGeometry(1.4, 0.35, 2.3),
-          matColor: 0x064e3b,
-          edgeColor: 0x10b981
-        },
-        {
-          id: "proto_south",
-          angle: -Math.PI / 2,
-          dist: 4.6,
-          shapeType: "triangle_fire",
-          title: "南方赤天三氣",
-          numText: "火三",
-          color: "#ef4444",
-          // 3D 台座：三棱柱（三角形）
-          createGeo: () => new THREE.CylinderGeometry(1.2, 1.2, 0.35, 3),
-          matColor: 0x7f1d1d,
-          edgeColor: 0xef4444
-        },
-        {
-          id: "proto_west",
-          angle: Math.PI,
-          dist: 4.6,
-          shapeType: "circle_metal",
-          title: "西方白天七氣",
-          numText: "金七",
-          color: "#ffffff",
-          // 3D 台座：圓柱形（圓形）
-          createGeo: () => new THREE.CylinderGeometry(1.15, 1.15, 0.35, 32),
-          matColor: 0xe2e8f0,
-          edgeColor: 0xffffff
-        },
-        {
-          id: "proto_north",
-          angle: Math.PI / 2,
-          dist: 4.6,
-          shapeType: "wave_water",
-          title: "北方黑天五氣",
-          numText: "水五",
-          color: "#38bdf8",
-          // 3D 台座：玄黑柱體搭配水紋
-          createGeo: () => new THREE.CylinderGeometry(1.2, 1.2, 0.35, 24),
-          matColor: 0x020617,
-          edgeColor: 0x38bdf8
-        }
+        { id: "proto_east", angle: 0, dist: 4.6, shapeType: "rect_wood", title: "東方青天九氣", numText: "木九", color: "#10b981", createGeo: () => new THREE.BoxGeometry(1.4, 0.35, 2.3), matColor: 0x064e3b, edgeColor: 0x10b981 },
+        { id: "proto_south", angle: -Math.PI / 2, dist: 4.6, shapeType: "triangle_fire", title: "南方赤天三氣", numText: "火三", color: "#ef4444", createGeo: () => new THREE.CylinderGeometry(1.2, 1.2, 0.35, 3), matColor: 0x7f1d1d, edgeColor: 0xef4444 },
+        { id: "proto_west", angle: Math.PI, dist: 4.6, shapeType: "circle_metal", title: "西方白天七氣", numText: "金七", color: "#ffffff", createGeo: () => new THREE.CylinderGeometry(1.15, 1.15, 0.35, 32), matColor: 0xe2e8f0, edgeColor: 0xffffff },
+        { id: "proto_north", angle: Math.PI / 2, dist: 4.6, shapeType: "wave_water", title: "北方黑天五氣", numText: "水五", color: "#38bdf8", createGeo: () => new THREE.CylinderGeometry(1.2, 1.2, 0.35, 24), matColor: 0x020617, edgeColor: 0x38bdf8 }
       ];
 
       elementsSetup.forEach(el => {
         const lx = Math.cos(el.angle) * el.dist;
         const lz = -Math.sin(el.angle) * el.dist;
 
-        // 3D 專屬造型幾何台座
         const geo = el.createGeo();
         const mat = new THREE.MeshStandardMaterial({ color: el.matColor, roughness: 0.3, metalness: 0.2 });
         const bMesh = new THREE.Mesh(geo, mat);
         bMesh.position.set(lx, 0.2, lz);
-        if (el.shapeType === "triangle_fire") {
-          bMesh.rotation.y = Math.PI / 6; // 調整三角形指向
-        }
+        if (el.shapeType === "triangle_fire") bMesh.rotation.y = Math.PI / 6;
         bMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo), new THREE.LineBasicMaterial({ color: el.edgeColor })));
         protoGroup.add(bMesh);
 
-        // 專屬形制幾何徽章貼圖
         const tex = createFiveElementsBadgeTexture(el.shapeType, el.title, el.numText);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
         sprite.scale.set(1.5, 1.5, 1.0);
@@ -1033,7 +967,6 @@
       }
     }
 
-    // 精準相機擺位
     function selectIsland(userData) {
       if (!userData || !userData.data) return;
       selectedIsland = userData.data;
@@ -1300,18 +1233,15 @@
 
       const t = time * 0.0015;
 
-      // 北斗星圖自轉
       const zCenterObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "beidou");
       if (zCenterObj && zCenterObj.userData.markerMesh) {
         zCenterObj.userData.markerMesh.rotation.y = t * 0.2;
       }
 
-      // 玉京山華林光相層旋轉
       if (dynamicYujingAura) {
         dynamicYujingAura.rotation.z = t * 0.18;
       }
 
-      // 天花散落
       if (dynamicPetalParticles) {
         const positions = dynamicPetalParticles.geometry.attributes.position.array;
         for (let i = 1; i < positions.length; i += 3) {
@@ -1321,7 +1251,6 @@
         dynamicPetalParticles.geometry.attributes.position.needsUpdate = true;
       }
 
-      // 剛風風澤旋轉與粒子向上浮動
       if (dynamicGangfengRing) {
         dynamicGangfengRing.rotation.z = t * 0.45;
       }
@@ -1334,7 +1263,6 @@
         dynamicUpliftParticles.geometry.attributes.position.needsUpdate = true;
       }
 
-      // 各標記微浮動
       clickableMeshes.forEach((mesh, idx) => {
         if (!mesh.userData.data || mesh.userData.data.isCenter) return;
         const marker = mesh.userData.markerMesh;
