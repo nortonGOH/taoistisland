@@ -12,6 +12,7 @@ for(const id of ['proto_center','proto_east','proto_south','proto_west','proto_n
  await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedIsland.id),id);
  assert.equal(await p.evaluate(()=>lastOrbitTransition.kind),'axis-orbit');
 }
+const axis=await p.evaluate(()=>{const a=scene.getObjectByName('lingbao-transparent-axis'),g=scene.getObjectByName('lingbao-axis-guide');return {opacity:a.material.opacity,depthWrite:a.material.depthWrite,guideOpacity:g.material.opacity,selectable:clickableMeshes.includes(a)||clickableMeshes.includes(g)};});assert.equal(axis.opacity,0.035);assert.equal(axis.depthWrite,false);assert.equal(axis.guideOpacity,0.18);assert.equal(axis.selectable,false);
 // Relocation shares the tower axis; the prototype moves into its third/fourth-layer junction.
 const layout=await p.evaluate(()=>{
  const wheel=scene.getObjectByName('lingbao-kalpa-wheel'),tower=scene.getObjectByName('lingbao-six-layers'),proto=scene.getObjectByName('five-qi-prototype');

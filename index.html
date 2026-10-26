@@ -67,7 +67,7 @@
           <strong>下方基座【九壘九宮剛風】：</strong>風澤洞虛，金剛乘天，自底層動態擎托天地大千。
         </p>
         <p class="reader-intro">主塔由上而下：第一層大羅、第二層三清、第三層種民與三界三十二天、第四層三光與神州、第五層九壘、第六層剛風。五氣貫穿六層，第三、四層為重點顯化區；五方五氣本體盤位於第三、四層交界，連接天界與天—地—人對應。先選節點，再切換導讀、課程或考證；3D 模式可拖曳旋轉、滾輪縮放。</p>
-        <p class="model-note">模型說明：本介面並置不同文本與歷史材料，空間位置不代表歷史承繼；各項引文、年代及圖像來源仍須依版本逐一核對。</p>
+        <p class="model-note">透明虛線軸僅作空間導引，不等同大羅一炁本體；軸線貫通不代表已證成氣化閉環。模型說明：本介面並置不同文本與歷史材料，空間位置不代表歷史承繼；各項引文、年代及圖像來源仍須依版本逐一核對。</p>
         <button id="btn-text-view" type="button" onclick="toggleTextView()" aria-pressed="false">切換文字閱讀</button>
         <!-- 視角快速跳轉列 -->
         <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
@@ -877,12 +877,17 @@
         { id: "lingbao_earth_realm", y: -6, radius: 8.0, color: "#f97316", text: "第四層【三光與神州】五星五嶽", emoji: "⛰️" }
       ];
 
-      // 中央垂直混元貫通光軸（直達玉京山底）
-      const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 46, 16);
-      const axisMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, emissive: 0xa855f7, emissiveIntensity: 0.6, transparent: true, opacity: 0.7 });
+      // 空間導引軸：視覺架構，不把大羅一炁物化成實體柱。
+      const axisGeo = new THREE.CylinderGeometry(0.12, 0.12, 47.5, 16);
+      const axisMat = new THREE.MeshBasicMaterial({ color: 0xcbd5e1, transparent: true, opacity: 0.035, depthWrite: false });
       const axisMesh = new THREE.Mesh(axisGeo, axisMat);
-      axisMesh.position.y = 8;
+      axisMesh.name = 'lingbao-transparent-axis';
+      axisMesh.position.y = 7.25;
       cosmoGroup.add(axisMesh);
+      const axisGuide = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0,-16.5,0), new THREE.Vector3(0,31,0)
+      ]), new THREE.LineDashedMaterial({color:0xcbd5e1,transparent:true,opacity:0.18,depthWrite:false,dashSize:0.45,gapSize:0.65}));
+      axisGuide.name='lingbao-axis-guide';axisGuide.computeLineDistances();cosmoGroup.add(axisGuide);
 
       midLayers.forEach(lvl => {
         const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.45, 48);
