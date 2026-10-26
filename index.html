@@ -152,6 +152,39 @@
     <button onclick="selectIslandById('sector_0')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
       <span>🐭 子鼠｜先秦命論與天師從數到籍</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
+    <button onclick="selectIslandById('sector_1')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐮 丑牛｜王充命義與太平經身即宇宙</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_2')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐯 寅虎｜九天胎變、司命勒籍與解承負</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_3')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐰 卯兔｜二十四結節生理病理學</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_4')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐲 辰龍｜陶弘景亦離亦合與法體純潔性</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_5')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐍 巳蛇｜太陰煉形與政治命籍審判</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_6')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐴 午馬｜北斗七真與真誥存星臥斗</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_7')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐑 未羊｜七星移度與靈寶三十五燈</span><span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_8')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐵 申猴｜蕭吉五行大義地支配星</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_9')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐔 酉雞｜敦煌產經星糧與受生借貸</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_10')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐶 戌狗｜十一曜輸入與南極丹書步斗</span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_11')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐗 亥豬｜全真性不死與馮道真墓七星冠</span><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+    </button>
   </div>
 
   <!-- 閱讀路徑切換列 -->
@@ -214,9 +247,6 @@
     let selectedIsland = null;
     const clickableMeshes = [];
 
-    let isLeftPanelCollapsed = false;
-    let isRightPanelOpen = true;
-
     // 空間座標配置
     const ZODIAC_CENTER    = new THREE.Vector3(-14, 0, 8);   // 左盤：十二辰星盤
     const KALPA_CENTER     = new THREE.Vector3(14, 0, 8);    // 右盤：靈寶五劫輪
@@ -258,41 +288,6 @@
 
     let dynamicGangfengRing = null;
     let dynamicUpliftParticles = null;
-
-    function toggleLeftPanel() {
-      const content = document.getElementById("left-panel-content");
-      const icon = document.getElementById("left-collapse-icon");
-      const text = document.getElementById("left-collapse-text");
-      isLeftPanelCollapsed = !isLeftPanelCollapsed;
-
-      if (isLeftPanelCollapsed) {
-        content.style.maxHeight = "0px";
-        content.style.opacity = "0";
-        icon.classList.add("-rotate-90");
-        if (text) text.textContent = "展開";
-      } else {
-        content.style.maxHeight = "500px";
-        content.style.opacity = "1";
-        icon.classList.remove("-rotate-90");
-        if (text) text.textContent = "收合";
-      }
-    }
-
-    function toggleRightPanel() {
-      const rightPanel = document.getElementById("right-panel");
-      const triggerBtn = document.getElementById("right-panel-trigger");
-      isRightPanelOpen = !isRightPanelOpen;
-
-      if (isRightPanelOpen) {
-        rightPanel.classList.remove("translate-x-full");
-        triggerBtn.classList.add("hidden");
-        triggerBtn.classList.remove("flex");
-      } else {
-        rightPanel.classList.add("translate-x-full");
-        triggerBtn.classList.remove("hidden");
-        triggerBtn.classList.add("flex");
-      }
-    }
 
     function createBadgeTexture(emoji, text, colorHex) {
       const canvas = document.createElement("canvas");
@@ -674,7 +669,6 @@
         const urx = Math.cos(uAng) * 8.5;
         const urz = Math.sin(uAng) * 8.5;
         upliftPoints.push(new THREE.Vector3(urx, -12.5, urz));
-        // 向上收聚托住九宮格底部
         upliftPoints.push(new THREE.Vector3(urx * 0.45, -8.0, urz * 0.45));
       }
       const upliftGeo = new THREE.BufferGeometry().setFromPoints(upliftPoints);
@@ -694,7 +688,7 @@
         const pR = Math.random() * 8.5;
         const pTh = Math.random() * Math.PI * 2;
         particlePos[p] = Math.cos(pTh) * pR;
-        particlePos[p + 1] = -12.5 + Math.random() * 4.5; // 分佈在 -12.5 到 -8 之間
+        particlePos[p + 1] = -12.5 + Math.random() * 4.5;
         particlePos[p + 2] = Math.sin(pTh) * pR;
       }
       const particleGeo = new THREE.BufferGeometry();
@@ -758,7 +752,7 @@
       }
       scene.add(zGroup);
 
-      // 右盤下層：靈寶五劫天輪
+      // 右盤下層：靈寶五劫天輪 (KALPA_CENTER, Y = 0)
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
 
@@ -893,6 +887,7 @@
       if (mesh) selectIsland(mesh.userData);
     }
 
+    // 視角快速導航
     function focusOverview() {
       new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
@@ -1074,7 +1069,7 @@
         pCenterObj.userData.markerMesh.material.rotation = -t * 0.15;
       }
 
-      // 底層「金剛乘天」剛風金剛環旋轉與粒子向上浮動
+      // 底層「風澤洞虛・金剛乘天」剛風金剛環旋轉與粒子向上浮動
       if (dynamicGangfengRing) {
         dynamicGangfengRing.rotation.z = t * 0.45;
       }
