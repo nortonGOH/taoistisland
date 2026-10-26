@@ -6,7 +6,7 @@ const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http:
 const b=await chromium.launch({...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await b.newPage({viewport:{width:1440,height:960}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
 await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady);
-await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForTimeout(1000);
+await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
 const central=await p.evaluate(()=>{
  const c=clickableMeshes.find(m=>m.userData.data?.id==='proto_center'&&m.isSprite);
  const s=clickableMeshes.find(m=>m.userData.data?.id==='proto_south'&&m.isSprite);
@@ -15,17 +15,17 @@ const central=await p.evaluate(()=>{
 });
 assert(Math.abs(central.center.x-central.south.x)>(central.center.w+central.south.w)/2 || Math.abs(central.center.y-central.south.y)>(central.center.h+central.south.h)/2,'Center and south badge bounds overlap');
 await p.screenshot({path:path.join(root,'test-results','central-focus-qa.png')});
-await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForTimeout(1000);
+await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
 const tri=await p.evaluate(()=>{
 const g=scene.getObjectByName('sanqing-realms');const platforms=g.children.filter(o=>o.geometry?.type==='CylinderGeometry');return {vertices:platforms.map(o=>o.position.toArray()),triangle:!!g.getObjectByName('sanqing-triangle'),particles:sanqingFlows.length};});
 assert(tri.vertices.length===3&&tri.triangle&&tri.particles===12);assert(new Set(tri.vertices.map(v=>v[2])).size===2);
 await p.screenshot({path:path.join(root,'test-results','sanqing-triangle-qa.png')});
 const keys=await p.evaluate(()=>ISLANDS_DATA.find(n=>n.id==='lingbao_sanqing').sanqing.realms.map(r=>r.key));
 for(const key of keys){
- await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForTimeout(900);
+ await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
  const point=await p.evaluate(key=>{const g=scene.getObjectByName('sanqing-realms');const label=g.children.find(o=>o.isSprite&&o.userData.sanqingKey===key&&o.scale.x>4);const v=label.getWorldPosition(new THREE.Vector3()).project(camera);return {x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};},key);
  await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedSanqingKey),key);
- await p.waitForTimeout(850);
+ await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
 }
 
 await p.evaluate(()=>closeDrawer());await p.locator('#btn-course').click();
@@ -40,8 +40,26 @@ for(const key of ['east','south','west','north']){
  assert.equal(await p.locator('.four-brahma-card[data-selected="true"]').count(),1);
 }
 console.log('Mode with no selection and all four palace icons passed.');
+// The tower camera follows an arc about the same vertical axis, never a straight chord.
+const orbit=await p.evaluate(async()=>{
+ closeDrawer();camera.position.set(COSMOLOGY_CENTER.x+20,30,COSMOLOGY_CENTER.z);controls.target.set(COSMOLOGY_CENTER.x,18,COSMOLOGY_CENTER.z);controls.update();
+ selectIslandById('lingbao_four_brahma');const trajectory=[];
+ await new Promise(resolve=>{function sample(){trajectory.push({x:camera.position.x,z:camera.position.z});if(focusCameraTween?.isPlaying())requestAnimationFrame(sample);else resolve();}requestAnimationFrame(sample);});
+ return {transition:lastOrbitTransition,trajectory,target:controls.target.toArray(),axis:[COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y,COSMOLOGY_CENTER.z]};
+});
+assert.equal(orbit.transition.kind,'axis-orbit');assert(Math.abs(orbit.target[0]-orbit.axis[0])<0.01&&Math.abs(orbit.target[2]-orbit.axis[2])<0.01);
+assert(orbit.trajectory.length>3);
+for(const point of orbit.trajectory)assert(Math.hypot(point.x-orbit.axis[0],point.z-orbit.axis[2])>=Math.min(20,orbit.transition.endRadius)-0.2,'Camera cut across the axis instead of orbiting');
+for(const id of ['lingbao_sanqing','lingbao_daluo']){
+ await p.evaluate(id=>selectIslandById(id),id);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ assert.equal(await p.locator('.cosmogony-model').count(),2);
+ assert.equal(await p.locator('.counting-card').count(),3);
+ assert.equal(await p.locator('#drawer-dynamic-content a[href]').count(),0);
+}
+await p.screenshot({path:path.join(root,'test-results','daluo-cosmogony-qa.png')});
+console.log('Central-axis arc and two distinct cosmogony models passed.');
 // Fourth-layer data, no outbound navigation, and true reading-mode tabs.
-await p.evaluate(()=>selectIslandById('lingbao_four_brahma'));await p.waitForTimeout(900);
+await p.evaluate(()=>selectIslandById('lingbao_four_brahma'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
 assert.equal(await p.locator('.four-brahma-card').count(),4);
 assert.equal(await p.locator('#drawer-dynamic-content a[href]').count(),0);
 for(const mode of ['beginner','course','researcher']){
@@ -56,7 +74,7 @@ const originalLabels=await p.evaluate(()=>clickableMeshes.filter(m=>m.isSprite).
 assert(originalLabels.every(m=>Math.abs(m.local-m.y)<0.05),'Local float origins drifted');
 await p.evaluate(()=>openNarrativeModal());await p.screenshot({path:path.join(root,'test-results','cosmic-dialog-qa.png')});await p.keyboard.press('Escape');
 assert(await p.locator('#narrative-modal').evaluate(e=>e.classList.contains('hidden')));
-await p.setViewportSize({width:390,height:844});await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForTimeout(1000);
+await p.setViewportSize({width:390,height:844});await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
 const mobile=await p.locator('#side-drawer').boundingBox();assert(mobile.width<=390&&mobile.y>350);await p.screenshot({path:path.join(root,'test-results','mobile-dialog-qa.png')});
 await p.evaluate(()=>{closeDrawer();});assert(await p.evaluate(()=>camera.view.enabled===false));
 await p.setViewportSize({width:1440,height:960});

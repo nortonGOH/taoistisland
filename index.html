@@ -189,6 +189,42 @@
     let raycaster, mouse;
     let currentMode = "beginner";
     let selectedIsland = null;
+    let lastOrbitTransition=null;
+    function orbitLingbaoAxis(targetLookAt,targetCamPos,focusObject,userData) {
+      const axisX=COSMOLOGY_CENTER.x, axisZ=COSMOLOGY_CENTER.z;
+      const startRadius=Math.max(0.5,Math.hypot(camera.position.x-axisX,camera.position.z-axisZ));
+      const startAngle=Math.atan2(camera.position.x-axisX,camera.position.z-axisZ);
+      let endX=targetCamPos.x-axisX,endZ=targetCamPos.z-axisZ;
+      const part=!!(userData.sanqingKey || userData.fourBrahmaKey);
+      let lookY=targetLookAt.y,endY=targetCamPos.y;
+      if(part && focusObject){
+        const point=focusObject.getWorldPosition(new THREE.Vector3());
+        const bearing=Math.atan2(point.x-axisX,point.z-axisZ);
+        const radius=Math.hypot(point.x-axisX,point.z-axisZ)+(window.innerWidth<=700?10.5:8.5);
+        endX=Math.sin(bearing)*radius;endZ=Math.cos(bearing)*radius;
+        lookY=point.y;endY=point.y+1.8;
+      }
+      const endRadius=Math.max(2.5,Math.hypot(endX,endZ));
+      let endAngle=Math.atan2(endX,endZ);
+      let angleDelta=Math.atan2(Math.sin(endAngle-startAngle),Math.cos(endAngle-startAngle));
+      // Give a repeated front-facing selection a gentle visible arc as well.
+      if(Math.abs(angleDelta)<0.12){endAngle+=Math.PI/9;angleDelta=Math.atan2(Math.sin(endAngle-startAngle),Math.cos(endAngle-startAngle));}
+      const state={angle:startAngle,radius:startRadius,y:camera.position.y};
+      const end={angle:startAngle+angleDelta,radius:endRadius,y:endY};
+      lastOrbitTransition={nodeId:selectedIsland.id,axisX,axisZ,startAngle,angleDelta,endRadius,kind:'axis-orbit'};
+      // Keep the x/z pivot on the tower axis; only its height changes with the layer.
+      focusTargetTween=new TWEEN.Tween(controls.target).to({x:axisX,y:lookY,z:axisZ},950).easing(TWEEN.Easing.Cubic.InOut).start();
+      const duration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?0:950;
+      if(duration===0){
+        focusTargetTween.stop();controls.target.set(axisX,lookY,axisZ);
+        camera.position.set(axisX+Math.sin(end.angle)*end.radius,end.y,axisZ+Math.cos(end.angle)*end.radius);
+        controls.update();refreshFocusAppearance();return;
+      }
+      focusCameraTween=new TWEEN.Tween(state).to(end,duration).easing(TWEEN.Easing.Cubic.InOut)
+        .onUpdate(()=>camera.position.set(axisX+Math.sin(state.angle)*state.radius,state.y,axisZ+Math.cos(state.angle)*state.radius))
+        .onComplete(()=>{controls.update();refreshFocusAppearance();}).start();
+    }
+
     let focusedObject=null, focusedUserData=null, focusCameraTween=null, focusTargetTween=null, focusViewSignature='';
     const focusAppearance=[];
     function restoreFocusAppearance() {
@@ -1311,6 +1347,11 @@
       if(focusTargetTween) focusTargetTween.stop();
       if(focusCameraTween) focusCameraTween.stop();
 
+      if(selectedIsland.disk==='cosmology_lingbao') {
+        orbitLingbaoAxis(targetLookAt,targetCamPos,focusedObject,userData);
+        return;
+      }
+      lastOrbitTransition=null;
       // 平滑旋轉焦點至該圖示
       focusTargetTween = new TWEEN.Tween(controls.target)
         .to({ x: targetLookAt.x, y: targetLookAt.y, z: targetLookAt.z }, 800)
@@ -1602,6 +1643,7 @@
         `;
       }
       renderSanqingPanel(contentBox);
+      renderCosmogonyPanel(contentBox);
       renderFourBrahmaPanel(contentBox);
       removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');

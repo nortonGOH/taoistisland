@@ -140,3 +140,14 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 .source-record h4 { font-weight:600; color:#e2e8f0; }
 .four-brahma-panel ol { padding-left:20px; list-style:decimal; }
 @media(max-width:420px) { .mode-caption { font-size:9px; } .four-brahma-grid { grid-template-columns:1fr; } }
+.cosmogony-panel { padding:18px; border:1px solid #e1c88950; border-radius:16px; background:linear-gradient(135deg,#ab8b3d12,#5a509a12); }
+.cosmogony-panel h3 { color:#f5d58c; font-size:20px; font-weight:700; margin-bottom:14px; }
+.cosmogony-panel h4 { font-size:16px; font-weight:700; color:#dde7fc; margin-bottom:9px; }
+.cosmogony-model,.counting-card,.nine-qi-panel { padding:15px; margin:16px 0; background:#02081750; border:1px solid #96a9d52b; border-radius:12px; }
+#drawer-dynamic-content .model-sequence { color:#f1d89e; font-size:16px; line-height:1.8; }
+.comparison-scroll { overflow-x:auto; }
+.cosmogony-panel table { width:100%; border-collapse:collapse; font-size:13px; line-height:1.8; }
+.cosmogony-panel caption { color:#adbbd1; text-align:left; padding:8px 0; font-size:12px; }
+.cosmogony-panel th,.cosmogony-panel td { padding:9px 7px; text-align:left; border-bottom:1px solid #8897b82e; vertical-align:top; }
+.cosmogony-panel th { color:#a9c6ee; font-size:12px; white-space:nowrap; }
+.cosmogony-panel th:first-child,.cosmogony-panel td:first-child { white-space:nowrap; }

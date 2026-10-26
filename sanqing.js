@@ -30,6 +30,9 @@ function buildSanqingRealms(parent) {
   group.name = 'sanqing-realms';
   group.position.set(0,22,4.5);
   parent.add(group);
+  const bridgeCurve=new THREE.CatmullRomCurve3([new THREE.Vector3(0,28.4,2.5),new THREE.Vector3(0,27.2,3.6),new THREE.Vector3(0,25.7,4.7)]);
+  const bridge=new THREE.Mesh(new THREE.TubeGeometry(bridgeCurve,32,0.055,8,false),new THREE.MeshBasicMaterial({color:'#f5d58c',transparent:true,opacity:0.55}));
+  bridge.name='daluo-sanqing-bridge';parent.add(bridge);
   const focus = new THREE.Vector3(COSMOLOGY_CENTER.x,23.5,COSMOLOGY_CENTER.z+4.5);
   function clickable(object,key=null) {
     object.userData = {data,focusPos:focus,sanqingKey:key,focusObject:object};
@@ -40,7 +43,7 @@ function buildSanqingRealms(parent) {
   const sourcePos = new THREE.Vector3(0,3.7,0.2);
   const source = new THREE.Mesh(new THREE.SphereGeometry(0.56,32,24),new THREE.MeshStandardMaterial({color:'#fff7cc',emissive:'#facc15',emissiveIntensity:1.7,roughness:0.2}));
   source.position.copy(sourcePos); group.add(clickable(source));
-  const sourceLabel=sanqingText(['一炁','化生三炁・分為三天'],'#fde68a',1024,300);
+  const sourceLabel=sanqingText(['大羅一炁','三炁分化・模式 A 示意'],'#fde68a',1024,300);
   sourceLabel.position.set(0,4.9,0.2); sourceLabel.scale.set(5,1.46,1); group.add(clickable(sourceLabel));
   data.sanqing.realms.forEach((realm,index)=>{
     // One rear vertex and two forward vertices, all within the fifth layer.
@@ -151,4 +154,32 @@ function renderFourBrahmaPanel(container) {
     }
   }
   container.prepend(panel);
+}
+
+function renderCosmogonyPanel(container) {
+  const model=selectedIsland?.cosmogony;if(!model)return;
+  const panel=document.createElement('section');panel.className='cosmogony-panel';
+  const add=(parent,tag,text,className)=>{const element=document.createElement(tag);element.textContent=text;if(className)element.className=className;parent.append(element);return element;};
+  add(panel,'h3',model.title);add(panel,'p',model.sourceSummary,'hierarchy-strip');
+  add(panel,'p','第六層：大羅天 → 第五層：三清勝境；層號是本介面的教學分類。','evidence-note');
+  for(const pattern of model.models){
+    const card=add(panel,'section','', 'cosmogony-model');card.dataset.model=pattern.key;
+    add(card,'h4',pattern.title);add(card,'p',pattern.sequence,'model-sequence');
+    const wrap=add(card,'div','','comparison-scroll');const table=document.createElement('table');wrap.append(table);
+    const caption=document.createElement('caption');caption.textContent=pattern.key==='A'?'3D 三境沿用此組炁名；色象另列，不冒充模型配色。':'此組炁名配天與模式 A 不同；不混入同一 3D 對應。';table.append(caption);
+    const head=document.createElement('thead');table.append(head);const row=document.createElement('tr');head.append(row);
+    for(const heading of ['炁名','色象','天境']){const th=add(row,'th',heading);th.scope='col';}
+    const body=document.createElement('tbody');table.append(body);
+    for(const item of pattern.rows){const row=document.createElement('tr');body.append(row);for(const text of item.slice(0,3))add(row,'td',text);}
+    if(pattern.key==='A'){
+      const teaching=add(card,'div','','teaching-links');
+      for(const item of pattern.rows)add(teaching,'p',`${item[0]} → ${item[3]} → ${item[4]}`);
+    }
+    if(currentMode!=='beginner'){add(card,'p',pattern.source,'source-record');add(card,'p',pattern.note,'evidence-note');}
+  }
+  const nine=add(panel,'section','','nine-qi-panel');add(nine,'h4','九炁九天・前三章例');
+  for(const item of model.nineExamples)add(nine,'p',`${item.heaven} → ${item.qi}`);
+  for(const entry of model.numbers){const card=add(panel,'section','','counting-card');add(card,'h4',entry.label);add(card,'p',entry.formula,'model-sequence');add(card,'p',entry.note);}
+  if(currentMode==='researcher')for(const source of model.sources){const card=add(panel,'article','','source-record');add(card,'h4',source.title);add(card,'p',source.finding);add(card,'p',source.status,'evidence-note');}
+  add(panel,'p',model.note,'evidence-note');container.prepend(panel);
 }
