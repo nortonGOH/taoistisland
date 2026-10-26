@@ -294,15 +294,114 @@
 
         initScene();
       } catch (error) {
-        console.error("資料載入失敗：", error);
-        document.getElementById("canvas-container").innerHTML = `
-          <div class="flex items-center justify-center h-full px-4">
-            <div class="bg-rose-950/90 border border-rose-500 text-rose-200 px-6 py-5 rounded-xl max-w-lg text-sm shadow-2xl">
-              <h3 class="font-bold text-base mb-2">⚠️ 資料庫 (islands.json) 讀取失敗</h3>
-              <p class="text-xs leading-relaxed text-rose-300 mb-2">請確認本機有開啟 HTTP 伺服器，或已正確發布至 GitHub Pages。</p>
-            </div>
-          </div>
-        `;
+        console.warn("無法透過 fetch 讀取 islands.json（可能因本機 file:/// 限制），啟動內建資料庫渲染：", error);
+        // 內建完整資料庫備援，避免畫面空白
+        ISLANDS_DATA = [
+          {
+            id: "beidou",
+            title: "北斗樞紐：生殺注籍與五斗分司",
+            subtitle: "天之綱紀・在身神識・一炁生水・總監眾靈之至尊",
+            modelType: "星辰身命盤・中央樞紐",
+            disk: "zodiac",
+            isCenter: true,
+            isKalpa: false,
+            color: 0x38bdf8,
+            hexColor: "#38bdf8",
+            beginner: {
+              step1_question: "北斗在道教信仰中，為何同時是天體、身體神識，又是審定生死的司法機關？",
+              step2_concept: "道教拒絕將北斗視為冰冷的宿命星宿。北斗既是宇宙時間運轉的樞紐，又是人身神識與魂魄本質的來源。其坐鎮中天旋迴四方，並以五斗職司分理筭數、記名、上生與落死，透過齋謝醮禮即可轉動命籍。",
+              step3_evidence: "《太上三十六部尊經·太清境中精經第八》：「正北位居中，一炁生水……故北斗居中天而旋廻四方，主一切人民生死禍福。」",
+              step4_narrative: "<p>北斗七星於《太清境中精經第八》分司五斗：第一貪狼、第三祿存為東斗主筭；第二巨門、第四文曲為西斗記名；第六武曲居本位為北斗落死；第五廉貞為南斗上生；第七破軍居中位為中斗大魁，總監眾靈。其威能置於水生萬物的生生之氣上，透過祈禱醮禮善無不應，打破了絕對定命論。</p>"
+            },
+            course: {
+              topicMap: "漢魏六朝星神學 → 北斗樞紐、五斗分司與身神網絡",
+              materials: ["《太上三十六部尊經·太清境中精經第八》", "《太上玄靈北斗本命延生真經》", "朱磊《中國古代的北斗信仰研究》"],
+              comparisons: "《太清境中精經》中北斗七星分隸五斗之職司，如何將天體星官轉化為分工嚴密的司法行政網絡？"
+            },
+            researcher: {
+              searchTerms: "北斗九星; 太清境中精經; 東斗主筭; 西斗記名; 北斗落死; 南斗上生; 旋璣玉衡",
+              imageRef: "洞真部本文類《太清境中精經第八》經本圖示",
+              dispute: "【典籍考訂】：北斗職司分隸五斗確立了生殺簿籍的司法分權，表明北斗威能重在「一炁生水」之生機，而非單純司殺。"
+            }
+          },
+          {
+            id: "kalpa_center",
+            title: "玄都玉京天樞樞紐",
+            subtitle: "元始所居・九玄空洞之先・靈寶真文自然結秀之所",
+            modelType: "五劫天輪・中央天台",
+            disk: "kalpa",
+            isCenter: true,
+            isKalpa: true,
+            color: 0x38bdf8,
+            hexColor: "#38bdf8",
+            beginner: {
+              step1_question: "五劫天輪之核心「玄都玉京」在靈寶宇宙論中代表何種地位？",
+              step2_concept: "靈寶五劫運度皆由元始天尊於玄都玉京大羅天中旋轉發動。此處為萬法與真文之母源，不屬任何劫數之成壞，超乎五劫運度之上，總攝周天大劫之開滅與復正。",
+              step3_evidence: "《太上洞玄靈寶赤書玉訣妙經》：「元始天尊於玄都玉京紫微上宮，敷陳靈寶自然真文，五劫運度，開化天地。」",
+              step4_narrative: "<p>天地歷經成壞、水火交侵之時，唯有玉京山與靈寶元始真文超脫劫難之外。天輪以此天樞為中心，象徵至道玄根永恆不滅，統馭五劫之開通、幽冥、復位與普濟。</p>"
+            },
+            course: {
+              topicMap: "靈寶經宇宙劫運學 → 玄都玉京、元始大羅天與五劫天輪總覽",
+              materials: ["《太上洞玄靈寶赤書玉訣妙經》", "《元始無量度人上品妙經》", "陸修靜《太上洞玄靈寶授度儀》"],
+              comparisons: "玄都玉京之「超劫永存」與佛教須彌山在三災中的成住壞空有何本體論差異？"
+            },
+            researcher: {
+              searchTerms: "玄都玉京; 元始天尊; 大羅天; 靈寶五劫; 五劫運度; 赤書玉訣妙經",
+              imageRef: "正統道藏洞真部玉訣類《度人經》玄都玉京山天真內景星象圖錄",
+              dispute: "【神學考據】：古靈寶經將玉京天台置於至高無上之樞軸，確立了一切星宿運度、大劫消長皆受天尊法文統轄的最高神學法權。"
+            }
+          }
+        ];
+
+        // 補齊 12 辰位簡約預設資料（若本機直接雙擊開啟時不報錯）
+        for (let i = 0; i < 12; i++) {
+          ISLANDS_DATA.push({
+            id: `sector_${i}`,
+            title: `第 ${i+1} 辰位｜${ZODIAC_LIST[i].branch}・${ZODIAC_LIST[i].animal}`,
+            subtitle: `十二辰身命星盤宮位（${ZODIAC_LIST[i].emoji}）`,
+            modelType: "星辰身命盤・中環辰位",
+            disk: "zodiac",
+            isCenter: false,
+            isKalpa: false,
+            sectorIndex: i,
+            color: 0xf59e0b,
+            hexColor: "#f59e0b",
+            beginner: {
+              step1_question: `此辰位在道教身命觀中對應何種修行階段？`,
+              step2_concept: `請將 islands.json 檔案置於同目錄下，或上傳至 GitHub Pages 以檢視此節點之完整深度文獻。`,
+              step3_evidence: `《正統道藏》相關原典記載。`,
+              step4_narrative: `<p>本節點完整文字已建構於 islands.json 資料庫中。</p>`
+            },
+            course: { topicMap: "十二辰身命系統", materials: ["《正統道藏》"], comparisons: "身命與星宿之辯證關係。" },
+            researcher: { searchTerms: "身命; 辰位; 命籍", imageRef: "經本圖示", dispute: "文獻考異已建錄於資料庫中。" }
+          });
+        }
+
+        // 補齊 5 劫期簡約預設資料
+        for (let k = 0; k < 5; k++) {
+          ISLANDS_DATA.push({
+            id: KALPA_BADGES[k].id,
+            title: `${KALPA_BADGES[k].name}劫期`,
+            subtitle: `靈寶五劫天輪第 ${k+1} 劫（${KALPA_BADGES[k].emoji}）`,
+            modelType: "五劫天輪・外環扇區",
+            disk: "kalpa",
+            isCenter: false,
+            isKalpa: true,
+            kalpaIndex: k,
+            color: parseInt(KALPA_BADGES[k].color.replace("#", "0x"), 16),
+            hexColor: KALPA_BADGES[k].color,
+            beginner: {
+              step1_question: `${KALPA_BADGES[k].name}劫期在宇宙大劫運度中具有何種特徵？`,
+              step2_concept: `請將 islands.json 檔案置於同目錄下，或上傳至 GitHub Pages 以檢視此節點之完整深度文獻。`,
+              step3_evidence: `《太上洞玄靈寶赤書玉訣妙經》相關記載。`,
+              step4_narrative: `<p>本節點完整文字已建構於 islands.json 資料庫中。</p>`
+            },
+            course: { topicMap: "靈寶五劫運度", materials: ["《九天生神章經》"], comparisons: "大劫運度與真文隱顯之歷史辯證。" },
+            researcher: { searchTerms: "五劫; 靈寶真文", imageRef: "真形圖碑", dispute: "考證結果已建錄於資料庫中。" }
+          });
+        }
+
+        initScene();
       }
     }
 
@@ -345,6 +444,7 @@
       dirLight.shadow.bias = -0.0005;
       scene.add(dirLight);
 
+      // 左盤中心光源與右盤中心光源
       const zodiacLight = new THREE.PointLight(0x38bdf8, 2.2, 30);
       zodiacLight.position.set(ZODIAC_CENTER.x, 4, ZODIAC_CENTER.z);
       scene.add(zodiacLight);
@@ -616,13 +716,15 @@
         kalpaGroup.add(badgeSprite);
 
         const worldFocus = KALPA_CENTER.clone().add(new THREE.Vector3(localX, 0, localZ));
-        sectorMeshUserData = {
+        
+        // 修正：補上 const 關鍵字宣告，避免 ReferenceError 中斷渲染
+        const kalpaMeshUserData = {
           data: kalpaData,
           markerMesh: badgeSprite,
           focusPos: worldFocus
         };
-        kalpaMesh.userData = sectorMeshUserData;
-        badgeSprite.userData = sectorMeshUserData;
+        kalpaMesh.userData = kalpaMeshUserData;
+        badgeSprite.userData = kalpaMeshUserData;
 
         clickableMeshes.push(kalpaMesh);
         clickableMeshes.push(badgeSprite);
@@ -704,7 +806,7 @@
         },
         researcher: {
           searchTerms: "雙中心式盤; 十二辰星盤; 靈寶五劫天輪; 大劫運度; 身命同構",
-          imageRef": "正統道藏洞真部玉訣類雙盤星象與五劫壇場對照圖版",
+          imageRef: "正統道藏洞真部玉訣類雙盤星象與五劫壇場對照圖版",
           dispute: "【雙軌神學範式】：避免將個體生辰祿命與宏觀五劫混為一談，雙盤獨立配置落實了道教文獻學對「個人壽夭命局」與「宇宙浩劫運度」之精確範疇區隔。"
         }
       };
