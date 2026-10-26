@@ -66,7 +66,7 @@
           <strong>第一層【玉京金闕聖境】：</strong>非空寂無物，金闕七寶玄臺朝禮、八方七寶樹彌覆諸天、七寶華林光相燦爛、靈禽神獸翔集、天樂散花誦詠度人。<br>
           <strong>下方基座【九壘九宮剛風】：</strong>風澤洞虛，金剛乘天，自底層動態擎托天地大千。
         </p>
-        <p class="reader-intro">主塔由上而下：第一層大羅、第二層三清、第三層種民與三界三十二天、第四層三光與神州、第五層九壘、第六層剛風。五氣貫穿六層，第三、四層為重點顯化區；原位本體盤保留。先選節點，再切換導讀、課程或考證；3D 模式可拖曳旋轉、滾輪縮放。</p>
+        <p class="reader-intro">主塔由上而下：第一層大羅、第二層三清、第三層種民與三界三十二天、第四層三光與神州、第五層九壘、第六層剛風。五氣貫穿六層，第三、四層為重點顯化區；五方五氣本體盤位於第三、四層交界，連接天界與天—地—人對應。先選節點，再切換導讀、課程或考證；3D 模式可拖曳旋轉、滾輪縮放。</p>
         <p class="model-note">模型說明：本介面並置不同文本與歷史材料，空間位置不代表歷史承繼；各項引文、年代及圖像來源仍須依版本逐一核對。</p>
         <button id="btn-text-view" type="button" onclick="toggleTextView()" aria-pressed="false">切換文字閱讀</button>
         <!-- 視角快速跳轉列 -->
@@ -199,10 +199,10 @@
       let lookY=targetLookAt.y,endY=targetCamPos.y;
       if(part && focusObject){
         const point=focusObject.getWorldPosition(new THREE.Vector3());
-        const bearing=Math.atan2(point.x-axisX,point.z-axisZ);
+        const bearing=userData.prototypeNode && userData.data?.id==='proto_center' ? Math.PI/4 : Math.atan2(point.x-axisX,point.z-axisZ);
         const radius=Math.hypot(point.x-axisX,point.z-axisZ)+(window.innerWidth<=700?10.5:8.5);
         endX=Math.sin(bearing)*radius;endZ=Math.cos(bearing)*radius;
-        lookY=point.y;endY=point.y+1.8;
+        lookY=point.y;endY=point.y+(userData.prototypeNode?4.5:1.8);
       }
       const endRadius=Math.max(2.5,Math.hypot(endX,endZ));
       let endAngle=Math.atan2(endX,endZ);
@@ -296,8 +296,8 @@
     // 空間座標配置
     const ZODIAC_CENTER    = { x: -14, y: 0, z: 8 };   // 左盤：十二辰星盤
     const KALPA_CENTER     = { x: 0, y: 0, z: -18 };   // 主塔下三層：五劫與三界
-    const PROTO_CENTER     = { x: 14, y: 0, z: 8 };    // 五方五氣保留原位
-    const PROTO_HEIGHT     = 5.2;                            // 右盤上層五方五氣高程差
+    const PROTO_CENTER     = { x: 0, y: 0, z: -18 };   // 與六層主塔共軸
+    const PROTO_HEIGHT     = -2.6; // 第三層下緣與第四層之間的教學樞紐
     const COSMOLOGY_CENTER = { x: 0, y: 0, z: -18 };   // 後方垂直立體軸：靈寶六層空間體系
 
     const DISK_HEIGHT = 0.65;
@@ -1149,10 +1149,11 @@
       const tower=scene.getObjectByName('lingbao-six-layers');
       if(tower){kalpaGroup.position.set(0,0,0);tower.add(kalpaGroup);}else scene.add(kalpaGroup);
 
-      // 右盤上層：五方五氣本體盤
+      // 六層空間內：五方五氣本體盤，位於第三、四層交界
       const protoGroup = new THREE.Group();
       protoGroup.name="five-qi-prototype";
-      protoGroup.position.set(PROTO_CENTER.x, PROTO_HEIGHT, PROTO_CENTER.z);
+      protoGroup.position.set(0, PROTO_HEIGHT, 0);
+      tower.add(protoGroup);
 
       const pBaseGeo = new THREE.CylinderGeometry(5.8, 5.8, 0.2, 48);
       const pBaseMat = new THREE.MeshStandardMaterial({ color: 0x221a08, transparent: true, opacity: 0.65, roughness: 0.3 });
@@ -1178,7 +1179,7 @@
 
       const protoCenterData = ISLANDS_DATA.find(d => d.id === "proto_center");
       const protoCenterWorldPos = new THREE.Vector3(PROTO_CENTER.x, PROTO_HEIGHT, PROTO_CENTER.z);
-      const pCenterUserData = { data: protoCenterData, markerMesh: tianshuSprite, focusPos: protoCenterWorldPos };
+      const pCenterUserData = { data: protoCenterData, markerMesh: tianshuSprite, focusObject:tianshuSprite, focusPos: protoCenterWorldPos, focusContext:'tower', axisPart:true, prototypeNode:true };
       pCenterHitMesh.userData = pCenterUserData;
       tianshuSprite.userData = pCenterUserData;
       centerBase.userData = pCenterUserData;core.userData = pCenterUserData;
@@ -1222,7 +1223,7 @@
 
         const nodeData = ISLANDS_DATA.find(d => d.id === dir.id);
         const nodeWorldPos = new THREE.Vector3(PROTO_CENTER.x + lx, PROTO_HEIGHT, PROTO_CENTER.z + lz);
-        const dirUserData = { data: nodeData, markerMesh: sprite, focusPos: nodeWorldPos };
+        const dirUserData = { data: nodeData, markerMesh: sprite, focusObject:sprite, focusPos: nodeWorldPos, focusContext:'tower', axisPart:true, prototypeNode:true };
         bMesh.userData = dirUserData;
         sprite.userData = dirUserData;
 
@@ -1231,7 +1232,8 @@
         protoGroup.add(bMesh);
       });
 
-      scene.add(protoGroup);
+      const junctionLabel=sanqingText(['五方五氣本體','第三、四層交界'],'#fde68a',1024,256);
+      junctionLabel.position.set(0,-0.8,6.1);protoGroup.add(junctionLabel);
       buildWuqiAcross(scene.getObjectByName('lingbao-six-layers'));
     }
 
@@ -1503,9 +1505,6 @@
     }
 
     function focusProtoDisk() {
-      if (!sceneReady || textView) { selectIslandById('proto_center'); return; }
-      new TWEEN.Tween(controls.target).to({ x: PROTO_CENTER.x, y: PROTO_HEIGHT, z: PROTO_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(camera.position).to({ x: PROTO_CENTER.x, y: PROTO_HEIGHT + 14, z: PROTO_CENTER.z + 12 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('proto_center');
     }
 

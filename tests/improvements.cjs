@@ -5,21 +5,28 @@ const http=require('http'),path=require('path');const root=path.resolve(__dirnam
 const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http://localhost').pathname;const f=path.join(root,pathname==='/'?'index.html':pathname);fs.readFile(f,(e,data)=>{if(e){res.statusCode=404;res.end();return;}res.setHeader('Content-Type',f.endsWith('.js')?'text/javascript':f.endsWith('.css')?'text/css':f.endsWith('.json')?'application/json':'text/html');res.end(data);});});await new Promise(r=>server.listen(8766,'127.0.0.1',r));
 const b=await chromium.launch({...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await b.newPage({viewport:{width:1440,height:960}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
-await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady);
-// Relocation shares the tower axis; all prototype coordinates stay exactly where they were.
+await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady).catch(e=>{console.error('Scene initialization errors:',errors);throw e;});
+for(const id of ['proto_center','proto_east','proto_south','proto_west','proto_north']) {
+ await p.evaluate(id=>selectIslandById(id),id);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});
+ await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedIsland.id),id);
+ assert.equal(await p.evaluate(()=>lastOrbitTransition.kind),'axis-orbit');
+}
+// Relocation shares the tower axis; the prototype moves into its third/fourth-layer junction.
 const layout=await p.evaluate(()=>{
  const wheel=scene.getObjectByName('lingbao-kalpa-wheel'),tower=scene.getObjectByName('lingbao-six-layers'),proto=scene.getObjectByName('five-qi-prototype');
- return {wheel:wheel.getWorldPosition(new THREE.Vector3()).toArray(),tower:tower.getWorldPosition(new THREE.Vector3()).toArray(),parent:wheel.parent.name,proto:proto.getWorldPosition(new THREE.Vector3()).toArray(),layers:[1,2,3].map(i=>scene.getObjectByName('tower-layer-'+i).getWorldPosition(new THREE.Vector3()).y),nodes:ISLANDS_DATA.length};
+ return {wheel:wheel.getWorldPosition(new THREE.Vector3()).toArray(),tower:tower.getWorldPosition(new THREE.Vector3()).toArray(),parent:wheel.parent.name,protoParent:proto.parent.name,proto:proto.getWorldPosition(new THREE.Vector3()).toArray(),layers:[1,2,3].map(i=>scene.getObjectByName('tower-layer-'+i).getWorldPosition(new THREE.Vector3()).y),nodes:ISLANDS_DATA.length};
 });
-assert.deepEqual(layout.wheel,[0,0,-18]);assert.equal(layout.parent,'lingbao-six-layers');assert.deepEqual(layout.proto,[14,5.2,8]);
+assert.deepEqual(layout.wheel,[0,0,-18]);assert.equal(layout.parent,'lingbao-six-layers');assert.deepEqual(layout.proto,[0,-2.6,-18]);
+assert.equal(layout.protoParent,'lingbao-six-layers');
 assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,34);
-console.log('Wheel moved to the tower; five-qi prototype coordinates unchanged.');
-// Six macro layers are numbered top-down; the qi network crosses all six without moving the original disk.
+console.log('Wheel moved to the tower; five-qi prototype moved inside the tower.');
+// Six macro layers are numbered top-down; the qi network crosses all six through the relocated disk.
 const across=await p.evaluate(()=>{
  const source=ISLANDS_DATA.find(n=>n.id==='proto_center').wuqiAcross;
  const group=scene.getObjectByName('wuqi-across-six-layers');
  return {levels:source.layers.map(l=>[l.rank,ISLANDS_DATA.find(n=>n.id===l.id).spaceLayer]),flows:group.children.filter(o=>o.name.startsWith('wuqi-flow-')).length,points:group.children.filter(o=>o.userData.towerWuqiLayer).length,proto:scene.getObjectByName('five-qi-prototype').getWorldPosition(new THREE.Vector3()).toArray()};
-});assert.deepEqual(across.levels,[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]]);assert.equal(across.flows,5);assert.equal(across.points,25);assert.deepEqual(across.proto,[14,5.2,8]);
+});assert.deepEqual(across.levels,[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]]);assert.equal(across.flows,5);assert.equal(across.points,25);assert.deepEqual(across.proto,[0,-2.6,-18]);
 for(const rank of [2,3,4,5,6]){
  await p.evaluate(rank=>selectIsland(scene.getObjectByName('wuqi-proto_north-layer-'+rank).userData),rank);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
  assert.equal(await p.locator('.wuqi-layer-list button[data-selected="true"]').getAttribute('data-rank'),String(rank));
@@ -28,7 +35,7 @@ for(const rank of [2,3,4,5,6]){
  const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedWuqiLayer),rank);
 }
 await p.screenshot({path:path.join(root,'test-results','wuqi-across-qa.png')});
-console.log('Six top-down layers, five streams, 25 cross-layer points and unchanged prototype passed.');
+console.log('Six top-down layers, five streams, 25 cross-layer points and relocated prototype passed.');
 await p.evaluate(()=>closeDrawer());assert.equal(await p.evaluate(()=>scene.getObjectByName('wuqi-flow-proto_north').material.opacity),0.25);
 // The kalpa wheel now contains all 28 heavens in three internal tiers.
 await p.evaluate(()=>selectIslandById('kalpa_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());

@@ -263,8 +263,9 @@ function buildWuqiAcross(parent) {
     const points=[sourcePoint.clone()];
     for(const layer of model.layers.slice(1)){
       const radius=center?0.65:layer.rank===2?4.4:layer.rank===6?9.0:8.6;
+      if(layer.rank===4)points.push(new THREE.Vector3(center?0:Math.cos(angle)*4.5,PROTO_HEIGHT,center?0:-Math.sin(angle)*4.5));
       const point=new THREE.Vector3(Math.cos(angle)*radius,layer.y,-Math.sin(angle)*radius);points.push(point);
-      const dot=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,8),new THREE.MeshBasicMaterial({color:direction.color}));dot.position.copy(point);dot.name=`wuqi-${direction.id}-layer-${layer.rank}`;group.add(dot);
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(layer.rank===3 || layer.rank===4?0.23:0.14,10,8),new THREE.MeshBasicMaterial({color:direction.color}));dot.position.copy(point);dot.name=`wuqi-${direction.id}-layer-${layer.rank}`;group.add(dot);
       dot.userData={data:ISLANDS_DATA.find(n=>n.id===direction.id),focusContext:'tower',towerWuqiKey:direction.id,towerWuqiLayer:layer.rank,focusObject:dot,focusPos:point.clone().add(new THREE.Vector3(COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y,COSMOLOGY_CENTER.z))};clickableMeshes.push(dot);
     }
     const flow=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),90,0.023,5,false),new THREE.MeshBasicMaterial({color:direction.color,transparent:true,opacity:0.25,depthWrite:false}));flow.name='wuqi-flow-'+direction.id;flow.userData.wuqiFlow=true;group.add(flow);
@@ -280,7 +281,7 @@ function renderWuqiAcrossPanel(container) {
   const model=selectedIsland?.wuqiAcross;if(!model)return;
   const panel=document.createElement('details');panel.className='wuqi-across-panel';panel.open=selectedIsland.disk==='proto_lingbao'||selectedIsland.id==='lingbao_earth_realm'||currentMode==='researcher';
   const add=(parent,tag,text,cls)=>{const item=document.createElement(tag);item.textContent=text;if(cls)item.className=cls;parent.append(item);return item;};
-  add(panel,'summary',model.title);add(panel,'p','由上而下編號；第三層天界、第四層天—地—人對應為重點顯化區。','hierarchy-strip');
+  add(panel,'summary',model.title);add(panel,'p',model.placement,'hierarchy-strip');add(panel,'p',model.interpretation,'evidence-note');add(panel,'p','由上而下編號；第三層天界、第四層天—地—人對應為重點顯化區。','hierarchy-strip');
   const stack=add(panel,'div','','wuqi-layer-list');
   for(const layer of model.layers){const button=add(stack,'button',`${layer.rank}・${layer.name}`);button.type='button';button.dataset.rank=layer.rank;button.dataset.selected=String(selectedWuqiLayer===layer.rank);button.addEventListener('click',()=>selectIslandById(layer.id));add(stack,'p',layer.role);}
   const wrap=add(panel,'div','','comparison-scroll');const table=add(wrap,'table','');add(table,'caption','五星・五嶽・五臟對照：山名與完整配對仍須核對版本。');
