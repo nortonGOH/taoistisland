@@ -264,7 +264,7 @@
       const selectedBox=projectBox(marker);
       scene.traverse(object=>{
         if(!object.isSprite || object===marker || !object.visible)return;
-        if(!marker.isSprite && object.userData.data?.id===selectedIsland.id)return;
+        if(!marker.isSprite && object.userData.data?.id===selectedIsland.id && !(focusedUserData?.yujingPart && object.userData.yujingPart!==focusedUserData.yujingPart))return;
         if(marker.isGroup){let ancestor=object.parent;while(ancestor){if(ancestor===marker)return;ancestor=ancestor.parent;}}
         const box=projectBox(object);
         if(box.left<selectedBox.right && box.right>selectedBox.left && box.bottom<selectedBox.top && box.top>selectedBox.bottom){
@@ -686,6 +686,7 @@
     function buildYujingSanctuary(cosmoGroup, baseY) {
       const yujingGroup = new THREE.Group();
       yujingGroup.position.y = baseY;
+      yujingGroup.name='yujing-sanctuary';
 
       // 1. 【七寶玄臺】：三層金玉琉璃漸縮八角階梯臺
       const platformGeo1 = new THREE.CylinderGeometry(5.2, 5.5, 0.45, 8);
@@ -831,6 +832,7 @@
       yujingGroup.add(dynamicPetalParticles);
 
       // 綁定點擊事件
+      palace.visible=false;roof.visible=false;orb.visible=false;
       const daluoData = ISLANDS_DATA.find(d => d.id === "lingbao_daluo");
       const focusWorldPos = new THREE.Vector3(COSMOLOGY_CENTER.x, COSMOLOGY_CENTER.y, COSMOLOGY_CENTER.z).add(new THREE.Vector3(0, baseY + 2.2, 3.0));
       const yujingUserData = { data: daluoData, markerMesh: palace, focusPos: focusWorldPos };
@@ -839,6 +841,7 @@
       clickableMeshes.push(p1);
       clickableMeshes.push(palace);
 
+      buildYujingCore(yujingGroup,daluoData,baseY);
       cosmoGroup.add(yujingGroup);
     }
 
@@ -856,6 +859,7 @@
       const daluoMainTex = createBadgeTexture("👑", "第一層【至高聖境】大羅天玉京山金闕", "#facc15");
       const daluoMainSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: daluoMainTex, transparent: true }));
       daluoMainSprite.scale.set(2.4, 2.4, 1.0);
+      daluoMainSprite.visible=false; // Replaced by the spatial overview label; keep the scripture core unobstructed.
       daluoMainSprite.position.set(0, 33.2, 3.5);
       daluoMainSprite.userData = {
         data: daluoData,
@@ -1259,6 +1263,7 @@
       if (!userData || !userData.data) return;
       restoreFocusAppearance();
       selectedSanqingKey = userData.sanqingKey || null;
+      selectedYujingPart = userData.yujingPart || null;
       selectedFourBrahmaKey = userData.fourBrahmaKey || null;
       selectedKalpaRealmKey = userData.kalpaRealmKey || null;
       selectedWuqiLayer = userData.towerWuqiLayer || null;
@@ -1292,7 +1297,9 @@
           targetCamPos.set(COSMOLOGY_CENTER.x + 1.2, COSMOLOGY_CENTER.y + 30.5, COSMOLOGY_CENTER.z + 26);
         } else if (selectedIsland.id === "lingbao_daluo") {
           // 第六層大羅天玉京山：正對金闕與玄臺
-          targetCamPos.set(targetPos.x, targetPos.y + 4.5, targetPos.z + 9.5);
+          const distanceScale=Math.max(1,700/window.innerWidth);
+          targetLookAt.set(COSMOLOGY_CENTER.x,31.2,COSMOLOGY_CENTER.z);
+          targetCamPos.set(COSMOLOGY_CENTER.x,31.2+6*distanceScale,COSMOLOGY_CENTER.z+24*distanceScale);
         } else {
           // 第2~5層：正面微俯角平視該層圖示
           targetCamPos.set(targetPos.x, targetPos.y + 3.0, targetPos.z + 8.0);
@@ -1676,6 +1683,7 @@
       renderWuqiAcrossPanel(contentBox);
       renderFourBrahmaPanel(contentBox);
       renderKalpaBoundaryPanel(contentBox);
+      renderYujingPanel(contentBox);
       removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');
       cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });
@@ -1724,6 +1732,7 @@
       if (!sceneReady || textView) { animationFrame = null; return; }
       animationFrame = requestAnimationFrame(animate);
       TWEEN.update();
+      animateYujingRitual(time || 0);
       controls.update();
 
       const t = time * 0.0015;

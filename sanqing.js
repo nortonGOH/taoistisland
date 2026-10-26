@@ -97,7 +97,7 @@ function buildSanqingRealms(parent) {
     const rim=new THREE.Mesh(new THREE.TorusGeometry(2.17,0.065,8,64),new THREE.MeshBasicMaterial({color:realm.color}));
     rim.rotation.x=Math.PI/2; rim.position.set(x,y+0.24,z);group.add(rim);
     const figure=createSanqingFigure(realm,object=>clickable(object,realm.key));
-    figure.position.set(x,y+1.45,z);group.add(figure);
+    figure.position.set(x,y+1.45,z);figure.rotation.y=Math.atan2(x,z);group.add(figure);
     const curve=new THREE.CatmullRomCurve3([sourcePos.clone(),new THREE.Vector3(x*0.55,3.2,z*0.55),new THREE.Vector3(x,y+2.6,z),new THREE.Vector3(x,y+1.95,z)]);
     group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.045,8,false),new THREE.MeshBasicMaterial({color:realm.color,transparent:true,opacity:0.7})));
     const qiLabel=sanqingText([realm.qi],realm.color,640,180);
@@ -327,4 +327,59 @@ function renderWuqiAcrossPanel(container) {
   add(panel,'p','此組青黃白出自齋壇存炁語境，不以相同顏色之名強行合併三炁模式 A、B。','evidence-note');
   if(currentMode==='researcher')for(const source of model.sources){const card=add(panel,'article','','source-record');add(card,'h4',source.title);add(card,'p',source.finding);add(card,'p',source.status,'evidence-note');}
   add(panel,'p',model.note,'evidence-note');container.prepend(panel);
+}
+
+let selectedYujingPart=null;
+function buildYujingCore(group,data,baseY){
+  const gold=new THREE.MeshStandardMaterial({color:'#bfa461',metalness:0.6,roughness:0.35});
+  const jade=new THREE.MeshStandardMaterial({color:'#40566f',metalness:0.35,roughness:0.4});
+  const book=new THREE.Group();book.name='yujing-scripture';book.position.set(0,4.15,0);group.add(book);
+  const palace=new THREE.Group();palace.name='yujing-purple-palace';palace.position.y=3;group.add(palace);
+  const attendants=new THREE.Group();attendants.name='yujing-attendants';attendants.position.y=2.2;group.add(attendants);
+  function register(object,part,focus){object.userData={data,yujingPart:part,axisPart:part!=='overview',focusContext:'tower',focusObject:focus,focusPos:new THREE.Vector3(COSMOLOGY_CENTER.x,baseY+focus.position.y,COSMOLOGY_CENTER.z)};if(object.isSprite)object.userData.markerMesh=object;clickableMeshes.push(object);return object;}
+  function mesh(parent,geo,mat,x,y,z,part,focus){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);parent.add(m);register(m,part,focus);return m;}
+  // Open architecture keeps the scripture visible within the upper sanctuary.
+  mesh(palace,new THREE.CylinderGeometry(1.65,1.85,0.22,8),jade,0,0.26,0,'palace',palace);
+  for(const x of [-1.25,1.25])for(const z of [-1.25,1.25])mesh(palace,new THREE.CylinderGeometry(0.07,0.09,3.1,10),gold,x,0.4,z,'palace',palace);
+  const roofMaterial=gold.clone();roofMaterial.transparent=true;roofMaterial.opacity=0.2;roofMaterial.depthWrite=false;
+  const roof=mesh(palace,new THREE.ConeGeometry(2.0,0.7,4),roofMaterial,0,2.28,0,'palace',palace);roof.rotation.y=Math.PI/4;roof.add(new THREE.LineSegments(new THREE.EdgesGeometry(roof.geometry),new THREE.LineBasicMaterial({color:'#d4bd7e',transparent:true,opacity:0.65})));
+  mesh(palace,new THREE.CylinderGeometry(0.6,0.8,0.22,8),gold,0,0.56,0,'scripture',book);
+  for(let i=0;i<3;i++){
+    const leaf=mesh(book,new THREE.BoxGeometry(0.34,1.08,0.09),new THREE.MeshStandardMaterial({color:['#79c6cf','#b8b1dc','#d7c38a'][i],emissive:'#e6dcb1',emissiveIntensity:0.16,metalness:0.3,roughness:0.4}),(i-1)*0.4,0,0,'scripture',book);
+    for(let row=0;row<3;row++)mesh(book,new THREE.BoxGeometry(0.18,0.012,0.012),gold,(i-1)*0.4,0.25-row*0.21,0.055,'scripture',book);
+  }
+  const bookLabel=sanqingText(['三寶神經','七寶玄臺・藏經核心'],'#fde68a',1024,300);bookLabel.scale.set(3.2,0.94,1);bookLabel.position.set(0,3.5,2.0);group.add(register(bookLabel,'scripture',book));
+  const labels=[['無上大羅天／極致虛空','超越性場域・非實體天幕',0,6.3,-1,'overview'],['玄都玉京山・七寶城闕','中央藏經・八方寶林',0,-0.55,6.2,'overview'],['紫微上宮／劫仞臺','元始／大道君治所說〔待核〕',-4.1,3.2,1.5,'palace'],['七寶騫林／靈禽神獸','八樹覆八方・靈風成宮商',4.1,3.2,1.5,'forest']];
+  labels.forEach(([a,b,x,y,z,part])=>{const label=sanqingText([a,b],'#d6d3ed',1024,280);label.scale.set(3.7,1.01,1);label.position.set(x,y,z);group.add(register(label,part,label));});
+  for(let i=0;i<10;i++){
+    const a=i*Math.PI*2/10,person=new THREE.Group();person.name='yujing-worshipper-'+i;person.position.set(Math.cos(a)*3.05,0,Math.sin(a)*3.05);person.rotation.y=Math.atan2(-person.position.x,-person.position.z);attendants.add(person);
+    mesh(person,new THREE.ConeGeometry(0.16,0.43,8),new THREE.MeshStandardMaterial({color:'#a7b8d1',roughness:0.7}),0,0.2,0,'ritual',attendants);
+    mesh(person,new THREE.SphereGeometry(0.085,10,8),gold,0,0.48,0,'ritual',attendants);
+    mesh(person,new THREE.BoxGeometry(0.22,0.065,0.09),gold,0,0.31,0.12,'ritual',attendants);
+  }
+  const ritualLabel=sanqingText(['聖眾旋繞玄臺・誦詠朝禮','十方代表造型・環行示意'],'#cbd5e1',1024,260);ritualLabel.scale.set(4.4,1.12,1);ritualLabel.position.set(0,1.4,4.0);group.add(register(ritualLabel,'ritual',attendants));
+  for(let i=0;i<3;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(3+i*0.65,0.015,4,64),new THREE.MeshBasicMaterial({color:'#a5b4fc',transparent:true,opacity:0.16,depthWrite:false}));ring.rotation.x=Math.PI/2;ring.position.y=1.6+i*0.14;ring.name='yujing-wind-'+i;group.add(ring);}
+  group.userData.ritualGroup=attendants;
+}
+function animateYujingRitual(time){
+  const group=scene?.getObjectByName('yujing-sanctuary');if(!group)return;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  group.userData.ritualGroup.rotation.y=reduced?0:time*0.00004;
+  for(let i=0;i<3;i++){const ring=group.getObjectByName('yujing-wind-'+i);ring.material.opacity=reduced?0.16:0.1+0.08*(1+Math.sin(time*0.0007+i));}
+}
+function renderYujingPanel(container){
+  if(selectedIsland?.id!=='lingbao_daluo')return;
+  const panel=document.createElement('section');panel.className='sanqing-panel yujing-panel';
+  const add=(tag,text,parent=panel)=>{const e=document.createElement(tag);e.textContent=text;parent.append(e);return e;};
+  add('h3','玉京山：藏經核心與宇宙朝禮');
+  const map=add('div','');map.className='yujing-map';
+  add('p','無上大羅天／極致虛空',map);add('p','玄都玉京山・七寶城闕',map);
+  const branches=add('div','',map);branches.className='yujing-branches';add('p','紫微上宮／劫仞臺：藏經；元始／大道君治所說待逐文本對讀',branches);add('p','七寶騫林／靈禽神獸：八方寶林、宮商之音',branches);
+  const descriptions={overview:'玉京山神聖景觀總覽。',scripture:'天書置於上層中央開放式宮闕內；三片玉簡為三寶神經的象徵，並非卷數或古文字復原。',palace:'紫微上宮與劫仞臺並列作閱讀索引，並不宣稱二名完全同義或固定建築平面。',forest:'八方各一株寶樹；光環表達靈風與宮商之音，未自動播放音樂。',ritual:'十組代表造型面向中央，環行朝禮；不將十方理解為只有十位尊神。環行速度與人數屬視覺設計。'};
+  add('p',descriptions[selectedYujingPart||'overview']);
+  add('h4','原文與詮釋分層');
+  add('p','《洞玄靈寶玉京山步虛經》電子轉錄見「上有玉京金闕七寶玄臺紫微上宮，中有三寶神經」，並述八方寶樹、聖眾旋繞七寶玄臺三周匝與靈風成宮商。天書的核心地位有文本依據；本圖的精確高度、左右分支與建築層次為教學安排，不能由「中有」逕推唯一的最高物理座標。');
+  add('p','治所須分文本：《步虛經》此段作太上無極虛皇天尊之治；《度人上品妙經四註》相關注解另見高上玉皇及劫仞臺之說。使用者提出的元始天尊／大道君治所，須逐文本對讀，不直接覆蓋上述差異。');
+  add('p','「朝衛靈文於玉山之中」依使用者提供材料作主題提示；完整底本與具體段落尚待核對。朝衛靈文與《步虛經》旋繞玄臺之描寫分列，不將一匝與三周匝合成同一儀程。電子轉錄初核，底本影像與異文待核。');
+  container.prepend(panel);
 }
