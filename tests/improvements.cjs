@@ -38,7 +38,7 @@ const layout=await p.evaluate(()=>{
 });
 assert.deepEqual(layout.wheel,[0,0,-18]);assert.equal(layout.parent,'lingbao-six-layers');assert.deepEqual(layout.proto,[0,-2.6,-18]);
 assert.equal(layout.protoParent,'lingbao-six-layers');
-assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,34);
+assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,39);
 console.log('Wheel moved to the tower; five-qi prototype moved inside the tower.');
 // Six macro layers are numbered top-down; the qi network crosses all six through the relocated disk.
 const across=await p.evaluate(()=>{

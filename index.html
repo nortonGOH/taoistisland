@@ -40,6 +40,7 @@
   <div id="load-status" role="status" aria-live="polite">正在載入節點資料…</div>
   <noscript><p>本站需要 JavaScript 才能切換節點。您可下載 <a href="islands.json">節點原始資料</a> 閱讀。</p></noscript>
 
+  <nav id="space-switcher" aria-label="宇宙模型切換"><button id="btn-space-lingbao" type="button" onclick="openCosmologySpace('lingbao')">靈寶六層</button><button id="btn-space-shangqing" type="button" onclick="openCosmologySpace('shangqing')">上清經派</button></nav>
   <!-- 3D 渲染畫布容器 -->
   <div id="canvas-container" class="absolute inset-0"></div>
 
@@ -121,6 +122,7 @@
     <select id="node-group">
       <option value="">全部主題</option>
       <option value="cosmology_lingbao">靈寶空間</option>
+      <option value="shangqing">上清經派・獨立空間</option>
       <option value="proto_lingbao">五方五氣</option>
       <option value="kalpa">五劫天輪</option>
       <option value="zodiac">十二辰與命論</option>
@@ -184,6 +186,7 @@
   </div>
 
   <script src="sanqing.js"></script>
+  <script src="shangqing.js"></script>
   <script>
     let ISLANDS_DATA = [];
     let scene, camera, renderer, controls;
@@ -192,7 +195,8 @@
     let selectedIsland = null;
     let lastOrbitTransition=null;
     function orbitLingbaoAxis(targetLookAt,targetCamPos,focusObject,userData) {
-      const axisX=COSMOLOGY_CENTER.x, axisZ=COSMOLOGY_CENTER.z;
+      const axis=userData.focusAxis||COSMOLOGY_CENTER;
+      const axisX=axis.x, axisZ=axis.z;
       const startRadius=Math.max(0.5,Math.hypot(camera.position.x-axisX,camera.position.z-axisZ));
       const startAngle=Math.atan2(camera.position.x-axisX,camera.position.z-axisZ);
       let endX=targetCamPos.x-axisX,endZ=targetCamPos.z-axisZ;
@@ -600,6 +604,7 @@
 
       createStarfield();
       buildSceneSystems();
+      buildShangqingSpace();
 
       window.addEventListener("resize", onWindowResize);
       renderer.domElement.addEventListener("pointerdown", onPointerDown);
@@ -1244,7 +1249,7 @@
     }
 
     function onPointerDown(event) {
-      if (event.target.closest?.("header, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes, #side-drawer, #load-status")) return;
+      if (event.target.closest?.("header, #space-switcher, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes, #side-drawer, #load-status")) return;
       if (!document.getElementById("narrative-modal").classList.contains("hidden")) return;
 
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -1262,13 +1267,16 @@
    function selectIsland(userData) {
       if (!userData || !userData.data) return;
       restoreFocusAppearance();
+      selectedShangqingHeaven=userData.shangqingHeaven||null;selectedShangqingHouse=userData.shangqingHouse||null;
       selectedSanqingKey = userData.sanqingKey || null;
       selectedYujingPart = userData.yujingPart || null;
       selectedFourBrahmaKey = userData.fourBrahmaKey || null;
       selectedKalpaRealmKey = userData.kalpaRealmKey || null;
       selectedWuqiLayer = userData.towerWuqiLayer || null;
       selectedIsland = userData.data;
-      if(sceneReady)highlightWuqiAcross();
+      document.getElementById('btn-space-shangqing').setAttribute('aria-pressed',String(selectedIsland.disk==='shangqing'));
+      document.getElementById('btn-space-lingbao').setAttribute('aria-pressed',String(selectedIsland.disk==='cosmology_lingbao'||selectedIsland.disk==='proto_lingbao'||selectedIsland.disk==='kalpa'));
+      if(sceneReady){highlightWuqiAcross();applyShangqingModel();}
       if (!textView && !isLeftPanelCollapsed) toggleLeftPanel();
       renderDrawer();
       renderNodeList();
@@ -1282,7 +1290,11 @@
 
       let targetCamPos = new THREE.Vector3();
 
-      if (selectedIsland.disk === "cosmology_lingbao" || selectedIsland.disk === "kalpa" || userData.focusContext==='tower') {
+      if(selectedIsland.disk==='shangqing'){
+        const scale=Math.max(1,700/window.innerWidth),overview=userData.spaceOverview;
+        targetLookAt.set(SHANGQING_CENTER.x,overview?11:targetPos.y,SHANGQING_CENTER.z);
+        targetCamPos.set(SHANGQING_CENTER.x,targetLookAt.y+(overview?10:4)*scale,SHANGQING_CENTER.z+(overview?72:26)*scale);
+      } else if (selectedIsland.disk === "cosmology_lingbao" || selectedIsland.disk === "kalpa" || userData.focusContext==='tower') {
         // 【靈寶立體天塔與九壘剛風】：徽章面向南方(+Z)，相機直接正對該層圖示前方
         if(selectedIsland.id==='kalpa_center' || selectedIsland.id==='lingbao_three_realms'){
           targetLookAt.set(COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y+6,COSMOLOGY_CENTER.z);
@@ -1364,7 +1376,7 @@
       }
       updateSceneFraming();
 
-      let focusObject = userData.markerMesh || userData.focusObject;
+      let focusObject = userData.spaceOverview ? userData.focusObject : (userData.markerMesh || userData.focusObject);
       if (focusObject && !focusObject.isObject3D) focusObject = null;
       if (!focusObject) focusObject = clickableMeshes.find(m=>m.isSprite && m.userData.data?.id===selectedIsland.id);
       const individual = !!(userData.sanqingKey || userData.fourBrahmaKey || userData.kalpaRealmKey || userData.axisPart || userData.towerWuqiKey || (userData.data?.disk==='kalpa' && !userData.data.isCenter));
@@ -1385,7 +1397,7 @@
       if(focusTargetTween) focusTargetTween.stop();
       if(focusCameraTween) focusCameraTween.stop();
 
-      if(selectedIsland.disk==='cosmology_lingbao' || selectedIsland.disk==='kalpa' || userData.focusContext==='tower') {
+      if(selectedIsland.disk==='cosmology_lingbao' || selectedIsland.disk==='kalpa' || selectedIsland.disk==='shangqing' || userData.focusContext==='tower') {
         orbitLingbaoAxis(targetLookAt,targetCamPos,focusedObject,userData);
         return;
       }
@@ -1487,8 +1499,8 @@
     function focusOverview() {
       closeDrawer();
       if (!sceneReady || textView) { closeDrawer(); return; }
-      new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(controls.target).to({ x: 12, y: 8, z: -18 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(camera.position).to({ x: 20, y: 48, z: 90 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
     }
 
     function focusYujingSacred() {
@@ -1569,7 +1581,7 @@
       removeOutboundLinks(document.getElementById("modal-body"));
       modalReturnFocus = document.activeElement;
       modal.classList.remove("hidden");
-      document.querySelectorAll('header, #left-panel-trigger, #right-panel, #right-panel-trigger, #side-drawer, #reader-modes').forEach(el => el.inert = true);
+      document.querySelectorAll('header, #space-switcher, #left-panel-trigger, #right-panel, #right-panel-trigger, #side-drawer, #reader-modes').forEach(el => el.inert = true);
       modal.querySelector('button').focus();
     }
 
@@ -1577,7 +1589,7 @@
       const modal = document.getElementById('narrative-modal');
       if (modal.classList.contains('hidden')) return;
       modal.classList.add('hidden');
-      document.querySelectorAll('header, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes').forEach(el => el.inert = false);
+      document.querySelectorAll('header, #space-switcher, #left-panel-trigger, #right-panel, #right-panel-trigger, #reader-modes').forEach(el => el.inert = false);
       document.getElementById('side-drawer').inert = !selectedIsland;
       if (modalReturnFocus?.isConnected) modalReturnFocus.focus();
     }
@@ -1684,6 +1696,7 @@
       renderFourBrahmaPanel(contentBox);
       renderKalpaBoundaryPanel(contentBox);
       renderYujingPanel(contentBox);
+      renderShangqingPanel(contentBox);
       removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');
       cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });
@@ -1733,6 +1746,7 @@
       animationFrame = requestAnimationFrame(animate);
       TWEEN.update();
       animateYujingRitual(time || 0);
+      animateShangqing(time || 0);
       controls.update();
 
       const t = time * 0.0015;
