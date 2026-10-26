@@ -1138,8 +1138,72 @@
     }
 
     function selectIslandById(id) {
-      const mesh = clickableMeshes.find(m => m.userData.data && m.userData.data.id === id);
-      if (mesh) selectIsland(mesh.userData);
+      // 1. 優先尋找 3D 場景中已註冊且含有完整 focusPos 的可點擊物件
+      const mesh = clickableMeshes.find(m => m.userData && m.userData.data && m.userData.data.id === id && m.userData.focusPos);
+      if (mesh) {
+        selectIsland(mesh.userData);
+        return;
+      }
+
+      // 2. 備援機制：若點擊清單項目時物件層級未直接命中，直接由資料庫與空間座標推算並擺放視角
+      const nodeData = ISLANDS_DATA.find(d => d.id === id);
+      if (!nodeData) return;
+
+      let calcFocusPos = new THREE.Vector3();
+
+      if (nodeData.disk === "cosmology_lingbao") {
+        // 靈寶立體天塔六層
+        const layerHeights = {
+          lingbao_daluo: 28,
+          lingbao_sanqing: 22,
+          lingbao_four_brahma: 16,
+          lingbao_three_realms: 8,
+          lingbao_earth_realm: 0,
+          lingbao_nine_strata_gangfeng: -8
+        };
+        const y = layerHeights[id] !== undefined ? layerHeights[id] : 0;
+        calcFocusPos.set(COSMOLOGY_CENTER.x, y, COSMOLOGY_CENTER.z + 1.2);
+      } else if (nodeData.disk === "zodiac") {
+        // 左盤十二辰位
+        if (nodeData.isCenter) {
+          calcFocusPos.copy(ZODIAC_CENTER);
+        } else {
+          const ang = (Math.PI * 2) / TOTAL_SECTORS;
+          const midA = nodeData.sectorIndex * ang + ang / 2;
+          calcFocusPos.set(
+            ZODIAC_CENTER.x + Math.cos(midA) * 6.2,
+            0,
+            ZODIAC_CENTER.z - Math.sin(midA) * 6.2
+          );
+        }
+      } else if (nodeData.disk === "proto_lingbao") {
+        // 五方五氣赤文盤
+        const protoDirs = {
+          proto_center: { x: 0, z: 0 },
+          proto_east:   { x: 4.5, z: 0 },
+          proto_south:  { x: 0, z: 4.5 },
+          proto_west:   { x: -4.5, z: 0 },
+          proto_north:  { x: 0, z: -4.5 }
+        };
+        const offset = protoDirs[id] || { x: 0, z: 0 };
+        calcFocusPos.set(KALPA_CENTER.x + offset.x, PROTO_HEIGHT, KALPA_CENTER.z + offset.z);
+      } else if (nodeData.disk === "kalpa") {
+        // 靈寶五劫輪
+        if (nodeData.isCenter) {
+          calcFocusPos.copy(KALPA_CENTER);
+        } else {
+          const kang = (Math.PI * 2) / TOTAL_KALPAS;
+          const midA = nodeData.kalpaIndex * kang + kang / 2;
+          calcFocusPos.set(
+            KALPA_CENTER.x + Math.cos(midA) * 6.4,
+            0,
+            KALPA_CENTER.z - Math.sin(midA) * 6.4
+          );
+        }
+      }
+
+      // 呼叫統一的視角擺放函式
+      selectIsland({ data: nodeData, focusPos: calcFocusPos });
     }
 
     function focusOverview() {
