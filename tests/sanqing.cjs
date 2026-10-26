@@ -4,16 +4,6 @@ const server=http.createServer((req,res)=>{const f=path.join(process.cwd(),req.u
 const launch={headless:true}; if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH){launch.executablePath=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;launch.args=['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'];} const browser=await chromium.launch(launch);fs.mkdirSync('test-results',{recursive:true});
 try{const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:8770/#node=lingbao_sanqing&mode=beginner');await page.waitForFunction(()=>document.getElementById('load-status').textContent.includes('3D 已就緒'));await page.waitForFunction(()=>Math.abs(camera.position.z-(COSMOLOGY_CENTER.z+4.5+28))<0.1);
 assert.equal(await page.locator('.sanqing-card').count(),3);assert.match(await page.locator('.sanqing-panel').innerText(),/始炁 → 清微天・玉清境/);assert.match(await page.locator('.sanqing-panel').innerText(),/元炁 → 禹餘天・上清境/);assert.match(await page.locator('.sanqing-panel').innerText(),/玄炁 → 大赤天・太清境/);
-assert.equal(await page.locator('.sanqing-panel a').count(),0);
-assert.match(await page.locator('.sanqing-excerpt').innerText(),/元始以一炁化生三炁/);
-for(const key of ['yuqing','shangqing','taiqing']){
- await page.locator("button[onclick=\"selectIslandById('lingbao_sanqing')\"]").click();
- await page.waitForFunction(()=>Math.abs(camera.position.z-(COSMOLOGY_CENTER.z+4.5+28))<0.1);
- await page.locator('#drawer-close').click();const point=await page.evaluate(key=>{const mesh=clickableMeshes.find(m=>m.userData.sanqingKey===key && m.geometry?.type==='SphereGeometry');const v=mesh.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};},key);await page.mouse.click(point.x,point.y);assert.equal(await page.locator(`.sanqing-card[data-realm="${key}"]`).getAttribute('data-selected'),'true');
- await page.waitForFunction(key=>{const i=['yuqing','shangqing','taiqing'].indexOf(key);return Math.abs(camera.position.x-((i-1)*6.5+2.3))<0.1 && Math.abs(camera.position.z-(-18+4.5+16))<0.1;},key);
- }
- await page.getByRole('button',{name:'聚焦玉清境',exact:true}).click();
- await page.waitForFunction(()=>Math.abs(camera.position.x-(-6.5+2.3))<0.1);
-
+for(const key of ['yuqing','shangqing','taiqing']){await page.locator('#drawer-close').click();const point=await page.evaluate(key=>{const mesh=clickableMeshes.find(m=>m.userData.sanqingKey===key && m.geometry?.type==='SphereGeometry');const v=mesh.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};},key);await page.mouse.click(point.x,point.y);assert.equal(await page.locator(`.sanqing-card[data-realm="${key}"]`).getAttribute('data-selected'),'true');}
 await page.screenshot({path:'test-results/sanqing-3d.png'});await page.locator('#drawer-close').click();await page.locator('#btn-text-view').click();await page.locator('[data-node-id="lingbao_sanqing"]').click();assert.equal(await page.locator('.sanqing-card').count(),3);assert.deepEqual(errors,[]);console.log('PASS Sanqing: mapping, 3D picking of all three realms, and text fallback');
 }finally{await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exit(1)});

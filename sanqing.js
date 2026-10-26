@@ -31,11 +31,7 @@ function buildSanqingRealms(parent) {
   parent.add(group);
   const focus = new THREE.Vector3(COSMOLOGY_CENTER.x,23.5,COSMOLOGY_CENTER.z+4.5);
   function clickable(object,key=null) {
-    const index = data.sanqing.realms.findIndex(realm => realm.key === key);
-    const target = key && index >= 0
-      ? new THREE.Vector3(COSMOLOGY_CENTER.x + (index - 1) * 6.5, 22.5, COSMOLOGY_CENTER.z + 4.5)
-      : focus;
-    object.userData = {data,focusPos:target,sanqingKey:key};
+    object.userData = {data,focusPos:focus,sanqingKey:key};
     clickableMeshes.push(object);
     return object;
   }
@@ -87,23 +83,15 @@ function renderSanqingPanel(container) {
   if(!model) return;
   const section=document.createElement('section');section.className='sanqing-panel';
   const heading=document.createElement('h3');heading.textContent='一炁化三炁・三天三境對應';section.append(heading);
-  const help=document.createElement('p');help.textContent='點選境臺或其圖示，鏡頭會聚焦該境；點選一炁則呈現三境全貌。位置、色彩與宮殿造型為教學設計。';section.append(help);
+  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺並列，表示對應關係。位置、色彩與宮殿造型為教學設計。';section.append(help);
   for(const realm of model.realms){
     const card=document.createElement('article');card.className='sanqing-card';card.dataset.realm=realm.key;card.dataset.selected=String(selectedSanqingKey===realm.key);card.style.setProperty('--realm-color',realm.color);
     const title=document.createElement('h4');title.textContent=`${realm.qi} → ${realm.heaven}・${realm.realm}`;card.append(title);
     const body=document.createElement('p');body.textContent=`尊神對應：${realm.deity}；原文稱「${realm.lord}」。`;card.append(body);
     const teaching=document.createElement('p');teaching.textContent=`出《${realm.scripture}》十二部，以教天中${realm.audience}。`;card.append(teaching);
-    const focusButton=document.createElement('button');
-    focusButton.type='button';focusButton.className='sanqing-focus';focusButton.textContent=`聚焦${realm.realm}`;
-    focusButton.addEventListener('click',()=>{
-      const item=clickableMeshes.find(mesh=>mesh.userData?.sanqingKey===realm.key);
-      selectIsland(item?.userData || {data:selectedIsland,sanqingKey:realm.key});
-    });
-    card.append(focusButton);
     section.append(card);
   }
-  const source=document.createElement('p');source.className='sanqing-citation';source.textContent=model.sourceLabel;section.append(source);
-  const excerpt=document.createElement('blockquote');excerpt.className='sanqing-excerpt';excerpt.textContent=model.sourceExcerpt;section.append(excerpt);
+  const source=document.createElement('p');const link=document.createElement('a');link.href=model.sourceUrl;link.target='_blank';link.rel='noopener noreferrer';link.textContent=model.sourceLabel;source.append(link);section.append(source);
   const note=document.createElement('p');note.className='sanqing-source-note';note.textContent=model.sourceNote;section.append(note);
   container.prepend(section);
 }
