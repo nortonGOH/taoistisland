@@ -129,15 +129,15 @@
   </div>
 
   <!-- 閱讀路徑切換列 (底部居中) -->
-  <div id="reader-modes" aria-label="閱讀模式" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/90 shadow-xl">
-    <button onclick="setReaderMode('beginner')" id="btn-beginner" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all bg-indigo-600 text-white shadow-md">
-      初學者導讀
+  <div id="reader-modes" role="tablist" aria-label="閱讀模式" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/90 shadow-xl">
+    <button onclick="setReaderMode('beginner')" id="btn-beginner" role="tab" aria-controls="drawer-dynamic-content" aria-selected="true" title="提問・概念・材料" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all bg-indigo-600 text-white shadow-md">
+      <span>初學者導讀</span><small class="mode-caption">提問・概念・材料</small>
     </button>
-    <button onclick="setReaderMode('course')" id="btn-course" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
-      課程地圖
+    <button onclick="setReaderMode('course')" id="btn-course" role="tab" aria-controls="drawer-dynamic-content" aria-selected="false" title="脈絡・書目・比較" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+      <span>課程地圖</span><small class="mode-caption">脈絡・書目・比較</small>
     </button>
-    <button onclick="setReaderMode('researcher')" id="btn-researcher" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
-      研究者考證
+    <button onclick="setReaderMode('researcher')" id="btn-researcher" role="tab" aria-controls="drawer-dynamic-content" aria-selected="false" title="來源・異文・待核" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all text-slate-300 hover:text-white hover:bg-slate-800">
+      <span>研究者考證</span><small class="mode-caption">來源・異文・待核</small>
     </button>
   </div>
 
@@ -157,8 +157,9 @@
       <div class="text-xs font-mono text-slate-400" id="drawer-coord">空間位階</div>
       <h2 id="drawer-title" tabindex="-1" class="text-xl font-bold text-slate-100 mt-1">概念節點</h2>
       <p id="drawer-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
+      <p id="mode-description" class="mode-description" role="status"></p>
     </div>
-    <div id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
+    <div role="tabpanel" aria-labelledby="btn-beginner" id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
   </aside>
 
   <!-- 中央彈出式對話方塊 -->
@@ -188,6 +189,67 @@
     let raycaster, mouse;
     let currentMode = "beginner";
     let selectedIsland = null;
+    let focusedObject=null, focusedUserData=null, focusCameraTween=null, focusTargetTween=null, focusViewSignature='';
+    const focusAppearance=[];
+    function restoreFocusAppearance() {
+      for(const record of focusAppearance){
+        if(record.material){const temporary=record.object.material;record.object.material=record.material;if(Array.isArray(temporary))temporary.forEach(m=>m.dispose());else temporary.dispose();}
+        if(record.visible!==undefined)record.object.visible=record.visible;
+        if(record.renderOrder!==undefined)record.object.renderOrder=record.renderOrder;
+        delete record.object.userData.focusOccluder;
+      }
+      focusAppearance.length=0;
+    }
+    function refreshFocusAppearance() {
+      restoreFocusAppearance();
+      if(!sceneReady || textView || !selectedIsland || !focusedObject)return;
+      scene.updateMatrixWorld(true);camera.updateMatrixWorld(true);
+      const marker=focusedObject;
+      if(marker.isSprite){
+        focusAppearance.push({object:marker,material:marker.material,renderOrder:marker.renderOrder});
+        marker.material=marker.material.clone();marker.material.depthTest=false;marker.material.depthWrite=false;marker.renderOrder=100;
+      }
+      const center=marker.getWorldPosition(new THREE.Vector3());
+      const projected=center.clone().project(camera);
+      if(projected.z>1 || projected.z< -1)return;
+      const halfH=marker.isSprite?marker.scale.y/2:0.5;
+      const halfW=marker.isSprite?marker.scale.x/2:0.5;
+      const right=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion);
+      const up=new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion);
+      const targets=[center];
+      for(const x of [-0.8,0.8])for(const y of [-0.8,0.8])targets.push(center.clone().addScaledVector(right,halfW*x).addScaledVector(up,halfH*y));
+      const projectBox=object=>{
+        const p=object.getWorldPosition(new THREE.Vector3());const scale=object.getWorldScale(new THREE.Vector3());
+        const a=p.clone().addScaledVector(right,-scale.x/2).addScaledVector(up,-scale.y/2).project(camera);
+        const b=p.clone().addScaledVector(right,scale.x/2).addScaledVector(up,scale.y/2).project(camera);
+        return {left:Math.min(a.x,b.x),right:Math.max(a.x,b.x),bottom:Math.min(a.y,b.y),top:Math.max(a.y,b.y)};
+      };
+      const selectedBox=projectBox(marker);
+      scene.traverse(object=>{
+        if(!object.isSprite || object===marker || !object.visible)return;
+        const box=projectBox(object);
+        if(box.left<selectedBox.right && box.right>selectedBox.left && box.bottom<selectedBox.top && box.top>selectedBox.bottom){
+          focusAppearance.push({object,visible:object.visible});object.visible=false;object.userData.focusOccluder=true;
+        }
+      });
+      const blockers=new Set(), probe=new THREE.Raycaster();
+      const solidMeshes=[];scene.traverse(object=>{if(object.isMesh && object.visible)solidMeshes.push(object);});
+      for(const point of targets){
+        const delta=point.clone().sub(camera.position);probe.set(camera.position,delta.clone().normalize());probe.far=delta.length()-0.15;
+        for(const hit of probe.intersectObjects(solidMeshes,false)){
+          const object=hit.object;if(!object.isMesh || !object.visible || !object.material || object===marker)continue;
+          let current=object,belongs=false;
+          while(current){if(current===marker || (current.userData.data?.id===selectedIsland.id && !focusedUserData?.sanqingKey && !focusedUserData?.fourBrahmaKey)){belongs=true;break;}current=current.parent;}
+          if(!belongs)blockers.add(object);
+        }
+      }
+      for(const object of blockers){
+        focusAppearance.push({object,material:object.material});
+        const fade=m=>{const clone=m.clone();clone.transparent=true;clone.opacity=Math.min(m.opacity,0.09);clone.depthWrite=false;return clone;};
+        object.material=Array.isArray(object.material)?object.material.map(fade):fade(object.material);object.userData.focusOccluder=true;
+      }
+    }
+
     const clickableMeshes = [];
 
     let isLeftPanelCollapsed = false;
@@ -294,9 +356,12 @@
       ctx.textBaseline = "middle";
       ctx.fillText(emoji, 128, 105);
 
-      ctx.font = "bold 28px sans-serif";
       ctx.fillStyle = colorHex;
-      ctx.fillText(text, 128, 185);
+      const characters=Array.from(text), lines=[];
+      const perLine=Math.max(7,Math.ceil(characters.length/4));
+      for(let i=0;i<characters.length;i+=perLine)lines.push(characters.slice(i,i+perLine).join(''));
+      ctx.font = `bold ${Math.min(28,Math.floor(220/perLine))}px sans-serif`;
+      lines.forEach((line,i)=>ctx.fillText(line,128,lines.length===1?185:153+i*25,222));
 
       const texture = new THREE.CanvasTexture(canvas);
       texture.needsUpdate = true;
@@ -764,6 +829,7 @@
       cosmoGroup.add(daluoMainSprite);
 
       buildSanqingRealms(cosmoGroup);
+      buildFourBrahmaPalaces(cosmoGroup);
 
       // 2. 生成第 2~4 層圓台與徽章
       const midLayers = [
@@ -1002,7 +1068,7 @@
       kCenterMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(kCenterGeo), new THREE.LineBasicMaterial({ color: 0xa855f7 })));
 
       const kalpaCenterData = ISLANDS_DATA.find(d => d.id === "kalpa_center");
-      kCenterMesh.userData = { data: kalpaCenterData, focusPos: new THREE.Vector3(KALPA_CENTER.x, KALPA_CENTER.y, KALPA_CENTER.z) };
+      kCenterMesh.userData = { data: kalpaCenterData, focusObject:kCenterMesh, focusPos: new THREE.Vector3(KALPA_CENTER.x, KALPA_CENTER.y, KALPA_CENTER.z) };
       kalpaGroup.add(kCenterMesh);
       clickableMeshes.push(kCenterMesh);
 
@@ -1126,18 +1192,20 @@
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(clickableMeshes, true);
+      const intersects = raycaster.intersectObjects(clickableMeshes, true).filter(hit=>{let object=hit.object;while(object){if(!object.visible || object.userData.focusOccluder)return false;object=object.parent;}return true;});
 
       if (intersects.length > 0) {
         let obj = intersects[0].object;
         while (obj && !obj.userData.data && obj.parent) obj = obj.parent;
-        if (obj && obj.userData && obj.userData.data) selectIsland(obj.userData);
+        if (obj && obj.userData && obj.userData.data) selectIsland({...obj.userData,focusObject:obj.userData.focusObject || obj});
       }
     }
 
    function selectIsland(userData) {
       if (!userData || !userData.data) return;
+      restoreFocusAppearance();
       selectedSanqingKey = userData.sanqingKey || null;
+      selectedFourBrahmaKey = userData.fourBrahmaKey || null;
       selectedIsland = userData.data;
       if (!textView && !isLeftPanelCollapsed) toggleLeftPanel();
       renderDrawer();
@@ -1222,16 +1290,38 @@
       }
       updateSceneFraming();
 
+      let focusObject = userData.markerMesh || userData.focusObject;
+      if (focusObject && !focusObject.isObject3D) focusObject = null;
+      if (!focusObject) focusObject = clickableMeshes.find(m=>m.isSprite && m.userData.data?.id===selectedIsland.id);
+      const individual = !!(userData.sanqingKey || userData.fourBrahmaKey);
+      if (focusObject && (individual || !['lingbao_sanqing','lingbao_nine_strata_gangfeng','lingbao_daluo'].includes(selectedIsland.id))) {
+        const actual = focusObject.getWorldPosition(new THREE.Vector3());
+        const offset=targetCamPos.clone().sub(targetLookAt);
+        targetLookAt.copy(actual);
+        if (individual) {
+          const smallScreen=window.innerWidth<=700;
+          offset.set(1.8,2.8,smallScreen?9.5:7.5);
+        }
+        targetCamPos.copy(actual).add(offset);
+      }
+      focusedObject=focusObject || userData.focusObject || null;
+      focusedUserData=userData;
+      refreshFocusAppearance();
+      // Cancel any previous flight before starting the new selection.
+      if(focusTargetTween) focusTargetTween.stop();
+      if(focusCameraTween) focusCameraTween.stop();
+
       // 平滑旋轉焦點至該圖示
-      new TWEEN.Tween(controls.target)
+      focusTargetTween = new TWEEN.Tween(controls.target)
         .to({ x: targetLookAt.x, y: targetLookAt.y, z: targetLookAt.z }, 800)
         .easing(TWEEN.Easing.Cubic.Out)
         .start();
 
       // 平滑位移相機至正對該圖示之觀測點
-      new TWEEN.Tween(camera.position)
+      focusCameraTween = new TWEEN.Tween(camera.position)
         .to({ x: targetCamPos.x, y: targetCamPos.y, z: targetCamPos.z }, 800)
         .easing(TWEEN.Easing.Cubic.Out)
+        .onComplete(()=>{controls.update(); refreshFocusAppearance();})
         .start();
     }
 
@@ -1243,9 +1333,9 @@
         selectIsland({ data: node });
         return;
       }
-      const mesh = clickableMeshes.find(m => m.userData && m.userData.data && m.userData.data.id === id && m.userData.focusPos);
+      const mesh = clickableMeshes.find(m => m.userData?.data?.id === id && m.userData.focusPos && !m.userData.sanqingKey && !m.userData.fourBrahmaKey) || clickableMeshes.find(m=>m.userData?.data?.id===id && m.userData.focusPos);
       if (mesh) {
-        selectIsland(mesh.userData);
+        selectIsland({...mesh.userData,focusObject:mesh.userData.focusObject || mesh});
         return;
       }
 
@@ -1311,6 +1401,7 @@
     }
 
     function focusOverview() {
+      closeDrawer();
       if (!sceneReady || textView) { closeDrawer(); return; }
       new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
@@ -1359,10 +1450,20 @@
       selectIslandById('kalpa_center');
     }
 
-    function setReaderMode(mode) {
+    document.getElementById('reader-modes').addEventListener('keydown',event=>{
+      const modes=['beginner','course','researcher'];let index=modes.indexOf(currentMode);
+      if(event.key==='ArrowRight')index=(index+1)%3;else if(event.key==='ArrowLeft')index=(index+2)%3;
+      else if(event.key==='Home')index=0;else if(event.key==='End')index=2;else return;
+      event.preventDefault();setReaderMode(modes[index]);document.getElementById('btn-'+modes[index]).focus();
+    });
+
+    function setReaderMode(mode, activate = true) {
       if (!['beginner', 'course', 'researcher'].includes(mode)) return;
       currentMode = mode;
-      document.querySelectorAll('.mode-btn').forEach(btn => btn.setAttribute('aria-pressed', String(btn.id === `btn-${mode}`)));
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        const active=btn.id === `btn-${mode}`;
+        btn.setAttribute('aria-pressed',String(active));btn.setAttribute('aria-selected',String(active));btn.tabIndex=active ? 0 : -1;
+      });
       writeRoute();
       document.querySelectorAll(".mode-btn").forEach(btn => {
         btn.classList.remove("bg-indigo-600", "text-white", "shadow-md");
@@ -1374,6 +1475,14 @@
         activeBtn.classList.add("bg-indigo-600", "text-white", "shadow-md");
       }
       if (selectedIsland) renderDrawer();
+      else if (activate && ISLANDS_DATA.length) {
+        const group=document.getElementById('node-group').value;
+        selectIslandById((ISLANDS_DATA.find(n=>!group || n.disk===group)||ISLANDS_DATA[0]).id);
+      }
+    }
+
+    function removeOutboundLinks(container) {
+      container.querySelectorAll('a[href]').forEach(link=>{const text=document.createElement('span');text.className='source-label';text.textContent=link.textContent;link.replaceWith(text);});
     }
 
     function openNarrativeModal() {
@@ -1381,6 +1490,7 @@
       const modal = document.getElementById("narrative-modal");
       document.getElementById("modal-title").textContent = `${selectedIsland.title}・深度考證論述`;
       document.getElementById("modal-body").innerHTML = selectedIsland.beginner.step4_narrative || "<p>暫無詳細論述。</p>";
+      removeOutboundLinks(document.getElementById("modal-body"));
       modalReturnFocus = document.activeElement;
       modal.classList.remove("hidden");
       document.querySelectorAll('header, #right-panel, #right-panel-trigger, #side-drawer, #reader-modes').forEach(el => el.inert = true);
@@ -1416,6 +1526,9 @@
       tag.style.backgroundColor = `${selectedIsland.hexColor}25`;
       tag.style.color = selectedIsland.displayColor || selectedIsland.hexColor;
 
+      const descriptions={beginner:'導讀｜從問題出發，閱讀概念、材料轉述，再開啟完整論述。',course:'課程｜追蹤主題脈絡、研讀書目與比較問題，安排研讀順序。',researcher:'考證｜檢查來源、圖像線索與爭議；待核內容不視為定論。'};
+      document.getElementById('mode-description').textContent=descriptions[currentMode];
+      document.getElementById('drawer-dynamic-content').setAttribute('aria-labelledby','btn-'+currentMode);
       const review = selectedIsland.review;
       document.getElementById('drawer-status').textContent = review?.status || '引文與版本待核';
       const contentBox = document.getElementById("drawer-dynamic-content");
@@ -1489,6 +1602,8 @@
         `;
       }
       renderSanqingPanel(contentBox);
+      renderFourBrahmaPanel(contentBox);
+      removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');
       cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });
       drawer.scrollTop = 0;
@@ -1501,6 +1616,8 @@
       drawer.inert = true;
       if (drawer.contains(document.activeElement)) document.getElementById('node-search').focus();
       selectedIsland = null;
+      restoreFocusAppearance();focusedObject=null;focusedUserData=null;
+      if(focusTargetTween)focusTargetTween.stop();if(focusCameraTween)focusCameraTween.stop();
       updateSceneFraming();
       renderNodeList();
       writeRoute();
@@ -1588,18 +1705,20 @@
         dynamicUpliftParticles.geometry.attributes.position.needsUpdate = true;
       }
 
-      // 6. 各標記微浮動
-      clickableMeshes.forEach((mesh, idx) => {
-        if (!mesh.userData.data || mesh.userData.data.isCenter) return;
-        const marker = mesh.userData.markerMesh;
-        if (marker && marker.isSprite) {
-          let baseH = 1.25;
-          if (mesh.userData.data.disk === "proto_lingbao") baseH = 1.15;
-          else if (mesh.userData.data.disk === "cosmology_lingbao") baseH = 1.35;
-          else if (mesh.userData.data.isKalpa) baseH = DISK_HEIGHT / 2 + 1.45;
-          marker.position.y = (mesh.userData.focusPos.y + baseH) + Math.sin(t * 1.5 + idx) * 0.06;
-        }
-      });
+      // Preserve each marker's local origin; a shared marker is animated once per frame.
+      const markers=new Set();
+      for(const mesh of clickableMeshes){
+        const marker=mesh.userData.markerMesh;
+        if(!marker?.isSprite || markers.has(marker))continue;
+        markers.add(marker);
+        if(marker.userData.floatBaseY===undefined)marker.userData.floatBaseY=marker.position.y;
+        const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        marker.position.y=marker.userData.floatBaseY+(reduced?0:Math.sin(t*1.5+markers.size)*0.04);
+      }
+      if (selectedIsland && !focusCameraTween?.isPlaying()) {
+        const signature=camera.position.toArray().concat(controls.target.toArray()).map(n=>n.toFixed(2)).join(',');
+        if(signature!==focusViewSignature){focusViewSignature=signature;refreshFocusAppearance();}
+      }
 
       animateSanqingFlow(time);
       renderer.render(scene, camera);
@@ -1619,6 +1738,8 @@
 
     function setTextView(enabled) {
       textView = enabled;
+      if(enabled)restoreFocusAppearance();
+      updateSceneFraming();
       document.body.classList.toggle('text-view', enabled);
       const button = document.getElementById('btn-text-view');
       button.textContent = enabled && sceneReady ? '切換 3D 探索' : enabled ? '文字閱讀（3D 暫不可用）' : '切換文字閱讀';
@@ -1673,7 +1794,7 @@
       restoringRoute = true;
       try {
         const params = new URLSearchParams(location.hash.slice(1));
-        setReaderMode(params.get('mode') || 'beginner');
+        setReaderMode(params.get('mode') || 'beginner', false);
         const id = params.get('node');
         if (id && ISLANDS_DATA.some(node => node.id === id)) selectIslandById(id);
         else {

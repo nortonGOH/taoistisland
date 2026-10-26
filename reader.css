@@ -125,3 +125,18 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
   body:not(.text-view):has(#side-drawer[aria-hidden="false"]) #right-panel,
   body:not(.text-view):has(#side-drawer[aria-hidden="false"]) #right-panel-trigger { visibility:hidden; pointer-events:none; }
 }
+.mode-btn { display:flex; flex-direction:column; align-items:center; gap:3px; }
+.mode-caption { font-size:10px; font-weight:400; opacity:.76; }
+.mode-description { margin:18px 0 0; padding:12px 14px; border-radius:10px; border:1px solid #849bd133; background:#506fa912; font-size:13px; line-height:1.8; color:#bccce8; }
+.four-brahma-panel { padding:18px; border:1px solid #c084fc55; border-radius:16px; background:linear-gradient(135deg,#8d5dcc15,#4168a00d); }
+.four-brahma-panel h3 { font-size:19px; color:#ebd2ff; font-weight:700; margin:0 0 14px; }
+.hierarchy-strip { color:#c0cfe6; padding:12px; background:#03091766; border-radius:9px; }
+.four-brahma-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0; }
+.four-brahma-card { padding:13px; border-left:2px solid var(--realm-color); border-radius:9px; background:#ffffff05; }
+.four-brahma-card h4 { color:var(--realm-color); font-size:15px; font-weight:700; }
+.four-brahma-card[data-selected="true"] { outline:2px solid var(--realm-color); background:#ffffff0e; }
+#drawer-dynamic-content .evidence-note { color:#c1ad8a; font-size:12px; line-height:1.9; }
+.source-record { padding:13px; margin:12px 0; border:1px solid #8f9fbd33; border-radius:9px; color:#c3cee1; }
+.source-record h4 { font-weight:600; color:#e2e8f0; }
+.four-brahma-panel ol { padding-left:20px; list-style:decimal; }
+@media(max-width:420px) { .mode-caption { font-size:9px; } .four-brahma-grid { grid-template-columns:1fr; } }

@@ -1,5 +1,6 @@
 /* Fifth-layer diagram: geometry is a teaching reconstruction, not an ancient image. */
 let selectedSanqingKey = null;
+let selectedFourBrahmaKey = null;
 const sanqingFlows = [];
 
 function sanqingText(lines, color, width = 1024, height = 512) {
@@ -31,7 +32,8 @@ function buildSanqingRealms(parent) {
   parent.add(group);
   const focus = new THREE.Vector3(COSMOLOGY_CENTER.x,23.5,COSMOLOGY_CENTER.z+4.5);
   function clickable(object,key=null) {
-    object.userData = {data,focusPos:focus,sanqingKey:key};
+    object.userData = {data,focusPos:focus,sanqingKey:key,focusObject:object};
+    if(object.isSprite) object.userData.markerMesh=object;
     clickableMeshes.push(object);
     return object;
   }
@@ -97,7 +99,56 @@ function renderSanqingPanel(container) {
     const teaching=document.createElement('p');teaching.textContent=`出《${realm.scripture}》十二部，以教天中${realm.audience}。`;card.append(teaching);
     section.append(card);
   }
-  const source=document.createElement('p');const link=document.createElement('a');link.href=model.sourceUrl;link.target='_blank';link.rel='noopener noreferrer';link.textContent=model.sourceLabel;source.append(link);section.append(source);
+  const source=document.createElement('p');source.className='source-record';source.textContent='文獻出處：'+model.sourceLabel;section.append(source);
   const note=document.createElement('p');note.className='sanqing-source-note';note.textContent=model.sourceNote;section.append(note);
   container.prepend(section);
+}
+
+function buildFourBrahmaPalaces(parent) {
+  const data=ISLANDS_DATA.find(n=>n.id==='lingbao_four_brahma');
+  if(!data?.fourBrahma) return;
+  const group=new THREE.Group();group.name='four-brahma-palaces';group.position.y=16;
+  parent.add(group);
+  data.fourBrahma.realms.forEach(realm=>{
+    const palace=new THREE.Group();palace.position.fromArray(realm.position);group.add(palace);
+    function register(object){
+      object.userData={data,fourBrahmaKey:realm.key,focusObject:object,focusPos:new THREE.Vector3(COSMOLOGY_CENTER.x+realm.position[0],COSMOLOGY_CENTER.y+16,COSMOLOGY_CENTER.z+realm.position[2])};
+      if(object.isSprite) object.userData.markerMesh=object;
+      clickableMeshes.push(object);palace.add(object);return object;
+    }
+    const material=new THREE.MeshStandardMaterial({color:realm.color,emissive:realm.color,emissiveIntensity:0.18,metalness:0.25,roughness:0.35});
+    const base=register(new THREE.Mesh(new THREE.CylinderGeometry(0.85,1,0.2,32),material));base.position.y=0.35;
+    for(const x of [-0.48,0.48])for(const z of [-0.36,0.36]){const pillar=register(new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.07,0.85,10),material));pillar.position.set(x,0.85,z);}
+    const roof=register(new THREE.Mesh(new THREE.ConeGeometry(1.05,0.4,4),material));roof.rotation.y=Math.PI/4;roof.position.y=1.45;
+    const label=sanqingText([`${realm.direction}・${realm.palace}`,realm.heaven],realm.color,1024,380);
+    label.scale.set(2.6,0.96,1);label.position.set(0,2.3,0);register(label);
+  });
+}
+
+function renderFourBrahmaPanel(container) {
+  const model=selectedIsland?.fourBrahma;if(!model)return;
+  const panel=document.createElement('section');panel.className='four-brahma-panel';
+  const title=document.createElement('h3');title.textContent='四種民天・四宮對照';panel.append(title);
+  const intro=document.createElement('p');intro.textContent=model.hierarchy.join(' ↓ ');intro.className='hierarchy-strip';panel.append(intro);
+  const grid=document.createElement('div');grid.className='four-brahma-grid';
+  for(const realm of model.realms){
+    const card=document.createElement('article');card.className='four-brahma-card';card.dataset.selected=String(selectedFourBrahmaKey===realm.key);card.style.setProperty('--realm-color',realm.color);
+    const heading=document.createElement('h4');heading.textContent=`${realm.direction}・${realm.palace}`;card.append(heading);
+    const text=document.createElement('p');text.textContent=realm.heaven;card.append(text);grid.append(card);
+  }
+  panel.append(grid);
+  const note=document.createElement('p');note.className='evidence-note';note.textContent=model.note;panel.append(note);
+  if(currentMode==='course'){
+    const h=document.createElement('h4');h.textContent='建議研讀順序';panel.append(h);
+    const list=document.createElement('ol');
+    for(const item of ['畫出二十八天、四種民天、三清與大羅的層級','將四天與四宮逐項對讀，檢查方位依據','比較三災與清淨炁的正文、注疏所指','區分避劫受迎、劫後下化與現代種子庫比喻']){const li=document.createElement('li');li.textContent=item;list.append(li);}panel.append(list);
+  }
+  if(currentMode==='researcher'){
+    for(const source of model.sources){const card=document.createElement('article');card.className='source-record';
+      const heading=document.createElement('h4');heading.textContent=source.label;card.append(heading);
+      const scope=document.createElement('p');scope.textContent=source.scope;card.append(scope);
+      const status=document.createElement('p');status.className='evidence-note';status.textContent=source.status;card.append(status);panel.append(card);
+    }
+  }
+  container.prepend(panel);
 }

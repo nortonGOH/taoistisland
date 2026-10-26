@@ -22,19 +22,59 @@ assert(tri.vertices.length===3&&tri.triangle&&tri.particles===12);assert(new Set
 await p.screenshot({path:path.join(root,'test-results','sanqing-triangle-qa.png')});
 const keys=await p.evaluate(()=>ISLANDS_DATA.find(n=>n.id==='lingbao_sanqing').sanqing.realms.map(r=>r.key));
 for(const key of keys){
+ await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForTimeout(900);
  const point=await p.evaluate(key=>{const g=scene.getObjectByName('sanqing-realms');const label=g.children.find(o=>o.isSprite&&o.userData.sanqingKey===key&&o.scale.x>4);const v=label.getWorldPosition(new THREE.Vector3()).project(camera);return {x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};},key);
  await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedSanqingKey),key);
  await p.waitForTimeout(850);
 }
 
+await p.evaluate(()=>closeDrawer());await p.locator('#btn-course').click();
+assert(await p.evaluate(()=>!!selectedIsland && currentMode==='course'));
+await p.evaluate(()=>setReaderMode('beginner'));
+for(const key of ['east','south','west','north']){
+ await p.evaluate(key=>{const marker=clickableMeshes.find(m=>m.isSprite&&m.userData.fourBrahmaKey===key);selectIsland(marker.userData);},key);
+ await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2,depthTest:focusedObject.material.depthTest};});
+ assert(!point.depthTest);await p.mouse.click(point.x,point.y);
+ assert.equal(await p.evaluate(()=>selectedFourBrahmaKey),key);
+ assert.equal(await p.locator('.four-brahma-card[data-selected="true"]').count(),1);
+}
+console.log('Mode with no selection and all four palace icons passed.');
+// Fourth-layer data, no outbound navigation, and true reading-mode tabs.
+await p.evaluate(()=>selectIslandById('lingbao_four_brahma'));await p.waitForTimeout(900);
+assert.equal(await p.locator('.four-brahma-card').count(),4);
+assert.equal(await p.locator('#drawer-dynamic-content a[href]').count(),0);
+for(const mode of ['beginner','course','researcher']){
+ await p.locator('#btn-'+mode).click();
+ assert.equal(await p.locator('#btn-'+mode).getAttribute('aria-selected'),'true');
+ assert.equal(await p.locator('#drawer-dynamic-content').getAttribute('aria-labelledby'),'btn-'+mode);
+}
+assert.equal(await p.locator('.four-brahma-panel .source-record').count(),3);
+await p.locator('#btn-researcher').press('Home');assert.equal(await p.evaluate(()=>currentMode),'beginner');
+await p.screenshot({path:path.join(root,'test-results','four-brahma-qa.png')});
+const originalLabels=await p.evaluate(()=>clickableMeshes.filter(m=>m.isSprite).map(m=>({id:m.userData.data?.id,y:m.userData.floatBaseY,local:m.position.y})).filter(m=>m.id==='proto_south'));
+assert(originalLabels.every(m=>Math.abs(m.local-m.y)<0.05),'Local float origins drifted');
 await p.evaluate(()=>openNarrativeModal());await p.screenshot({path:path.join(root,'test-results','cosmic-dialog-qa.png')});await p.keyboard.press('Escape');
 assert(await p.locator('#narrative-modal').evaluate(e=>e.classList.contains('hidden')));
 await p.setViewportSize({width:390,height:844});await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForTimeout(1000);
 const mobile=await p.locator('#side-drawer').boundingBox();assert(mobile.width<=390&&mobile.y>350);await p.screenshot({path:path.join(root,'test-results','mobile-dialog-qa.png')});
 await p.evaluate(()=>{closeDrawer();});assert(await p.evaluate(()=>camera.view.enabled===false));
 await p.setViewportSize({width:1440,height:960});
+const focusChecks=[];
+for(const id of await p.evaluate(()=>ISLANDS_DATA.map(n=>n.id))){
+ await p.evaluate(id=>selectIslandById(id),id);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
+ const check=await p.evaluate(()=>{
+  const o=focusedObject;const v=o?.getWorldPosition(new THREE.Vector3()).project(camera);
+  const rect=document.getElementById('side-drawer').getBoundingClientRect();
+  return {id:selectedIsland.id,x:v?(v.x+1)*innerWidth/2:null,y:v?(1-v.y)*innerHeight/2:null,right:rect.left,visible:o?.visible,depthTest:o?.isSprite?o.material.depthTest:false};
+ });
+ assert(check.visible && !check.depthTest,JSON.stringify(check));
+ assert(check.x>0 && check.x<check.right && check.y>0 && check.y<960,JSON.stringify(check));focusChecks.push(check);
+}
+console.log('Focused 30 nodes in available scene area.');
 await p.evaluate(()=>setTextView(true));
+
 const ids=await p.evaluate(()=>ISLANDS_DATA.map(n=>n.id));
-for(const id of ids)for(const mode of ['beginner','course','researcher']){await p.evaluate(({id,mode})=>{setReaderMode(mode);selectIslandById(id);},{id,mode});assert((await p.locator('#drawer-dynamic-content').innerText()).length>0);}
+for(const id of ids)for(const mode of ['beginner','course','researcher']){await p.evaluate(({id,mode})=>{setReaderMode(mode);selectIslandById(id);},{id,mode});assert((await p.locator('#drawer-dynamic-content').innerText()).length>0);assert.equal(await p.locator('#drawer-dynamic-content a[href]').count(),0);}
 assert.deepEqual(errors,[]);console.log(JSON.stringify({central,tri,mobile,errors},null,2));await b.close();server.close();
 })();
