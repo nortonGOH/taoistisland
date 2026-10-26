@@ -81,7 +81,7 @@ function buildSanqingRealms(parent) {
   const triangle = [new THREE.Vector3(0,0.08,-3.4),new THREE.Vector3(-4.6,-0.52,3.2),new THREE.Vector3(4.6,-0.52,3.2)];
   const frame = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(triangle),new THREE.LineBasicMaterial({color:'#a5b4fc',transparent:true,opacity:0.55}));
   frame.name='sanqing-triangle';group.add(frame);
-  const foot=sanqingText(['第五層・三清勝境','三炁 → 三天三境 → 三洞經教'],'#cbd5e1',1024,260);
+  const foot=sanqingText(['第二層・三清勝境','三炁 → 三天三境 → 三洞經教'],'#cbd5e1',1024,260);
   foot.scale.set(6,1.52,1);foot.position.set(0,-4.1,4.0);group.add(clickable(foot));
 }
 
@@ -95,7 +95,7 @@ function renderSanqingPanel(container) {
   if(!model) return;
   const section=document.createElement('section');section.className='sanqing-panel';
   const heading=document.createElement('h3');heading.textContent='一炁化三炁・三天三境對應';section.append(heading);
-  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺以前後錯落的立體三角呈現，仍屬靈寶第五層。三角配置、位置、色彩與宮殿造型為教學設計，不代表經文記載的方位或尊卑。';section.append(help);
+  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺以前後錯落的立體三角呈現，仍屬靈寶第二層。三角配置、位置、色彩與宮殿造型為教學設計，不代表經文記載的方位或尊卑。';section.append(help);
   for(const realm of model.realms){
     const card=document.createElement('article');card.className='sanqing-card';card.dataset.realm=realm.key;card.dataset.selected=String(selectedSanqingKey===realm.key);card.style.setProperty('--realm-color',realm.color);
     const title=document.createElement('h4');title.textContent=`${realm.qi} → ${realm.heaven}・${realm.realm}`;card.append(title);
@@ -168,7 +168,7 @@ function renderCosmogonyPanel(container) {
   const panel=document.createElement('section');panel.className='cosmogony-panel';
   const add=(parent,tag,text,className)=>{const element=document.createElement(tag);element.textContent=text;if(className)element.className=className;parent.append(element);return element;};
   add(panel,'h3',model.title);add(panel,'p',model.sourceSummary,'hierarchy-strip');
-  add(panel,'p','第六層：大羅天 → 第五層：三清勝境；層號是本介面的教學分類。','evidence-note');
+  add(panel,'p','第一層：大羅天 → 第二層：三清勝境；層號是本介面的教學分類。','evidence-note');
   for(const pattern of model.models){
     const card=add(panel,'section','', 'cosmogony-model');card.dataset.model=pattern.key;
     add(card,'h4',pattern.title);add(card,'p',pattern.sequence,'model-sequence');
@@ -206,7 +206,7 @@ function buildKalpaBoundary(parent,data) {
       tickPositions.push(new THREE.Vector3(Math.cos(angle)*(radius-0.2),y+0.1,Math.sin(angle)*(radius-0.2)),new THREE.Vector3(Math.cos(angle)*radius,y+0.1,Math.sin(angle)*radius));
     }
     const ticks=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPositions),new THREE.LineBasicMaterial({color:realm.color}));ticks.name='kalpa-ticks-'+realm.key;group.add(ticks);
-    const label=sanqingText([`第${["一","二","三"][index]}層・${realm.name} ${realm.count}天`],realm.color,768,200);label.scale.set(3.2,0.83,1);label.position.set(0,y+0.35,radius+0.3);group.add(label);
+    const label=sanqingText([`第三層・${realm.name} ${realm.count}天`],realm.color,768,200);label.scale.set(3.2,0.83,1);label.position.set(0,y+0.35,radius+0.3);group.add(label);
     const userData={data:realmData,kalpaRealmKey:realm.key,markerMesh:label,focusObject:label,focusPos:new THREE.Vector3(KALPA_CENTER.x,KALPA_CENTER.y+0.6+y,KALPA_CENTER.z+radius+0.3)};
     platform.userData=userData;label.userData=userData;clickableMeshes.push(platform,label);
   });
@@ -248,4 +248,49 @@ function renderUpperSynthesisPanel(container) {
   for(const [tag,text] of [['h3',model.title],['p',model.history],['p',model.practice]]){const item=document.createElement(tag);item.textContent=text;panel.append(item);}
   if(currentMode!=='beginner')for(const text of [model.evidence,model.limits]){const item=document.createElement('p');item.className='evidence-note';item.textContent=text;panel.append(item);}
   container.prepend(panel);
+}
+
+let selectedWuqiLayer=null;
+function buildWuqiAcross(parent) {
+  const model=ISLANDS_DATA.find(n=>n.id==='proto_center')?.wuqiAcross;if(!model)return;
+  const group=new THREE.Group();group.name='wuqi-across-six-layers';parent.add(group);
+  const sourcePoint=new THREE.Vector3(0,31,0);
+  const source=new THREE.Mesh(new THREE.SphereGeometry(0.24,16,12),new THREE.MeshBasicMaterial({color:'#fff2cc'}));source.position.copy(sourcePoint);group.add(source);
+  source.userData={data:ISLANDS_DATA.find(n=>n.id==='lingbao_daluo'),focusContext:'tower',focusObject:source,focusPos:sourcePoint.clone().add(new THREE.Vector3(COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y,COSMOLOGY_CENTER.z))};clickableMeshes.push(source);
+  const angles={proto_east:0,proto_south:-Math.PI/2,proto_west:Math.PI,proto_north:Math.PI/2,proto_center:Math.PI/4};
+  for(const direction of model.directions){
+    const angle=angles[direction.id], center=direction.id==='proto_center';
+    const points=[sourcePoint.clone()];
+    for(const layer of model.layers.slice(1)){
+      const radius=center?0.65:layer.rank===2?4.4:layer.rank===6?9.0:8.6;
+      const point=new THREE.Vector3(Math.cos(angle)*radius,layer.y,-Math.sin(angle)*radius);points.push(point);
+      const dot=new THREE.Mesh(new THREE.SphereGeometry(0.14,10,8),new THREE.MeshBasicMaterial({color:direction.color}));dot.position.copy(point);dot.name=`wuqi-${direction.id}-layer-${layer.rank}`;group.add(dot);
+      dot.userData={data:ISLANDS_DATA.find(n=>n.id===direction.id),focusContext:'tower',towerWuqiKey:direction.id,towerWuqiLayer:layer.rank,focusObject:dot,focusPos:point.clone().add(new THREE.Vector3(COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y,COSMOLOGY_CENTER.z))};clickableMeshes.push(dot);
+    }
+    const flow=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points),90,0.023,5,false),new THREE.MeshBasicMaterial({color:direction.color,transparent:true,opacity:0.25,depthWrite:false}));flow.name='wuqi-flow-'+direction.id;flow.userData.wuqiFlow=true;group.add(flow);
+  }
+}
+function highlightWuqiAcross() {
+  const group=scene?.getObjectByName('wuqi-across-six-layers');if(!group)return;
+  for(const direction of ISLANDS_DATA.find(n=>n.id==='proto_center').wuqiAcross.directions){
+    const flow=group.getObjectByName('wuqi-flow-'+direction.id);flow.material.opacity=selectedIsland?.id===direction.id?0.8:0.25;
+  }
+}
+function renderWuqiAcrossPanel(container) {
+  const model=selectedIsland?.wuqiAcross;if(!model)return;
+  const panel=document.createElement('details');panel.className='wuqi-across-panel';panel.open=selectedIsland.disk==='proto_lingbao'||selectedIsland.id==='lingbao_earth_realm'||currentMode==='researcher';
+  const add=(parent,tag,text,cls)=>{const item=document.createElement(tag);item.textContent=text;if(cls)item.className=cls;parent.append(item);return item;};
+  add(panel,'summary',model.title);add(panel,'p','由上而下編號；第三層天界、第四層天—地—人對應為重點顯化區。','hierarchy-strip');
+  const stack=add(panel,'div','','wuqi-layer-list');
+  for(const layer of model.layers){const button=add(stack,'button',`${layer.rank}・${layer.name}`);button.type='button';button.dataset.rank=layer.rank;button.dataset.selected=String(selectedWuqiLayer===layer.rank);button.addEventListener('click',()=>selectIslandById(layer.id));add(stack,'p',layer.role);}
+  const wrap=add(panel,'div','','comparison-scroll');const table=add(wrap,'table','');add(table,'caption','五星・五嶽・五臟對照：山名與完整配對仍須核對版本。');
+  const head=add(table,'thead',''), tr=add(head,'tr','');for(const text of ['方位／天氣','五星','五嶽','五臟']){const th=add(tr,'th',text);th.scope='col';}
+  const body=add(table,'tbody','');
+  for(const direction of model.directions){const row=add(body,'tr','');row.dataset.direction=direction.id;row.dataset.selected=String(selectedIsland.id===direction.id);add(row,'td',direction.direction+'・'+direction.qi);add(row,'td',direction.planet);add(row,'td',direction.mountain);add(row,'td',direction.organ);}
+  add(panel,'h4','第三層・五方國土〔提供材料，逐項待核〕');for(const direction of model.directions)add(panel,'p',`${direction.direction}：${direction.kingdom}`);
+  add(panel,'h4','中央氣數・分文本保留');for(const entry of model.numbers)add(panel,'p',`${entry.value}：${entry.context}`);
+  add(panel,'h4','金允中模式・青黃白／三境／三田');for(const entry of model.jinYunzhong)add(panel,'p',`${entry.color} → ${entry.realm} → ${entry.field} → ${entry.organ}`);
+  add(panel,'p','此組青黃白出自齋壇存炁語境，不以相同顏色之名強行合併三炁模式 A、B。','evidence-note');
+  if(currentMode==='researcher')for(const source of model.sources){const card=add(panel,'article','','source-record');add(card,'h4',source.title);add(card,'p',source.finding);add(card,'p',source.status,'evidence-note');}
+  add(panel,'p',model.note,'evidence-note');container.prepend(panel);
 }

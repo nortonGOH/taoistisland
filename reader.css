@@ -166,3 +166,14 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 .salvation-path { border-top:1px solid #c084fc44; padding-top:16px; margin-top:16px; }
 .salvation-path h4 { color:#ead0ff; font-weight:700; }
 .salvation-path ol { list-style:decimal; padding-left:22px; margin:12px 0; }
+.wuqi-across-panel { border:1px solid #92a6d755; border-radius:15px; padding:16px; background:linear-gradient(130deg,#81703013,#4f658c15); }
+.wuqi-across-panel summary { cursor:pointer; color:#f3d999; font-weight:700; font-size:18px; line-height:1.6; }
+.wuqi-across-panel h4 { color:#d4e2fc; font-weight:700; margin:18px 0 10px; }
+.wuqi-across-panel p { margin:9px 0; }
+.wuqi-layer-list { margin:16px 0; }
+.wuqi-layer-list button { width:100%; padding:8px 12px; border:1px solid #90a5d444; border-radius:8px; background:#ffffff06; color:#d8e8ff; }
+.wuqi-layer-list button[data-selected="true"] { border-color:#f5d58c; background:#a58a3922; }
+.wuqi-across-panel table { width:100%; border-collapse:collapse; font-size:12px; }
+.wuqi-across-panel th,.wuqi-across-panel td { padding:8px 5px; text-align:left; border-bottom:1px solid #8899bb33; vertical-align:top; }
+.wuqi-across-panel caption { padding:9px 0; text-align:left; color:#b2c3de; font-size:12px; }
+.wuqi-across-panel tr[data-selected="true"] { background:#cfb7771a; }

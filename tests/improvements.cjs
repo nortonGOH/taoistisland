@@ -12,8 +12,24 @@ const layout=await p.evaluate(()=>{
  return {wheel:wheel.getWorldPosition(new THREE.Vector3()).toArray(),tower:tower.getWorldPosition(new THREE.Vector3()).toArray(),parent:wheel.parent.name,proto:proto.getWorldPosition(new THREE.Vector3()).toArray(),layers:[1,2,3].map(i=>scene.getObjectByName('tower-layer-'+i).getWorldPosition(new THREE.Vector3()).y),nodes:ISLANDS_DATA.length};
 });
 assert.deepEqual(layout.wheel,[0,0,-18]);assert.equal(layout.parent,'lingbao-six-layers');assert.deepEqual(layout.proto,[14,5.2,8]);
-assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,33);
+assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,34);
 console.log('Wheel moved to the tower; five-qi prototype coordinates unchanged.');
+// Six macro layers are numbered top-down; the qi network crosses all six without moving the original disk.
+const across=await p.evaluate(()=>{
+ const source=ISLANDS_DATA.find(n=>n.id==='proto_center').wuqiAcross;
+ const group=scene.getObjectByName('wuqi-across-six-layers');
+ return {levels:source.layers.map(l=>[l.rank,ISLANDS_DATA.find(n=>n.id===l.id).spaceLayer]),flows:group.children.filter(o=>o.name.startsWith('wuqi-flow-')).length,points:group.children.filter(o=>o.userData.towerWuqiLayer).length,proto:scene.getObjectByName('five-qi-prototype').getWorldPosition(new THREE.Vector3()).toArray()};
+});assert.deepEqual(across.levels,[[1,1],[2,2],[3,3],[4,4],[5,5],[6,6]]);assert.equal(across.flows,5);assert.equal(across.points,25);assert.deepEqual(across.proto,[14,5.2,8]);
+for(const rank of [2,3,4,5,6]){
+ await p.evaluate(rank=>selectIsland(scene.getObjectByName('wuqi-proto_north-layer-'+rank).userData),rank);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ assert.equal(await p.locator('.wuqi-layer-list button[data-selected="true"]').getAttribute('data-rank'),String(rank));
+ assert.equal(await p.locator('.wuqi-across-panel tbody tr[data-selected="true"]').getAttribute('data-direction'),'proto_north');
+ assert.equal(await p.evaluate(()=>scene.getObjectByName('wuqi-flow-proto_north').material.opacity),0.8);
+ const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedWuqiLayer),rank);
+}
+await p.screenshot({path:path.join(root,'test-results','wuqi-across-qa.png')});
+console.log('Six top-down layers, five streams, 25 cross-layer points and unchanged prototype passed.');
+await p.evaluate(()=>closeDrawer());assert.equal(await p.evaluate(()=>scene.getObjectByName('wuqi-flow-proto_north').material.opacity),0.25);
 // The kalpa wheel now contains all 28 heavens in three internal tiers.
 await p.evaluate(()=>selectIslandById('kalpa_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
 assert.equal(await p.locator('.kalpa-realm-row').count(),3);
