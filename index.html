@@ -138,9 +138,6 @@
     <button onclick="selectIslandById('sector_1')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
       <span>🐮 丑牛｜王充命義與太平經身即宇宙</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
-    <button onclick="selectIslandById('sector_2')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐯 寅虎｜九天胎變、司命勒籍與解承負</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-    </button>
   </div>
 
   <!-- 側邊深度檢視抽屜 -->
@@ -304,18 +301,27 @@
       return texture;
     }
 
+    // 異步讀取外部 islands.json 檔案
     async function loadIslandsData() {
       try {
         const response = await fetch('./islands.json');
-        if (!response.ok) throw new Error("Fetch failed");
+        if (!response.ok) throw new Error("讀取 islands.json 失敗");
         ISLANDS_DATA = await response.json();
         ISLANDS_DATA.forEach(item => {
           if (typeof item.color === 'string') item.color = parseInt(item.color, 16);
         });
+        initScene();
       } catch (err) {
-        console.warn("使用預設備援資料");
+        console.error("無法載入文獻資料庫 islands.json：", err);
+        document.getElementById("canvas-container").innerHTML = `
+          <div class="flex items-center justify-center h-full px-4">
+            <div class="bg-rose-950/90 border border-rose-500 text-rose-200 px-6 py-5 rounded-xl max-w-lg text-sm shadow-2xl">
+              <h3 class="font-bold text-base mb-2">⚠️ 資料庫 (islands.json) 讀取失敗</h3>
+              <p class="text-xs leading-relaxed text-rose-300 mb-2">請確認本機有開啟 HTTP 伺服器，或已將 islands.json 上傳至 GitHub Pages 儲存庫根目錄。</p>
+            </div>
+          </div>
+        `;
       }
-      initScene();
     }
 
     function initScene() {
@@ -549,42 +555,27 @@
       const protoGroup = new THREE.Group();
       protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
 
-      // 上層盤底支撐光環（半透明懸浮雲台）
       const pBaseGeo = new THREE.CylinderGeometry(5.8, 5.8, 0.2, 48);
-      const pBaseMat = new THREE.MeshStandardMaterial({
-        color: 0x221a08,
-        transparent: true,
-        opacity: 0.65,
-        roughness: 0.3
-      });
+      const pBaseMat = new THREE.MeshStandardMaterial({ color: 0x221a08, transparent: true, opacity: 0.65, roughness: 0.3 });
       const pBaseMesh = new THREE.Mesh(pBaseGeo, pBaseMat);
       pBaseMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(pBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15, opacity: 0.7 })));
       protoGroup.add(pBaseMesh);
 
       // 中心：以「靈寶自然天文」圓形赤書天篆 Sprite 表現（非多邊菱形）
       const tianshuTex = createNaturalTianshuTexture();
-      const tianshuMat = new THREE.SpriteMaterial({
-        map: tianshuTex,
-        transparent: true,
-        depthTest: true
-      });
+      const tianshuMat = new THREE.SpriteMaterial({ map: tianshuTex, transparent: true, depthTest: true });
       const tianshuSprite = new THREE.Sprite(tianshuMat);
       tianshuSprite.scale.set(3.4, 3.4, 1.0);
       tianshuSprite.position.set(0, 1.2, 0);
       protoGroup.add(tianshuSprite);
 
-      // 中心真文點擊感應台
       const pCenterHitGeo = new THREE.CylinderGeometry(1.8, 1.8, 0.6, 24);
       const pCenterHitMesh = new THREE.Mesh(pCenterHitGeo, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
       pCenterHitMesh.position.set(0, 0.4, 0);
 
       const protoCenterData = ISLANDS_DATA.find(d => d.id === "proto_center");
       const protoCenterWorldPos = new THREE.Vector3(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
-      const pCenterUserData = {
-        data: protoCenterData,
-        markerMesh: tianshuSprite,
-        focusPos: protoCenterWorldPos
-      };
+      const pCenterUserData = { data: protoCenterData, markerMesh: tianshuSprite, focusPos: protoCenterWorldPos };
       pCenterHitMesh.userData = pCenterUserData;
       tianshuSprite.userData = pCenterUserData;
       clickableMeshes.push(pCenterHitMesh);
@@ -603,7 +594,6 @@
         const lx = Math.cos(dir.angle) * dir.dist;
         const lz = -Math.sin(dir.angle) * dir.dist;
 
-        // 方形氣化印台
         const bGeo = new THREE.BoxGeometry(1.6, 0.35, 1.6);
         const bMesh = new THREE.Mesh(bGeo, new THREE.MeshStandardMaterial({ color: 0x131d31, roughness: 0.3 }));
         bMesh.position.set(lx, 0.2, lz);
@@ -665,21 +655,18 @@
     }
 
     function focusProtoDisk() {
-      // 聚焦右盤上層：五方五氣本體盤
       new TWEEN.Tween(controls.target).to({ x: KALPA_CENTER.x, y: PROTO_HEIGHT, z: KALPA_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: KALPA_CENTER.x, y: PROTO_HEIGHT + 14, z: KALPA_CENTER.z + 12 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('proto_center');
     }
 
     function focusZodiacDisk() {
-      // 聚焦左盤：十二辰星盤
       new TWEEN.Tween(controls.target).to({ x: ZODIAC_CENTER.x, y: 0, z: ZODIAC_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: ZODIAC_CENTER.x, y: 20, z: ZODIAC_CENTER.z + 17 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('beidou');
     }
 
     function focusKalpaDisk() {
-      // 聚焦右盤下層：靈寶五劫天輪
       new TWEEN.Tween(controls.target).to({ x: KALPA_CENTER.x, y: 0, z: KALPA_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: KALPA_CENTER.x, y: 20, z: KALPA_CENTER.z + 18 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('kalpa_center');
@@ -825,7 +812,7 @@
         zCenterObj.userData.markerMesh.rotation.y = t * 0.2;
       }
 
-      // 右盤上層「靈寶自然天文」赤文天篆輕微旋轉（道身顯化）
+      // 右盤上層「靈寶自然天文」赤文天篆輕微自轉（道身顯化）
       const pCenterObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "proto_center");
       if (pCenterObj && pCenterObj.userData.markerMesh) {
         pCenterObj.userData.markerMesh.material.rotation = -t * 0.15;
@@ -846,6 +833,7 @@
       renderer.render(scene, camera);
     }
 
+    // 啟動資料庫載入
     loadIslandsData();
   </script>
 </body>
