@@ -1053,11 +1053,87 @@
       }
     }
 
-    function selectIsland(userData) {
+   function selectIsland(userData) {
+      if (!userData || !userData.data) return;
       selectedIsland = userData.data;
       const targetPos = userData.focusPos;
-      new TWEEN.Tween(controls.target).to({ x: targetPos.x, y: targetPos.y + 0.3, z: targetPos.z }, 800).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(camera.position).to({ x: targetPos.x + 5, y: targetPos.y + 7.5, z: targetPos.z + 8.5 }, 800).easing(TWEEN.Easing.Cubic.Out).start();
+
+      // 視角擺放預設目標點（將目標點稍微抬高至圖示徽章中心）
+      const lookAtY = targetPos.y + (selectedIsland.disk === "cosmology_lingbao" ? 0.2 : 0.8);
+      const targetLookAt = new THREE.Vector3(targetPos.x, lookAtY, targetPos.z);
+
+      let targetCamPos = new THREE.Vector3();
+
+      if (selectedIsland.disk === "cosmology_lingbao") {
+        // 【靈寶立體天塔與九壘剛風】：徽章面向南方(+Z)，相機直接正對該層圖示前方
+        if (selectedIsland.id === "lingbao_nine_strata_gangfeng") {
+          // 第一層九宮格：採用前上方 45 度俯視，將九宮方陣與剛風盡收眼底
+          targetCamPos.set(targetPos.x, targetPos.y + 7.5, targetPos.z + 10.5);
+        } else if (selectedIsland.id === "lingbao_daluo") {
+          // 第六層大羅天玉京山：正對金闕與玄臺
+          targetCamPos.set(targetPos.x, targetPos.y + 4.5, targetPos.z + 9.5);
+        } else {
+          // 第2~5層：正面微俯角平視該層圖示
+          targetCamPos.set(targetPos.x, targetPos.y + 3.0, targetPos.z + 8.0);
+        }
+      } else if (selectedIsland.disk === "zodiac") {
+        // 【左盤十二辰星盤】：相機由該圖示的外側朝向圖示，視角自然直視該辰位
+        if (selectedIsland.isCenter) {
+          // 中央北斗：俯視天樞星圖
+          targetCamPos.set(targetPos.x, targetPos.y + 6.5, targetPos.z + 7.5);
+        } else {
+          const dirFromCenter = new THREE.Vector3(
+            targetPos.x - ZODIAC_CENTER.x,
+            0,
+            targetPos.z - ZODIAC_CENTER.z
+          ).normalize();
+          // 將相機放在圖示外緣向後退 4.5 單位、抬高 3.5 單位處，精準正對該辰位
+          targetCamPos.copy(targetPos).add(dirFromCenter.clone().multiplyScalar(4.5));
+          targetCamPos.y += 3.5;
+        }
+      } else if (selectedIsland.disk === "proto_lingbao") {
+        // 【五方五氣赤文道身】：正俯視或前傾直視自然天文赤篆
+        if (selectedIsland.isCenter) {
+          targetCamPos.set(targetPos.x, targetPos.y + 7.0, targetPos.z + 5.5);
+        } else {
+          const dirFromCenter = new THREE.Vector3(
+            targetPos.x - KALPA_CENTER.x,
+            0,
+            targetPos.z - KALPA_CENTER.z
+          ).normalize();
+          targetCamPos.copy(targetPos).add(dirFromCenter.clone().multiplyScalar(4.0));
+          targetCamPos.y += 3.0;
+        }
+      } else if (selectedIsland.disk === "kalpa") {
+        // 【靈寶五劫天輪】：正對該劫期之扇區與流光徽章
+        if (selectedIsland.isCenter) {
+          targetCamPos.set(targetPos.x, targetPos.y + 6.5, targetPos.z + 7.0);
+        } else {
+          const dirFromCenter = new THREE.Vector3(
+            targetPos.x - KALPA_CENTER.x,
+            0,
+            targetPos.z - KALPA_CENTER.z
+          ).normalize();
+          targetCamPos.copy(targetPos).add(dirFromCenter.clone().multiplyScalar(4.5));
+          targetCamPos.y += 3.5;
+        }
+      } else {
+        // 通用預設擺位
+        targetCamPos.set(targetPos.x + 3.0, targetPos.y + 5.0, targetPos.z + 6.0);
+      }
+
+      // 平滑旋轉焦點至該圖示
+      new TWEEN.Tween(controls.target)
+        .to({ x: targetLookAt.x, y: targetLookAt.y, z: targetLookAt.z }, 800)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .start();
+
+      // 平滑位移相機至正對該圖示之觀測點
+      new TWEEN.Tween(camera.position)
+        .to({ x: targetCamPos.x, y: targetCamPos.y, z: targetCamPos.z }, 800)
+        .easing(TWEEN.Easing.Cubic.Out)
+        .start();
+
       renderDrawer();
     }
 
