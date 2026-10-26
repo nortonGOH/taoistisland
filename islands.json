@@ -638,7 +638,9 @@
       "searchTerms": "靈寶自然天文; 混洞赤文; 唯道為身; 五方老數; 數起於一; 尚陽貴生",
       "imageRef": "《正統道藏》洞真部本文類《度人經》混洞赤文元始靈書符命拓本",
       "dispute": "【文獻學界定】：古靈寶經突破漢魏氣論，將真文確立為先於天地生成的本體實體；蕭吉《五行大義》引老數皆陽奇之理，確證道教以純陽生生之氣奠定創世基礎。"
-    }
+    },
+    "shape": "square",
+    "visualLabel": "正方形・黃色"
   },
   {
     "id": "proto_east",
@@ -667,7 +669,9 @@
       "searchTerms": "東方九氣; 青帝真文; 尚陽貴生; 老數納音; 赤書玉訣妙經",
       "imageRef": "《赤書玉訣妙經》東方九氣青靈始老天真符版",
       "dispute": "【文獻定論】：以九為木數非後世混雜，乃六朝古靈寶經承襲納音老數體系之嚴格規訓，專顯陽德。"
-    }
+    },
+    "shape": "rectangle",
+    "visualLabel": "長方形・綠色"
   },
   {
     "id": "proto_south",
@@ -676,8 +680,8 @@
     "modelType": "右盤上層：五方五氣本體・南方",
     "disk": "proto_lingbao",
     "direction": "south",
-    "color": "0xf97316",
-    "hexColor": "#f97316",
+    "color": "0xef4444",
+    "hexColor": "#ef4444",
     "beginner": {
       "step1_question": "南方「三氣」如何推動宇宙日月的開明？",
       "step2_concept": "南方火德主光明洞照。老數中『立於三』，象徵天之三景（日、月、星宿）由南方赤帝真文激發而得以破除黑暗、洞燭大千。",
@@ -696,7 +700,9 @@
       "searchTerms": "南方三氣; 赤帝真文; 開明三景; 天根; 無文不光",
       "imageRef": "宋刻本《度人經》南方丹靈流光圖",
       "dispute": "【神學考證】：三氣在此非後世精氣神之內丹引申，乃宇宙本體層面光照秩序之奠定。"
-    }
+    },
+    "shape": "triangle",
+    "visualLabel": "三角形・紅色"
   },
   {
     "id": "proto_west",
@@ -705,8 +711,8 @@
     "modelType": "右盤上層：五方五氣本體・西方",
     "disk": "proto_lingbao",
     "direction": "west",
-    "color": "0xe2e8f0",
-    "hexColor": "#e2e8f0",
+    "color": "0xffffff",
+    "hexColor": "#ffffff",
     "beginner": {
       "step1_question": "西方「七氣」在宇宙創生中掌管何種法度？",
       "step2_concept": "西方金德主品秩、肅清與裁成。老數中『盛於七』，對應周天七政之平度與收束救度之法，確保宇宙運行秩序嚴整，使生生之氣不致渙散。",
@@ -725,7 +731,9 @@
       "searchTerms": "西方七氣; 白帝真文; 數盛於七; 七政宣平; 無文不度",
       "imageRef": "正一部《赤書玉訣妙經》西靈素曜符命圖",
       "dispute": "【文獻學界定】：西方七氣並非主死殺，而是以秩序之立（成度）維護生道，符合「尚陽」之奇數體系。"
-    }
+    },
+    "shape": "circle",
+    "visualLabel": "圓形・白色"
   },
   {
     "id": "proto_north",
@@ -734,8 +742,8 @@
     "modelType": "右盤上層：五方五氣本體・北方",
     "disk": "proto_lingbao",
     "direction": "north",
-    "color": "0x38bdf8",
-    "hexColor": "#38bdf8",
+    "color": "0x05080d",
+    "hexColor": "#05080d",
     "beginner": {
       "step1_question": "北方「五氣」如何在幽冥未分中孕育生命形體？",
       "step2_concept": "北方水德為萬物受生之源。老數中『成於五』，象徵純陽生機潛入太陰真水之中，含孕一切生命的形魄質料，使萬物得以凝胎賦形。",
@@ -754,7 +762,10 @@
       "searchTerms": "北方五氣; 黑帝真文; 數成於五; 一炁生水; 無文不生",
       "imageRef": "正一部本文類《九天生神章經》北方玄老天真黑符",
       "dispute": "【本體定位】：北方老數五代表生機在幽闕之「成」，非一般陰滯之死氣，乃向生之胚盤。"
-    }
+    },
+    "shape": "wave",
+    "visualLabel": "波浪形・黑色",
+    "displayColor": "#38bdf8"
   },
   {
     "id": "lingbao_daluo",

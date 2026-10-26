@@ -302,6 +302,51 @@
       return texture;
     }
 
+    // Five-direction symbols are a visual design, not facsimiles of historical talismans.
+    function protoOutline(shape) {
+      if (shape === 'rectangle') return [[-1.1,-0.57],[1.1,-0.57],[1.1,0.57],[-1.1,0.57]];
+      if (shape === 'triangle') return [[0,1],[-1,-0.8],[1,-0.8]];
+      if (shape === 'square') return [[-1,-1],[1,-1],[1,1],[-1,1]];
+      if (shape === 'circle') return Array.from({length:64},(_,i)=>[Math.cos(i*Math.PI/32),Math.sin(i*Math.PI/32)]);
+      const top = Array.from({length:65},(_,i)=>{
+        const x=-1.15+i*2.3/64;
+        return [x,0.28+0.18*Math.sin((x+1.15)*Math.PI*2/1.15)];
+      });
+      return top.concat([...top].reverse().map(([x,y])=>[x,y-0.52]));
+    }
+
+    function createProtoGeometry(shape) {
+      const outline = new THREE.Shape();
+      protoOutline(shape).forEach(([x,y],i)=>i ? outline.lineTo(x,y) : outline.moveTo(x,y));
+      outline.closePath();
+      const geometry = new THREE.ExtrudeGeometry(outline,{depth:0.4,bevelEnabled:true,bevelThickness:0.045,bevelSize:0.045,bevelSegments:2,steps:1});
+      geometry.rotateX(-Math.PI/2);
+      return geometry;
+    }
+
+    function createProtoBadgeTexture(dir) {
+      const canvas=document.createElement('canvas');canvas.width=512;canvas.height=512;
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='rgba(8,15,31,0.95)';ctx.fillRect(0,0,512,512);
+      const points=protoOutline(dir.shape);
+      ctx.beginPath();points.forEach(([x,y],i)=>i ? ctx.lineTo(256+x*145,205-y*145) : ctx.moveTo(256+x*145,205-y*145));ctx.closePath();
+      ctx.fillStyle=dir.color;ctx.fill();ctx.strokeStyle=dir.edge || dir.color;ctx.lineWidth=7;
+      ctx.shadowColor=dir.edge || dir.color;ctx.shadowBlur=18;ctx.stroke();ctx.shadowBlur=0;
+      if(dir.shape==='wave') {
+        ctx.save();ctx.clip();ctx.strokeStyle='#38bdf8';ctx.lineWidth=2;
+        for(let row=0;row<4;row++){
+          ctx.beginPath();
+          for(let x=70;x<=442;x+=3){const y=177+row*20+10*Math.sin(x/27);x===70?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=dir.edge || dir.color;
+      ctx.font='bold 43px "Microsoft JhengHei",sans-serif';ctx.fillText(dir.text,256,385);
+      ctx.fillStyle='#e2e8f0';ctx.font='28px "Microsoft JhengHei",sans-serif';ctx.fillText(dir.description,256,447);
+      return new THREE.CanvasTexture(canvas);
+    }
+
     function createNaturalTianshuTexture() {
       const canvas = document.createElement("canvas");
       canvas.width = 512; canvas.height = 512;
@@ -317,7 +362,7 @@
       ctx.lineWidth = 6;
       ctx.strokeStyle = "#fef08a";
       ctx.beginPath();
-      ctx.arc(256, 256, 190, 0, Math.PI * 2);
+      ctx.rect(66, 66, 380, 380);
       ctx.stroke();
 
       ctx.lineWidth = 3;
@@ -332,8 +377,8 @@
       ctx.font = "bold 56px serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#ffffff";
-      ctx.shadowColor = "#facc15";
+      ctx.fillStyle = "#ef4444";
+      ctx.shadowColor = "#fca5a5";
       ctx.shadowBlur = 18;
       ctx.fillText("混洞赤文", 256, 220);
       ctx.font = "bold 34px serif";
@@ -999,13 +1044,20 @@
       pBaseMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(pBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15, opacity: 0.7 })));
       protoGroup.add(pBaseMesh);
 
-      const tianshuTex = createNaturalTianshuTexture();
+      const centerGeometry = createProtoGeometry('square');
+      const centerBase = new THREE.Mesh(centerGeometry,new THREE.MeshStandardMaterial({color:'#facc15',metalness:0.65,roughness:0.32}));
+      centerBase.position.y=0.15;
+      centerBase.add(new THREE.LineSegments(new THREE.EdgesGeometry(centerGeometry),new THREE.LineBasicMaterial({color:'#fef08a'})));
+      protoGroup.add(centerBase);
+      const core = new THREE.Mesh(new THREE.PlaneGeometry(1.65,1.65),new THREE.MeshBasicMaterial({map:createNaturalTianshuTexture(),transparent:true,side:THREE.DoubleSide}));
+      core.rotation.x=-Math.PI/2;core.position.y=0.61;protoGroup.add(core);
+      const tianshuTex = createProtoBadgeTexture({shape:'square',color:'#facc15',text:'中央土・一氣',description:'正方形・黃色・自然天文'});
       const tianshuSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tianshuTex, transparent: true, depthTest: true }));
-      tianshuSprite.scale.set(3.4, 3.4, 1.0);
-      tianshuSprite.position.set(0, 1.2, 0);
+      tianshuSprite.scale.set(2.2, 2.2, 1.0);
+      tianshuSprite.position.set(0, 2.0, 0);
       protoGroup.add(tianshuSprite);
 
-      const pCenterHitMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.8, 1.8, 0.6, 24), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
+      const pCenterHitMesh = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.7, 2.2), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 }));
       pCenterHitMesh.position.set(0, 0.4, 0);
 
       const protoCenterData = ISLANDS_DATA.find(d => d.id === "proto_center");
@@ -1013,30 +1065,43 @@
       const pCenterUserData = { data: protoCenterData, markerMesh: tianshuSprite, focusPos: protoCenterWorldPos };
       pCenterHitMesh.userData = pCenterUserData;
       tianshuSprite.userData = pCenterUserData;
+      centerBase.userData = pCenterUserData;core.userData = pCenterUserData;
+      clickableMeshes.push(centerBase,core);
       clickableMeshes.push(pCenterHitMesh);
       clickableMeshes.push(tianshuSprite);
       protoGroup.add(pCenterHitMesh);
 
       const directions = [
-        { id: "proto_east",  angle: 0,           dist: 4.5, text: "東方九氣", emoji: "🌱", color: "#10b981" },
-        { id: "proto_south", angle: -Math.PI / 2, dist: 4.5, text: "南方三氣", emoji: "🔥", color: "#f97316" },
-        { id: "proto_west",  angle: Math.PI,      dist: 4.5, text: "西方七氣", emoji: "⚪", color: "#e2e8f0" },
-        { id: "proto_north", angle: Math.PI / 2,  dist: 4.5, text: "北方五氣", emoji: "💧", color: "#38bdf8" }
+        { id:'proto_east',angle:0,dist:4.5,text:'東方木・九氣',shape:'rectangle',color:'#10b981',description:'長方形・綠色' },
+        { id:'proto_south',angle:-Math.PI/2,dist:4.5,text:'南方火・三氣',shape:'triangle',color:'#ef4444',description:'三角形・紅色' },
+        { id:'proto_west',angle:Math.PI,dist:4.5,text:'西方金・七氣',shape:'circle',color:'#ffffff',description:'圓形・白色' },
+        { id:'proto_north',angle:Math.PI/2,dist:4.5,text:'北方水・五氣',shape:'wave',color:'#05080d',edge:'#38bdf8',description:'波浪形・黑色' }
       ];
 
       directions.forEach(dir => {
         const lx = Math.cos(dir.angle) * dir.dist;
         const lz = -Math.sin(dir.angle) * dir.dist;
 
-        const bGeo = new THREE.BoxGeometry(1.6, 0.35, 1.6);
-        const bMesh = new THREE.Mesh(bGeo, new THREE.MeshStandardMaterial({ color: 0x131d31, roughness: 0.3 }));
+        const bGeo = createProtoGeometry(dir.shape);
+        const bMesh = new THREE.Mesh(bGeo, new THREE.MeshStandardMaterial({ color: dir.color, roughness: 0.3, metalness: 0.3 }));
         bMesh.position.set(lx, 0.2, lz);
-        bMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(bGeo), new THREE.LineBasicMaterial({ color: dir.color })));
+        bMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(bGeo), new THREE.LineBasicMaterial({ color: dir.edge || dir.color })));
 
-        const tex = createBadgeTexture(dir.emoji, dir.text, dir.color);
+        if (dir.shape === 'wave') {
+          // Black water body with three cyan wave traces; the outline remains visible in deep space.
+          for (let row=0;row<3;row++) {
+            const points=Array.from({length:65},(_,i)=>{
+              const x=-1.12+i*2.24/64;
+              return new THREE.Vector3(x,0.46,-(0.20-row*0.16+0.12*Math.sin((x+1.15)*Math.PI*2/1.15)));
+            });
+            const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:'#38bdf8',transparent:true,opacity:0.8}));
+            line.userData.protoWater=true;bMesh.add(line);
+          }
+        }
+        const tex = createProtoBadgeTexture(dir);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-        sprite.scale.set(1.4, 1.4, 1.0);
-        sprite.position.set(lx, 1.15, lz);
+        sprite.scale.set(2.0, 2.0, 1.0);
+        sprite.position.set(lx, 1.8, lz);
         protoGroup.add(sprite);
 
         const nodeData = ISLANDS_DATA.find(d => d.id === dir.id);
@@ -1340,7 +1405,7 @@
       const tag = document.getElementById("drawer-tag");
       tag.textContent = selectedIsland.modelType;
       tag.style.backgroundColor = `${selectedIsland.hexColor}25`;
-      tag.style.color = selectedIsland.hexColor;
+      tag.style.color = selectedIsland.displayColor || selectedIsland.hexColor;
 
       const review = selectedIsland.review;
       document.getElementById('drawer-status').textContent = review?.status || '引文與版本待核';
@@ -1452,7 +1517,15 @@
       // 2. 赤文自然天文微轉動
       const pCenterObj = clickableMeshes.find(m => m.userData.data && m.userData.data.id === "proto_center");
       if (pCenterObj && pCenterObj.userData.markerMesh) {
-        pCenterObj.userData.markerMesh.material.rotation = -t * 0.15;
+        // Keep the square badge and its text upright.
+        pCenterObj.userData.markerMesh.material.rotation = 0;
+      }
+      const waterNode = clickableMeshes.find(m => m.userData.data?.id === 'proto_north' && m.isMesh);
+      if (waterNode) {
+        const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        waterNode.children.forEach((child,i)=>{
+          if(child.userData.protoWater) child.material.opacity=reducedMotion ? 0.85 : 0.65+0.3*Math.sin(t*1.6+i);
+        });
       }
 
       // 3. 玉京山七寶華林光相層旋轉 (大羅神光)
