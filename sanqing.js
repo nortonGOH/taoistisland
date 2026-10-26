@@ -35,20 +35,22 @@ function buildSanqingRealms(parent) {
     clickableMeshes.push(object);
     return object;
   }
-  const sourcePos = new THREE.Vector3(0,4.3,0);
+  const sourcePos = new THREE.Vector3(0,3.7,0.2);
   const source = new THREE.Mesh(new THREE.SphereGeometry(0.56,32,24),new THREE.MeshStandardMaterial({color:'#fff7cc',emissive:'#facc15',emissiveIntensity:1.7,roughness:0.2}));
   source.position.copy(sourcePos); group.add(clickable(source));
   const sourceLabel=sanqingText(['一炁','化生三炁・分為三天'],'#fde68a',1024,300);
-  sourceLabel.position.set(0,5.7,0); sourceLabel.scale.set(5,1.46,1); group.add(clickable(sourceLabel));
+  sourceLabel.position.set(0,4.9,0.2); sourceLabel.scale.set(5,1.46,1); group.add(clickable(sourceLabel));
   data.sanqing.realms.forEach((realm,index)=>{
-    const x=(index-1)*6.5;
-    const center=new THREE.Vector3(x,0,0);
+    // One rear vertex and two forward vertices, all within the fifth layer.
+    const vertices = [[0,0.35,-3.4],[-4.6,-0.25,3.2],[4.6,-0.25,3.2]];
+    const [x,y,z] = vertices[index];
+    const center=new THREE.Vector3(x,y,z);
     const platform=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.45,0.38,48),new THREE.MeshStandardMaterial({color:realm.color,transparent:true,opacity:0.48,metalness:0.5,roughness:0.25}));
     platform.position.copy(center); group.add(clickable(platform,realm.key));
     const rim=new THREE.Mesh(new THREE.TorusGeometry(2.17,0.065,8,64),new THREE.MeshBasicMaterial({color:realm.color}));
-    rim.rotation.x=Math.PI/2; rim.position.set(x,0.24,0);group.add(rim);
+    rim.rotation.x=Math.PI/2; rim.position.set(x,y+0.24,z);group.add(rim);
     // A symbolic sanctuary: four columns and a roof, without invented deity iconography.
-    const sanctuary=new THREE.Group();sanctuary.position.set(x,0.25,0);group.add(sanctuary);
+    const sanctuary=new THREE.Group();sanctuary.position.set(x,y+0.25,z);group.add(sanctuary);
     const material=new THREE.MeshStandardMaterial({color:realm.color,emissive:realm.color,emissiveIntensity:0.25,metalness:0.4,roughness:0.25});
     for(const dx of [-0.85,0.85]) for(const dz of [-0.65,0.65]){
       const column=new THREE.Mesh(new THREE.CylinderGeometry(0.085,0.11,1.35,12),material);
@@ -58,19 +60,23 @@ function buildSanqingRealms(parent) {
     roof.rotation.y=Math.PI/4;roof.position.y=1.65;sanctuary.add(clickable(roof,realm.key));
     const pearl=new THREE.Mesh(new THREE.SphereGeometry(0.32,24,16),new THREE.MeshStandardMaterial({color:'#fff',emissive:realm.color,emissiveIntensity:1.2}));
     pearl.position.y=0.7;sanctuary.add(clickable(pearl,realm.key));
-    const curve=new THREE.CatmullRomCurve3([sourcePos.clone(),new THREE.Vector3(x*0.55,3.5,-0.3),new THREE.Vector3(x,2.6,0),new THREE.Vector3(x,1.95,0)]);
+    const curve=new THREE.CatmullRomCurve3([sourcePos.clone(),new THREE.Vector3(x*0.55,3.2,z*0.55),new THREE.Vector3(x,y+2.6,z),new THREE.Vector3(x,y+1.95,z)]);
     group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.045,8,false),new THREE.MeshBasicMaterial({color:realm.color,transparent:true,opacity:0.7})));
     const qiLabel=sanqingText([realm.qi],realm.color,640,180);
-    qiLabel.scale.set(2.3,0.65,1);qiLabel.position.set(x,2.8,0.5);group.add(clickable(qiLabel,realm.key));
+    qiLabel.scale.set(2.3,0.65,1);qiLabel.position.set(x,y+2.8,z+0.35);group.add(clickable(qiLabel,realm.key));
     for(let i=0;i<4;i++) {
       const particle=new THREE.Mesh(new THREE.SphereGeometry(0.075,8,8),new THREE.MeshBasicMaterial({color:realm.color}));group.add(particle);
       sanqingFlows.push({particle,curve,phase:i/4});
     }
     const label=sanqingText([`${realm.heaven}・${realm.realm}`,`${realm.deity}（${realm.lord}）`,`《${realm.scripture}》十二部 → ${realm.audience}`],realm.color);
-    label.position.set(x,-1.75,1.2);group.add(clickable(label,realm.key));
+    label.scale.set(4.25,2.125,1);
+    label.position.set(x,y-1.55,z+1.0);group.add(clickable(label,realm.key));
   });
+  const triangle = [new THREE.Vector3(0,0.08,-3.4),new THREE.Vector3(-4.6,-0.52,3.2),new THREE.Vector3(4.6,-0.52,3.2)];
+  const frame = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(triangle),new THREE.LineBasicMaterial({color:'#a5b4fc',transparent:true,opacity:0.55}));
+  frame.name='sanqing-triangle';group.add(frame);
   const foot=sanqingText(['第五層・三清勝境','三炁 → 三天三境 → 三洞經教'],'#cbd5e1',1024,260);
-  foot.scale.set(6,1.52,1);foot.position.set(0,-4.1,0.8);group.add(clickable(foot));
+  foot.scale.set(6,1.52,1);foot.position.set(0,-4.1,4.0);group.add(clickable(foot));
 }
 
 function animateSanqingFlow(time) {
@@ -83,7 +89,7 @@ function renderSanqingPanel(container) {
   if(!model) return;
   const section=document.createElement('section');section.className='sanqing-panel';
   const heading=document.createElement('h3');heading.textContent='一炁化三炁・三天三境對應';section.append(heading);
-  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺並列，表示對應關係。位置、色彩與宮殿造型為教學設計。';section.append(help);
+  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺以前後錯落的立體三角呈現，仍屬靈寶第五層。三角配置、位置、色彩與宮殿造型為教學設計，不代表經文記載的方位或尊卑。';section.append(help);
   for(const realm of model.realms){
     const card=document.createElement('article');card.className='sanqing-card';card.dataset.realm=realm.key;card.dataset.selected=String(selectedSanqingKey===realm.key);card.style.setProperty('--realm-color',realm.color);
     const title=document.createElement('h4');title.textContent=`${realm.qi} → ${realm.heaven}・${realm.realm}`;card.append(title);

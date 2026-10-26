@@ -143,7 +143,7 @@
 
   <!-- 側邊深度檢視抽屜 -->
   <aside aria-labelledby="drawer-title" aria-hidden="true" id="side-drawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[480px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-30 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
-    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+    <div class="drawer-toolbar flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
         <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
         <span id="drawer-status" class="text-[11px] text-amber-400/90 font-medium">引文與版本待核</span>
@@ -152,7 +152,8 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <div class="mt-4">
+    <div class="drawer-heading mt-4">
+      <span class="dialog-eyebrow">宇宙知識檔案 · CONCEPT ATLAS</span>
       <div class="text-xs font-mono text-slate-400" id="drawer-coord">空間位階</div>
       <h2 id="drawer-title" tabindex="-1" class="text-xl font-bold text-slate-100 mt-1">概念節點</h2>
       <p id="drawer-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed"></p>
@@ -162,7 +163,7 @@
 
   <!-- 中央彈出式對話方塊 -->
   <div role="dialog" aria-modal="true" aria-labelledby="modal-title" id="narrative-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-200">
-    <div class="relative w-full max-w-2xl bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div class="narrative-card relative w-full max-w-2xl bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
         <div class="flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
@@ -1119,7 +1120,7 @@
     }
 
     function onPointerDown(event) {
-      if (event.clientX > window.innerWidth - 500 && !document.getElementById("side-drawer").classList.contains("translate-x-full")) return;
+      if (event.target.closest?.("header, #right-panel, #right-panel-trigger, #reader-modes, #side-drawer, #load-status")) return;
       if (!document.getElementById("narrative-modal").classList.contains("hidden")) return;
 
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -1138,6 +1139,7 @@
       if (!userData || !userData.data) return;
       selectedSanqingKey = userData.sanqingKey || null;
       selectedIsland = userData.data;
+      if (!textView && !isLeftPanelCollapsed) toggleLeftPanel();
       renderDrawer();
       renderNodeList();
       writeRoute();
@@ -1157,9 +1159,8 @@
           targetCamPos.set(targetPos.x, targetPos.y + 7.5, targetPos.z + 10.5);
         } else if (selectedIsland.id === "lingbao_sanqing") {
           // Show the three realms together, leaving space for the reading drawer.
-          targetLookAt.x += 4.2;
-          targetLookAt.y += 2;
-          targetCamPos.set(targetPos.x + 4.2, targetPos.y + 5.5, targetPos.z + 28);
+          targetLookAt.y = COSMOLOGY_CENTER.y + 23.0;
+          targetCamPos.set(COSMOLOGY_CENTER.x + 1.2, COSMOLOGY_CENTER.y + 30.5, COSMOLOGY_CENTER.z + 26);
         } else if (selectedIsland.id === "lingbao_daluo") {
           // 第六層大羅天玉京山：正對金闕與玄臺
           targetCamPos.set(targetPos.x, targetPos.y + 4.5, targetPos.z + 9.5);
@@ -1185,7 +1186,10 @@
       } else if (selectedIsland.disk === "proto_lingbao") {
         // 【五方五氣赤文道身】：正俯視或前傾直視自然天文赤篆
         if (selectedIsland.isCenter) {
-          targetCamPos.set(targetPos.x, targetPos.y + 7.0, targetPos.z + 5.5);
+          // Diagonal overhead approach keeps the southern badge outside the center sightline.
+          targetLookAt.y = targetPos.y + 1.0;
+          const distanceScale = window.innerWidth <= 700 ? 1.4 : 1;
+          targetCamPos.set(targetPos.x + 3.6*distanceScale, targetPos.y + 1.0 + 8.0*distanceScale, targetPos.z + 2.4*distanceScale);
         } else {
           const dirFromCenter = new THREE.Vector3(
             targetPos.x - KALPA_CENTER.x,
@@ -1212,6 +1216,11 @@
         // 通用預設擺位
         targetCamPos.set(targetPos.x + 3.0, targetPos.y + 5.0, targetPos.z + 6.0);
       }
+
+      if (selectedIsland.id === 'lingbao_sanqing' && window.innerWidth <= 700) {
+        targetCamPos.sub(targetLookAt).multiplyScalar(Math.max(1,800/window.innerWidth)).add(targetLookAt);
+      }
+      updateSceneFraming();
 
       // 平滑旋轉焦點至該圖示
       new TWEEN.Tween(controls.target)
@@ -1480,6 +1489,9 @@
         `;
       }
       renderSanqingPanel(contentBox);
+      const cards = contentBox.querySelectorAll(':scope > div > div');
+      cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });
+      drawer.scrollTop = 0;
     }
 
     function closeDrawer() {
@@ -1489,8 +1501,23 @@
       drawer.inert = true;
       if (drawer.contains(document.activeElement)) document.getElementById('node-search').focus();
       selectedIsland = null;
+      updateSceneFraming();
       renderNodeList();
       writeRoute();
+    }
+
+    function updateSceneFraming() {
+      if (!camera || !sceneReady) return;
+      const drawer = document.getElementById('side-drawer');
+      if (!selectedIsland || textView || drawer.getAttribute('aria-hidden') === 'true') {
+        camera.clearViewOffset();
+      } else {
+        const rect = drawer.getBoundingClientRect();
+        // Reserve space for the side card, or for the mobile bottom sheet.
+        const mobile = window.innerWidth <= 700;
+        camera.setViewOffset(window.innerWidth,window.innerHeight,mobile ? 0 : rect.width/2,mobile ? Math.max(0,(rect.height-80)/2) : 0,window.innerWidth,window.innerHeight);
+      }
+      camera.updateProjectionMatrix();
     }
 
     function onWindowResize() {
@@ -1498,6 +1525,7 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+      updateSceneFraming();
     }
 
     function animate(time) {
