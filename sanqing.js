@@ -141,6 +141,12 @@ function renderFourBrahmaPanel(container) {
     const text=document.createElement('p');text.textContent=realm.heaven;card.append(text);grid.append(card);
   }
   panel.append(grid);
+  if(model.salvation){
+    const section=document.createElement('section');section.className='salvation-path';
+    const title=document.createElement('h4');title.textContent=model.salvation.title;section.append(title);
+    const list=document.createElement('ol');for(const text of model.salvation.path){const li=document.createElement('li');li.textContent=text;list.append(li);}section.append(list);
+    const caution=document.createElement('p');caution.className='evidence-note';caution.textContent=model.salvation.note;section.append(caution);panel.append(section);
+  }
   const note=document.createElement('p');note.className='evidence-note';note.textContent=model.note;panel.append(note);
   if(currentMode==='course'){
     const h=document.createElement('h4');h.textContent='建議研讀順序';panel.append(h);
@@ -189,9 +195,10 @@ function buildKalpaBoundary(parent,data) {
   if(!data?.kalpaBoundary)return null;
   const group=new THREE.Group();group.name='kalpa-three-realms';group.position.y=0.6;parent.add(group);
   data.kalpaBoundary.realms.forEach((realm,index)=>{
-    const radius=2.85-index*0.3, y=index*0.8;
+    const radius=7.0-index*0.7, y=index*5;
+    const realmData=ISLANDS_DATA.find(n=>n.id===realm.nodeId)||data;
     const platform=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,0.14,64),new THREE.MeshStandardMaterial({color:realm.color,transparent:true,opacity:0.28,roughness:0.5,metalness:0.15}));
-    platform.position.y=y;group.add(platform);
+    platform.position.y=y;platform.name="tower-layer-"+(index+1);group.add(platform);
     const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,0.032,6,64),new THREE.MeshBasicMaterial({color:realm.color}));ring.rotation.x=Math.PI/2;ring.position.y=y+0.09;group.add(ring);
     const tickPositions=[];
     for(let i=0;i<realm.count;i++){
@@ -199,13 +206,13 @@ function buildKalpaBoundary(parent,data) {
       tickPositions.push(new THREE.Vector3(Math.cos(angle)*(radius-0.2),y+0.1,Math.sin(angle)*(radius-0.2)),new THREE.Vector3(Math.cos(angle)*radius,y+0.1,Math.sin(angle)*radius));
     }
     const ticks=new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(tickPositions),new THREE.LineBasicMaterial({color:realm.color}));ticks.name='kalpa-ticks-'+realm.key;group.add(ticks);
-    const label=sanqingText([`${realm.name}・${realm.count}天`],realm.color,768,200);label.scale.set(2.5,0.65,1);label.position.set(0,y+0.28,3.0);group.add(label);
-    const userData={data,kalpaRealmKey:realm.key,markerMesh:label,focusObject:label,focusPos:new THREE.Vector3(KALPA_CENTER.x,KALPA_CENTER.y+0.6+y,KALPA_CENTER.z+3)};
+    const label=sanqingText([`第${["一","二","三"][index]}層・${realm.name} ${realm.count}天`],realm.color,768,200);label.scale.set(3.2,0.83,1);label.position.set(0,y+0.35,radius+0.3);group.add(label);
+    const userData={data:realmData,kalpaRealmKey:realm.key,markerMesh:label,focusObject:label,focusPos:new THREE.Vector3(KALPA_CENTER.x,KALPA_CENTER.y+0.6+y,KALPA_CENTER.z+radius+0.3)};
     platform.userData=userData;label.userData=userData;clickableMeshes.push(platform,label);
   });
-  const boundary=new THREE.Mesh(new THREE.TorusGeometry(3.12,0.065,8,96),new THREE.MeshBasicMaterial({color:'#f5d58c',transparent:true,opacity:0.8}));boundary.rotation.x=Math.PI/2;boundary.position.y=2.5;boundary.name='kalpa-boundary-ring';group.add(boundary);
-  const label=sanqingText(['劫運斷界〔示意〕','三界二十八天 → 種民避劫'],'#f5d58c',1024,300);label.scale.set(3.2,0.94,1);label.position.set(0,3.2,0);group.add(label);
-  label.userData={data,focusObject:label,markerMesh:label,focusPos:new THREE.Vector3(KALPA_CENTER.x,KALPA_CENTER.y+3.8,KALPA_CENTER.z)};boundary.userData=label.userData;clickableMeshes.push(boundary,label);
+  const boundary=new THREE.Mesh(new THREE.TorusGeometry(5.3,0.065,8,96),new THREE.MeshBasicMaterial({color:'#f5d58c',transparent:true,opacity:0.8}));boundary.rotation.x=Math.PI/2;boundary.position.y=12.8;boundary.name='kalpa-boundary-ring';group.add(boundary);
+  const label=sanqingText(['劫運斷界〔示意〕','三界二十八天 → 種民避劫'],'#f5d58c',1024,300);label.scale.set(3.2,0.94,1);label.position.set(0,13.3,5.6);group.add(label);
+  label.userData={data,focusObject:label,markerMesh:label,focusPos:new THREE.Vector3(KALPA_CENTER.x,KALPA_CENTER.y+13.9,KALPA_CENTER.z+5.6)};boundary.userData=label.userData;clickableMeshes.push(boundary,label);
   return group;
 }
 
@@ -233,4 +240,12 @@ function renderKalpaBoundaryPanel(container) {
   }
   if(currentMode==='researcher')for(const source of model.sources){const card=add(panel,'article','','source-record');add(card,'h4',source.title);add(card,'p',source.finding);add(card,'p',source.status,'evidence-note');}
   add(panel,'p',model.scopeNote,'evidence-note');container.prepend(panel);
+}
+
+function renderUpperSynthesisPanel(container) {
+  const model=selectedIsland?.upperSynthesis;if(!model)return;
+  const panel=document.createElement('section');panel.className='upper-synthesis-panel';
+  for(const [tag,text] of [['h3',model.title],['p',model.history],['p',model.practice]]){const item=document.createElement(tag);item.textContent=text;panel.append(item);}
+  if(currentMode!=='beginner')for(const text of [model.evidence,model.limits]){const item=document.createElement('p');item.className='evidence-note';item.textContent=text;panel.append(item);}
+  container.prepend(panel);
 }

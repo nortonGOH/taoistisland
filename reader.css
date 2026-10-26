@@ -160,3 +160,9 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 #drawer-dynamic-content .boundary-divider { padding:14px 0; margin:16px 0; border-top:1px dashed #f5d58c88; border-bottom:1px dashed #f5d58c88; color:#f5d58c; }
 .kalpa-related-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
 .kalpa-related-actions button { padding:8px 13px; border:1px solid #9dadd64d; border-radius:9px; background:#5266a322; color:#d4e4ff; }
+.upper-synthesis-panel { padding:18px; border:1px solid #b1a0dc55; border-radius:16px; background:linear-gradient(135deg,#7d559b1c,#766a3512); }
+.upper-synthesis-panel h3 { color:#e1cef5; font-size:19px; font-weight:700; margin-bottom:12px; }
+.upper-synthesis-panel p { margin:10px 0; }
+.salvation-path { border-top:1px solid #c084fc44; padding-top:16px; margin-top:16px; }
+.salvation-path h4 { color:#ead0ff; font-weight:700; }
+.salvation-path ol { list-style:decimal; padding-left:22px; margin:12px 0; }

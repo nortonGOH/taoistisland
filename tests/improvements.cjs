@@ -6,6 +6,14 @@ const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http:
 const b=await chromium.launch({...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await b.newPage({viewport:{width:1440,height:960}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
 await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady);
+// Relocation shares the tower axis; all prototype coordinates stay exactly where they were.
+const layout=await p.evaluate(()=>{
+ const wheel=scene.getObjectByName('lingbao-kalpa-wheel'),tower=scene.getObjectByName('lingbao-six-layers'),proto=scene.getObjectByName('five-qi-prototype');
+ return {wheel:wheel.getWorldPosition(new THREE.Vector3()).toArray(),tower:tower.getWorldPosition(new THREE.Vector3()).toArray(),parent:wheel.parent.name,proto:proto.getWorldPosition(new THREE.Vector3()).toArray(),layers:[1,2,3].map(i=>scene.getObjectByName('tower-layer-'+i).getWorldPosition(new THREE.Vector3()).y),nodes:ISLANDS_DATA.length};
+});
+assert.deepEqual(layout.wheel,[0,0,-18]);assert.equal(layout.parent,'lingbao-six-layers');assert.deepEqual(layout.proto,[14,5.2,8]);
+assert.deepEqual(layout.layers,[0.6,5.6,10.6]);assert.equal(layout.nodes,33);
+console.log('Wheel moved to the tower; five-qi prototype coordinates unchanged.');
 // The kalpa wheel now contains all 28 heavens in three internal tiers.
 await p.evaluate(()=>selectIslandById('kalpa_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
 assert.equal(await p.locator('.kalpa-realm-row').count(),3);
@@ -105,7 +113,7 @@ for(const id of await p.evaluate(()=>ISLANDS_DATA.map(n=>n.id))){
  assert(check.visible && !check.depthTest,JSON.stringify(check));
  assert(check.x>0 && check.x<check.right && check.y>0 && check.y<960,JSON.stringify(check));focusChecks.push(check);
 }
-console.log('Focused 30 nodes in available scene area.');
+console.log('Focused '+focusChecks.length+' nodes in available scene area.');
 await p.evaluate(()=>setTextView(true));
 
 const ids=await p.evaluate(()=>ISLANDS_DATA.map(n=>n.id));

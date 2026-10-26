@@ -64,9 +64,9 @@
       <div id="left-panel-content" class="transition-all duration-300">
         <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5 mt-2">
           <strong>第六層【玉京金闕聖境】：</strong>非空寂無物，金闕七寶玄臺朝禮、八方七寶樹彌覆諸天、七寶華林光相燦爛、靈禽神獸翔集、天樂散花誦詠度人。<br>
-          <strong>第一層【九壘九宮剛風】：</strong>風澤洞虛，金剛乘天，自底層動態擎托天地大千。
+          <strong>下方基座【九壘九宮剛風】：</strong>風澤洞虛，金剛乘天，自底層動態擎托天地大千。
         </p>
-        <p class="reader-intro">以空間圖像探索道教概念與文獻。先選節點，再切換導讀、課程或考證；3D 模式可拖曳旋轉、滾輪縮放。</p>
+        <p class="reader-intro">主塔第一至三層為欲界六天、色界十八天、無色界四天；第四層種民天、第五層三清、第六層大羅。五劫天輪併入下三層，五方五氣保留原位。先選節點，再切換導讀、課程或考證；3D 模式可拖曳旋轉、滾輪縮放。</p>
         <p class="model-note">模型說明：本介面並置不同文本與歷史材料，空間位置不代表歷史承繼；各項引文、年代及圖像來源仍須依版本逐一核對。</p>
         <button id="btn-text-view" type="button" onclick="toggleTextView()" aria-pressed="false">切換文字閱讀</button>
         <!-- 視角快速跳轉列 -->
@@ -78,7 +78,7 @@
             👑 聚焦：玉京山金闕七寶神境 (第六層)
           </button>
           <button onclick="focusNineStrataGrid()" class="px-2.5 py-1 rounded bg-slate-700/70 hover:bg-slate-600 border border-slate-500/50 text-[11px] text-slate-100 transition-colors">
-            🌪️ 聚焦：風澤洞虛・金剛乘天 (第一層)
+            🌪️ 聚焦：風澤洞虛・金剛乘天 (基座)
           </button>
           <button onclick="focusCelestialSymmetry()" class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[11px] text-purple-300 transition-colors">
             ⚖️ 聚焦：三十六天王 ── 對稱 ── 三十六土皇
@@ -195,7 +195,7 @@
       const startRadius=Math.max(0.5,Math.hypot(camera.position.x-axisX,camera.position.z-axisZ));
       const startAngle=Math.atan2(camera.position.x-axisX,camera.position.z-axisZ);
       let endX=targetCamPos.x-axisX,endZ=targetCamPos.z-axisZ;
-      const part=!!(userData.sanqingKey || userData.fourBrahmaKey);
+      const part=!!(userData.sanqingKey || userData.fourBrahmaKey || userData.kalpaRealmKey || (userData.data?.disk==='kalpa' && !userData.data.isCenter));
       let lookY=targetLookAt.y,endY=targetCamPos.y;
       if(part && focusObject){
         const point=focusObject.getWorldPosition(new THREE.Vector3());
@@ -264,6 +264,7 @@
       scene.traverse(object=>{
         if(!object.isSprite || object===marker || !object.visible)return;
         if(!marker.isSprite && object.userData.data?.id===selectedIsland.id)return;
+        if(marker.isGroup){let ancestor=object.parent;while(ancestor){if(ancestor===marker)return;ancestor=ancestor.parent;}}
         const box=projectBox(object);
         if(box.left<selectedBox.right && box.right>selectedBox.left && box.bottom<selectedBox.top && box.top>selectedBox.bottom){
           focusAppearance.push({object,visible:object.visible});object.visible=false;object.userData.focusOccluder=true;
@@ -294,7 +295,8 @@
 
     // 空間座標配置
     const ZODIAC_CENTER    = { x: -14, y: 0, z: 8 };   // 左盤：十二辰星盤
-    const KALPA_CENTER     = { x: 14, y: 0, z: 8 };    // 右盤：靈寶五劫輪
+    const KALPA_CENTER     = { x: 0, y: 0, z: -18 };   // 主塔下三層：五劫與三界
+    const PROTO_CENTER     = { x: 14, y: 0, z: 8 };    // 五方五氣保留原位
     const PROTO_HEIGHT     = 5.2;                            // 右盤上層五方五氣高程差
     const COSMOLOGY_CENTER = { x: 0, y: 0, z: -18 };   // 後方垂直立體軸：靈寶六層空間體系
 
@@ -592,7 +594,7 @@
       scene.add(kLight);
 
       const protoLight = new THREE.PointLight(0xfacc15, 2.6, 26);
-      protoLight.position.set(KALPA_CENTER.x, PROTO_HEIGHT + 3, KALPA_CENTER.z);
+      protoLight.position.set(PROTO_CENTER.x, PROTO_HEIGHT + 3, PROTO_CENTER.z);
       scene.add(protoLight);
 
       const cosmoLight = new THREE.PointLight(0xfef08a, 2.8, 55);
@@ -847,6 +849,7 @@
     function buildLingbaoSixLayers() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
+      cosmoGroup.name="lingbao-six-layers";
 
       // 1. 生成第六層玉京山金闕七寶神境 (Y = 28)
       buildYujingSanctuary(cosmoGroup, 28);
@@ -871,8 +874,7 @@
       // 2. 生成第 2~4 層圓台與徽章
       const midLayers = [
         { id: "lingbao_four_brahma", y: 16, radius: 5.0, color: "#c084fc", text: "第四層【種民聖界】四種民天 (避劫)", emoji: "✨" },
-        { id: "lingbao_three_realms",y: 8,  radius: 6.6, color: "#10b981", text: "第三層【三界界域】三界二十八天", emoji: "🌌" },
-        { id: "lingbao_earth_realm", y: 0,  radius: 8.0, color: "#f97316", text: "第二層【凡俗世界】五嶽十洲器界", emoji: "⛰️" }
+        { id: "lingbao_earth_realm", y: -6, radius: 8.0, color: "#f97316", text: "下方器界【凡俗世界】五嶽十洲", emoji: "⛰️" }
       ];
 
       // 中央垂直混元貫通光軸（直達玉京山底）
@@ -907,7 +909,7 @@
       });
 
       // 3. 【第一層地下九壘】：以「3x3 九宮格幾何方陣」建立 (Y = -8)
-      const gridY = -8;
+      const gridY = -12;
       const cellSize = 3.2;
       const cellGap = 0.4;
       const totalOffset = cellSize + cellGap;
@@ -952,7 +954,7 @@
       }
       cosmoGroup.add(strataGroup);
 
-      const strataMainTex = createBadgeTexture("🌪️", "第一層【九壘三十六土皇】風澤洞虛・金剛乘天", "#94a3b8");
+      const strataMainTex = createBadgeTexture("🌪️", "基座【九壘三十六土皇】風澤洞虛・金剛乘天", "#94a3b8");
       const strataMainSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: strataMainTex, transparent: true }));
       strataMainSprite.scale.set(2.3, 2.3, 1.0);
       strataMainSprite.position.set(0, gridY + 1.7, totalOffset * 1.5 + 1.4);
@@ -981,7 +983,7 @@
       symmetryLines.computeLineDistances();
       cosmoGroup.add(symmetryLines);
 
-      // 5. 【風澤洞虛・金剛乘天】懸浮支撐力學場 (Y = -12.5 至 -8)
+      // 5. 【風澤洞虛・金剛乘天】懸浮支撐力學場 (Y = -16.5 至 -8)
       const gangfengRingGeo = new THREE.TorusGeometry(10.8, 0.45, 16, 64);
       const gangfengRingMat = new THREE.MeshStandardMaterial({
         color: 0xe2e8f0,
@@ -991,7 +993,7 @@
       });
       dynamicGangfengRing = new THREE.Mesh(gangfengRingGeo, gangfengRingMat);
       dynamicGangfengRing.rotation.x = Math.PI / 2;
-      dynamicGangfengRing.position.y = -12.5;
+      dynamicGangfengRing.position.y = -16.5;
       cosmoGroup.add(dynamicGangfengRing);
 
       const innerCarrierRingGeo = new THREE.TorusGeometry(6.4, 0.3, 16, 48);
@@ -1004,7 +1006,7 @@
       });
       const innerCarrierRing = new THREE.Mesh(innerCarrierRingGeo, innerCarrierRingMat);
       innerCarrierRing.rotation.x = Math.PI / 2;
-      innerCarrierRing.position.y = -11.0;
+      innerCarrierRing.position.y = -15.0;
       cosmoGroup.add(innerCarrierRing);
 
       const upliftCount = 18;
@@ -1013,8 +1015,8 @@
         const uAng = (u * Math.PI * 2) / upliftCount;
         const urx = Math.cos(uAng) * 8.5;
         const urz = Math.sin(uAng) * 8.5;
-        upliftPoints.push(new THREE.Vector3(urx, -12.5, urz));
-        upliftPoints.push(new THREE.Vector3(urx * 0.45, -8.0, urz * 0.45));
+        upliftPoints.push(new THREE.Vector3(urx, -16.5, urz));
+        upliftPoints.push(new THREE.Vector3(urx * 0.45, -12.0, urz * 0.45));
       }
       const upliftGeo = new THREE.BufferGeometry().setFromPoints(upliftPoints);
       const upliftMat = new THREE.LineBasicMaterial({
@@ -1032,7 +1034,7 @@
         const pR = Math.random() * 8.5;
         const pTh = Math.random() * Math.PI * 2;
         particlePos[p] = Math.cos(pTh) * pR;
-        particlePos[p + 1] = -12.5 + Math.random() * 4.5;
+        particlePos[p + 1] = -16.5 + Math.random() * 4.5;
         particlePos[p + 2] = Math.sin(pTh) * pR;
       }
       const particleGeo = new THREE.BufferGeometry();
@@ -1099,6 +1101,7 @@
       // 右盤下層：靈寶五劫天輪
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
+      kalpaGroup.name="lingbao-kalpa-wheel";
 
       const kCenterGeo = new THREE.CylinderGeometry(3.2, 3.2, DISK_HEIGHT, 48);
       const kCenterMesh = new THREE.Mesh(kCenterGeo, new THREE.MeshStandardMaterial({ color: 0x1a0f2e, roughness: 0.35, metalness: 0.4 }));
@@ -1138,11 +1141,13 @@
       }
       const kalpaRealms=buildKalpaBoundary(kalpaGroup,kalpaCenterData);
       if(kalpaRealms)kCenterMesh.userData.focusObject=kalpaRealms;
-      scene.add(kalpaGroup);
+      const tower=scene.getObjectByName('lingbao-six-layers');
+      if(tower){kalpaGroup.position.set(0,0,0);tower.add(kalpaGroup);}else scene.add(kalpaGroup);
 
       // 右盤上層：五方五氣本體盤
       const protoGroup = new THREE.Group();
-      protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
+      protoGroup.name="five-qi-prototype";
+      protoGroup.position.set(PROTO_CENTER.x, PROTO_HEIGHT, PROTO_CENTER.z);
 
       const pBaseGeo = new THREE.CylinderGeometry(5.8, 5.8, 0.2, 48);
       const pBaseMat = new THREE.MeshStandardMaterial({ color: 0x221a08, transparent: true, opacity: 0.65, roughness: 0.3 });
@@ -1167,7 +1172,7 @@
       pCenterHitMesh.position.set(0, 0.4, 0);
 
       const protoCenterData = ISLANDS_DATA.find(d => d.id === "proto_center");
-      const protoCenterWorldPos = new THREE.Vector3(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
+      const protoCenterWorldPos = new THREE.Vector3(PROTO_CENTER.x, PROTO_HEIGHT, PROTO_CENTER.z);
       const pCenterUserData = { data: protoCenterData, markerMesh: tianshuSprite, focusPos: protoCenterWorldPos };
       pCenterHitMesh.userData = pCenterUserData;
       tianshuSprite.userData = pCenterUserData;
@@ -1211,7 +1216,7 @@
         protoGroup.add(sprite);
 
         const nodeData = ISLANDS_DATA.find(d => d.id === dir.id);
-        const nodeWorldPos = new THREE.Vector3(KALPA_CENTER.x + lx, PROTO_HEIGHT, KALPA_CENTER.z + lz);
+        const nodeWorldPos = new THREE.Vector3(PROTO_CENTER.x + lx, PROTO_HEIGHT, PROTO_CENTER.z + lz);
         const dirUserData = { data: nodeData, markerMesh: sprite, focusPos: nodeWorldPos };
         bMesh.userData = dirUserData;
         sprite.userData = dirUserData;
@@ -1260,9 +1265,13 @@
 
       let targetCamPos = new THREE.Vector3();
 
-      if (selectedIsland.disk === "cosmology_lingbao") {
+      if (selectedIsland.disk === "cosmology_lingbao" || selectedIsland.disk === "kalpa") {
         // 【靈寶立體天塔與九壘剛風】：徽章面向南方(+Z)，相機直接正對該層圖示前方
-        if (selectedIsland.id === "lingbao_nine_strata_gangfeng") {
+        if(selectedIsland.id==='kalpa_center' || selectedIsland.id==='lingbao_three_realms'){
+          targetLookAt.set(COSMOLOGY_CENTER.x,COSMOLOGY_CENTER.y+6,COSMOLOGY_CENTER.z);
+          const distanceScale=Math.max(1,750/window.innerWidth);
+          targetCamPos.set(COSMOLOGY_CENTER.x+5*distanceScale,COSMOLOGY_CENTER.y+6+12*distanceScale,COSMOLOGY_CENTER.z+32*distanceScale);
+        } else if (selectedIsland.id === "lingbao_nine_strata_gangfeng") {
           // 第一層九宮格：採用前上方 45 度俯視，將九宮方陣與剛風盡收眼底
           targetCamPos.set(targetPos.x, targetPos.y + 7.5, targetPos.z + 10.5);
         } else if (selectedIsland.id === "lingbao_sanqing") {
@@ -1300,9 +1309,9 @@
           targetCamPos.set(targetPos.x + 3.6*distanceScale, targetPos.y + 1.0 + 8.0*distanceScale, targetPos.z + 2.4*distanceScale);
         } else {
           const dirFromCenter = new THREE.Vector3(
-            targetPos.x - KALPA_CENTER.x,
+            targetPos.x - PROTO_CENTER.x,
             0,
-            targetPos.z - KALPA_CENTER.z
+            targetPos.z - PROTO_CENTER.z
           ).normalize();
           targetCamPos.copy(targetPos).add(dirFromCenter.clone().multiplyScalar(4.0));
           targetCamPos.y += 3.0;
@@ -1339,8 +1348,8 @@
       let focusObject = userData.markerMesh || userData.focusObject;
       if (focusObject && !focusObject.isObject3D) focusObject = null;
       if (!focusObject) focusObject = clickableMeshes.find(m=>m.isSprite && m.userData.data?.id===selectedIsland.id);
-      const individual = !!(userData.sanqingKey || userData.fourBrahmaKey);
-      if (focusObject && (individual || !['lingbao_sanqing','lingbao_nine_strata_gangfeng','lingbao_daluo'].includes(selectedIsland.id))) {
+      const individual = !!(userData.sanqingKey || userData.fourBrahmaKey || userData.kalpaRealmKey || (userData.data?.disk==='kalpa' && !userData.data.isCenter));
+      if (focusObject && (individual || !['lingbao_sanqing','lingbao_nine_strata_gangfeng','lingbao_daluo','kalpa_center','lingbao_three_realms'].includes(selectedIsland.id))) {
         const actual = focusObject.getWorldPosition(new THREE.Vector3());
         const offset=targetCamPos.clone().sub(targetLookAt);
         targetLookAt.copy(actual);
@@ -1357,7 +1366,7 @@
       if(focusTargetTween) focusTargetTween.stop();
       if(focusCameraTween) focusCameraTween.stop();
 
-      if(selectedIsland.disk==='cosmology_lingbao') {
+      if(selectedIsland.disk==='cosmology_lingbao' || selectedIsland.disk==='kalpa') {
         orbitLingbaoAxis(targetLookAt,targetCamPos,focusedObject,userData);
         return;
       }
@@ -1384,6 +1393,10 @@
         selectIsland({ data: node });
         return;
       }
+      if(id==='lingbao_three_realms'){
+        const group=scene.getObjectByName('kalpa-three-realms');
+        selectIsland({data:node,focusObject:group,focusPos:new THREE.Vector3(COSMOLOGY_CENTER.x,5.6,COSMOLOGY_CENTER.z)});return;
+      }
       const mesh = clickableMeshes.find(m => m.userData?.data?.id === id && m.userData.focusPos && !m.userData.sanqingKey && !m.userData.fourBrahmaKey && !m.userData.kalpaRealmKey) || clickableMeshes.find(m=>m.userData?.data?.id===id && m.userData.focusPos);
       if (mesh) {
         selectIsland({...mesh.userData,focusObject:mesh.userData.focusObject || mesh});
@@ -1402,9 +1415,10 @@
           lingbao_daluo: 28,
           lingbao_sanqing: 22,
           lingbao_four_brahma: 16,
-          lingbao_three_realms: 8,
-          lingbao_earth_realm: 0,
-          lingbao_nine_strata_gangfeng: -8
+          lingbao_three_realms: 5.6,
+          lingbao_desire_realm: 0.6, lingbao_form_realm: 5.6, lingbao_formless_realm:10.6,
+          lingbao_earth_realm: -6,
+          lingbao_nine_strata_gangfeng: -12
         };
         const y = layerHeights[id] !== undefined ? layerHeights[id] : 0;
         calcFocusPos.set(COSMOLOGY_CENTER.x, y, COSMOLOGY_CENTER.z + 1.2);
@@ -1431,7 +1445,7 @@
           proto_north:  { x: 0, z: -4.5 }
         };
         const offset = protoDirs[id] || { x: 0, z: 0 };
-        calcFocusPos.set(KALPA_CENTER.x + offset.x, PROTO_HEIGHT, KALPA_CENTER.z + offset.z);
+        calcFocusPos.set(PROTO_CENTER.x + offset.x, PROTO_HEIGHT, PROTO_CENTER.z + offset.z);
       } else if (nodeData.disk === "kalpa") {
         // 靈寶五劫輪
         if (nodeData.isCenter) {
@@ -1475,15 +1489,15 @@
 
     function focusNineStrataGrid() {
       if (!sceneReady || textView) { selectIslandById('lingbao_nine_strata_gangfeng'); return; }
-      new TWEEN.Tween(controls.target).to({ x: COSMOLOGY_CENTER.x, y: -7.5, z: COSMOLOGY_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(controls.target).to({ x: COSMOLOGY_CENTER.x, y: -11.5, z: COSMOLOGY_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: COSMOLOGY_CENTER.x, y: 5, z: COSMOLOGY_CENTER.z + 14 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('lingbao_nine_strata_gangfeng');
     }
 
     function focusProtoDisk() {
       if (!sceneReady || textView) { selectIslandById('proto_center'); return; }
-      new TWEEN.Tween(controls.target).to({ x: KALPA_CENTER.x, y: PROTO_HEIGHT, z: KALPA_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(camera.position).to({ x: KALPA_CENTER.x, y: PROTO_HEIGHT + 14, z: KALPA_CENTER.z + 12 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(controls.target).to({ x: PROTO_CENTER.x, y: PROTO_HEIGHT, z: PROTO_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
+      new TWEEN.Tween(camera.position).to({ x: PROTO_CENTER.x, y: PROTO_HEIGHT + 14, z: PROTO_CENTER.z + 12 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('proto_center');
     }
 
@@ -1494,12 +1508,7 @@
       selectIslandById('beidou');
     }
 
-    function focusKalpaDisk() {
-      if (!sceneReady || textView) { selectIslandById('kalpa_center'); return; }
-      new TWEEN.Tween(controls.target).to({ x: KALPA_CENTER.x, y: 0, z: KALPA_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
-      new TWEEN.Tween(camera.position).to({ x: KALPA_CENTER.x, y: 20, z: KALPA_CENTER.z + 18 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
-      selectIslandById('kalpa_center');
-    }
+    function focusKalpaDisk() { selectIslandById('kalpa_center'); }
 
     document.getElementById('reader-modes').addEventListener('keydown',event=>{
       const modes=['beginner','course','researcher'];let index=modes.indexOf(currentMode);
@@ -1654,6 +1663,7 @@
       }
       renderSanqingPanel(contentBox);
       renderCosmogonyPanel(contentBox);
+      renderUpperSynthesisPanel(contentBox);
       renderFourBrahmaPanel(contentBox);
       renderKalpaBoundaryPanel(contentBox);
       removeOutboundLinks(contentBox);
@@ -1751,8 +1761,8 @@
         const positions = dynamicUpliftParticles.geometry.attributes.position.array;
         for (let i = 1; i < positions.length; i += 3) {
           positions[i] += 0.065;
-          if (positions[i] > -8.0) {
-            positions[i] = -12.5;
+          if (positions[i] > -12.0) {
+            positions[i] = -16.5;
           }
         }
         dynamicUpliftParticles.geometry.attributes.position.needsUpdate = true;
