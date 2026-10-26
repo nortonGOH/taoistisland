@@ -67,3 +67,6 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 .sanqing-card[data-selected="true"] { outline: 2px solid var(--realm-color); background: #252c46; }
 .sanqing-panel a { color: #a5d8ff; text-decoration: underline; }
 .sanqing-source-note { color: #cbd5e1; }
+.sanqing-focus { padding: 6px 12px; margin-top: 8px; min-height: 40px; border: 1px solid var(--realm-color); border-radius: 6px; background: #0f172a; color: #f1f5f9; }
+.sanqing-citation { margin-top: 16px; font-weight: 700; color: #bfdbfe; }
+.sanqing-excerpt { border-left: 2px solid #94a3b8; padding-left: 12px; margin: 12px 0; color: #e2e8f0; }
