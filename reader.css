@@ -151,3 +151,12 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 .cosmogony-panel th,.cosmogony-panel td { padding:9px 7px; text-align:left; border-bottom:1px solid #8897b82e; vertical-align:top; }
 .cosmogony-panel th { color:#a9c6ee; font-size:12px; white-space:nowrap; }
 .cosmogony-panel th:first-child,.cosmogony-panel td:first-child { white-space:nowrap; }
+.kalpa-boundary-panel { padding:18px; border:1px solid #f5d58c55; border-radius:16px; background:linear-gradient(155deg,#956f2318,#4d599b18); }
+.kalpa-boundary-panel h3 { color:#f5d58c; font-size:20px; font-weight:700; margin-bottom:14px; }
+.kalpa-boundary-panel h4 { font-weight:700; color:#d7e4fc; margin-top:16px; }
+.kalpa-realm-stack { display:grid; gap:8px; margin:14px 0; }
+.kalpa-realm-row { padding:10px 14px; border-left:3px solid var(--realm-color); border-radius:8px; background:#ffffff06; color:var(--realm-color); }
+.kalpa-realm-row[data-selected="true"] { outline:2px solid var(--realm-color); }
+#drawer-dynamic-content .boundary-divider { padding:14px 0; margin:16px 0; border-top:1px dashed #f5d58c88; border-bottom:1px dashed #f5d58c88; color:#f5d58c; }
+.kalpa-related-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.kalpa-related-actions button { padding:8px 13px; border:1px solid #9dadd64d; border-radius:9px; background:#5266a322; color:#d4e4ff; }

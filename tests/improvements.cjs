@@ -6,6 +6,22 @@ const server=http.createServer((req,res)=>{const pathname=new URL(req.url,'http:
 const b=await chromium.launch({...(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH}:{}),headless:true,args:['--no-sandbox','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
 const p=await b.newPage({viewport:{width:1440,height:960}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
 await p.goto('http://127.0.0.1:8766');await p.waitForFunction(()=>sceneReady);
+// The kalpa wheel now contains all 28 heavens in three internal tiers.
+await p.evaluate(()=>selectIslandById('kalpa_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+assert.equal(await p.locator('.kalpa-realm-row').count(),3);
+assert(await p.evaluate(()=>clickableMeshes.filter(m=>m.isSprite&&m.userData.kalpaRealmKey).every(m=>m.visible)));
+const tickCount=await p.evaluate(()=>{const group=scene.getObjectByName('kalpa-three-realms');return ['desire','form','formless'].map(key=>group.getObjectByName('kalpa-ticks-'+key).geometry.attributes.position.count/2);});
+assert.deepEqual(tickCount,[6,18,4]);assert(await p.evaluate(()=>!!scene.getObjectByName('kalpa-boundary-ring')));
+for(const key of ['desire','form','formless']){
+ await p.evaluate(key=>selectIsland(clickableMeshes.find(m=>m.isSprite&&m.userData.kalpaRealmKey===key).userData),key);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return{x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});
+ await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedKalpaRealmKey),key);
+ assert.equal(await p.locator('.kalpa-realm-row[data-selected="true"]').count(),1);
+}
+await p.evaluate(()=>selectIslandById('kalpa_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+await p.screenshot({path:path.join(root,'test-results','kalpa-boundary-qa.png')});
+await p.locator('.kalpa-related-actions button').filter({hasText:'查看四種民天'}).click();assert.equal(await p.evaluate(()=>selectedIsland.id),'lingbao_four_brahma');
+console.log('Kalpa 6/18/4 tiers, boundary, picking and related navigation passed.');
 await p.evaluate(()=>selectIslandById('proto_center'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());await p.waitForTimeout(120);
 const central=await p.evaluate(()=>{
  const c=clickableMeshes.find(m=>m.userData.data?.id==='proto_center'&&m.isSprite);

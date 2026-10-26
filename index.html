@@ -263,6 +263,7 @@
       const selectedBox=projectBox(marker);
       scene.traverse(object=>{
         if(!object.isSprite || object===marker || !object.visible)return;
+        if(!marker.isSprite && object.userData.data?.id===selectedIsland.id)return;
         const box=projectBox(object);
         if(box.left<selectedBox.right && box.right>selectedBox.left && box.bottom<selectedBox.top && box.top>selectedBox.bottom){
           focusAppearance.push({object,visible:object.visible});object.visible=false;object.userData.focusOccluder=true;
@@ -275,7 +276,7 @@
         for(const hit of probe.intersectObjects(solidMeshes,false)){
           const object=hit.object;if(!object.isMesh || !object.visible || !object.material || object===marker)continue;
           let current=object,belongs=false;
-          while(current){if(current===marker || (current.userData.data?.id===selectedIsland.id && !focusedUserData?.sanqingKey && !focusedUserData?.fourBrahmaKey)){belongs=true;break;}current=current.parent;}
+          while(current){if(current===marker || (current.userData.data?.id===selectedIsland.id && !focusedUserData?.sanqingKey && !focusedUserData?.fourBrahmaKey && !focusedUserData?.kalpaRealmKey)){belongs=true;break;}current=current.parent;}
           if(!belongs)blockers.add(object);
         }
       }
@@ -1135,6 +1136,8 @@
         clickableMeshes.push(badgeSprite);
         kalpaGroup.add(kalpaMesh);
       }
+      const kalpaRealms=buildKalpaBoundary(kalpaGroup,kalpaCenterData);
+      if(kalpaRealms)kCenterMesh.userData.focusObject=kalpaRealms;
       scene.add(kalpaGroup);
 
       // 右盤上層：五方五氣本體盤
@@ -1228,7 +1231,7 @@
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
       raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(clickableMeshes, true).filter(hit=>{let object=hit.object;while(object){if(!object.visible || object.userData.focusOccluder)return false;object=object.parent;}return true;});
+      const intersects = raycaster.intersectObjects(clickableMeshes, true).filter(hit=>{if(!hit.object.isMesh && !hit.object.isSprite)return false;let object=hit.object;while(object){if(!object.visible || object.userData.focusOccluder)return false;object=object.parent;}return true;});
 
       if (intersects.length > 0) {
         let obj = intersects[0].object;
@@ -1242,6 +1245,7 @@
       restoreFocusAppearance();
       selectedSanqingKey = userData.sanqingKey || null;
       selectedFourBrahmaKey = userData.fourBrahmaKey || null;
+      selectedKalpaRealmKey = userData.kalpaRealmKey || null;
       selectedIsland = userData.data;
       if (!textView && !isLeftPanelCollapsed) toggleLeftPanel();
       renderDrawer();
@@ -1306,7 +1310,13 @@
       } else if (selectedIsland.disk === "kalpa") {
         // 【靈寶五劫天輪】：正對該劫期之扇區與流光徽章
         if (selectedIsland.isCenter) {
-          targetCamPos.set(targetPos.x, targetPos.y + 6.5, targetPos.z + 7.0);
+          if(!userData.kalpaRealmKey){
+            targetLookAt.y=targetPos.y+1.5;
+            const distanceScale=Math.max(1,750/window.innerWidth);
+            targetCamPos.set(targetPos.x+7.5*distanceScale,targetPos.y+1.5+9.5*distanceScale,targetPos.z+23*distanceScale);
+          } else {
+            targetCamPos.set(targetPos.x,targetPos.y+6.5,targetPos.z+7.0);
+          }
         } else {
           const dirFromCenter = new THREE.Vector3(
             targetPos.x - KALPA_CENTER.x,
@@ -1374,7 +1384,7 @@
         selectIsland({ data: node });
         return;
       }
-      const mesh = clickableMeshes.find(m => m.userData?.data?.id === id && m.userData.focusPos && !m.userData.sanqingKey && !m.userData.fourBrahmaKey) || clickableMeshes.find(m=>m.userData?.data?.id===id && m.userData.focusPos);
+      const mesh = clickableMeshes.find(m => m.userData?.data?.id === id && m.userData.focusPos && !m.userData.sanqingKey && !m.userData.fourBrahmaKey && !m.userData.kalpaRealmKey) || clickableMeshes.find(m=>m.userData?.data?.id===id && m.userData.focusPos);
       if (mesh) {
         selectIsland({...mesh.userData,focusObject:mesh.userData.focusObject || mesh});
         return;
@@ -1645,6 +1655,7 @@
       renderSanqingPanel(contentBox);
       renderCosmogonyPanel(contentBox);
       renderFourBrahmaPanel(contentBox);
+      renderKalpaBoundaryPanel(contentBox);
       removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');
       cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });
