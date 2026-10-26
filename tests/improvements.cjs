@@ -24,6 +24,13 @@ for(const id of ['proto_center','proto_east','proto_south','proto_west','proto_n
  assert.equal(await p.evaluate(()=>lastOrbitTransition.kind),'axis-orbit');
 }
 const axis=await p.evaluate(()=>{const a=scene.getObjectByName('lingbao-transparent-axis'),g=scene.getObjectByName('lingbao-axis-guide');return {opacity:a.material.opacity,depthWrite:a.material.depthWrite,guideOpacity:g.material.opacity,selectable:clickableMeshes.includes(a)||clickableMeshes.includes(g)};});assert.equal(axis.opacity,0.035);assert.equal(axis.depthWrite,false);assert.equal(axis.guideOpacity,0.18);assert.equal(axis.selectable,false);
+const figures=await p.evaluate(()=>['yuqing','shangqing','taiqing'].map(key=>{const g=scene.getObjectByName('sanqing-deity-'+key);return {key,exists:!!g,selectable:g.children[0].children.filter(o=>o.isMesh).every(o=>o.userData.sanqingKey===key),halo:!!g.getObjectByName('deity-halo-'+key)};}));assert(figures.every(f=>f.exists&&f.selectable&&f.halo));
+for(const key of ['yuqing','shangqing','taiqing']){
+ await p.evaluate(key=>selectIsland(scene.getObjectByName('sanqing-deity-'+key).children[0].children.find(o=>o.isMesh).userData),key);await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+ const point=await p.evaluate(()=>{const v=focusedObject.getWorldPosition(new THREE.Vector3()).project(camera);return {x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};});await p.mouse.click(point.x,point.y);assert.equal(await p.evaluate(()=>selectedSanqingKey),key);
+}
+await p.evaluate(()=>selectIslandById('lingbao_sanqing'));await p.waitForFunction(()=>!focusCameraTween?.isPlaying());
+console.log('All three deity figures, attributes and mesh picking passed.');
 // Relocation shares the tower axis; the prototype moves into its third/fourth-layer junction.
 const layout=await p.evaluate(()=>{
  const wheel=scene.getObjectByName('lingbao-kalpa-wheel'),tower=scene.getObjectByName('lingbao-six-layers'),proto=scene.getObjectByName('five-qi-prototype');

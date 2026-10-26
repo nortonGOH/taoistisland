@@ -24,6 +24,47 @@ function sanqingText(lines, color, width = 1024, height = 512) {
   return sprite;
 }
 
+// Contemporary low-poly teaching figures; source references appear in the reading panel.
+function createSanqingFigure(realm,register) {
+  const figure=new THREE.Group();figure.name='sanqing-deity-'+realm.key;
+  const body=new THREE.Group();body.position.y=-1.2;figure.add(body);
+  const gold=new THREE.MeshStandardMaterial({color:'#e6c778',metalness:0.65,roughness:0.32});
+  const robe=new THREE.MeshStandardMaterial({color:({yuqing:'#286b81',shangqing:'#64528f',taiqing:'#a17a26'})[realm.key],metalness:0.25,roughness:0.55,emissive:realm.color,emissiveIntensity:0.12});
+  const skin=new THREE.MeshStandardMaterial({color:'#bc9276',roughness:0.8});
+  const hair=new THREE.MeshStandardMaterial({color:realm.key==='taiqing'?'#e2e8f0':'#293342',roughness:0.8});
+  const ink=new THREE.MeshBasicMaterial({color:'#293342'});
+  function add(geo,mat,x,y,z,sx=1,sy=1,sz=1){const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);m.scale.set(sx,sy,sz);body.add(m);register(m);m.userData.focusObject=figure;return m;}
+  const sphere=(r,mat,x,y,z,sx=1,sy=1,sz=1)=>add(new THREE.SphereGeometry(r,12,8),mat,x,y,z,sx,sy,sz);
+  add(new THREE.CylinderGeometry(0.95,1.05,0.18,32),gold,0,0.12,0);
+  add(new THREE.TorusGeometry(0.94,0.035,8,48),gold,0,0.23,0).rotation.x=Math.PI/2;
+  const profile=[[0,0.22],[0.72,0.25],[0.65,0.55],[0.49,0.86],[0.36,1.17],[0.23,1.4]].map(([r,y])=>new THREE.Vector2(r,y));
+  add(new THREE.LatheGeometry(profile,20),robe,0,0,0);
+  sphere(0.45,robe,-0.32,0.39,0.26,1.35,0.45,0.75);sphere(0.45,robe,0.32,0.39,0.26,1.35,0.45,0.75);
+  for(const side of [-1,1]){
+    const sleeve=sphere(0.26,robe,side*0.39,0.95,0.22,0.9,1.5,0.9);sleeve.rotation.z=side*0.45;
+    sphere(0.095,skin,side*0.25,0.98,0.49,1,0.7,1);
+    const trim=add(new THREE.TorusGeometry(0.115,0.018,6,20),gold,side*0.27,0.98,0.43);trim.rotation.x=0.6;
+  }
+  sphere(0.25,hair,0,1.63,-0.035,1.08,1.28,1);
+  sphere(0.245,skin,0,1.63,0.075,1,1.18,0.88);
+  sphere(0.045,skin,0,1.61,0.29,0.8,1.3,0.7);
+  for(const side of [-1,1]){const eye=add(new THREE.TorusGeometry(0.045,0.01,4,12,Math.PI),ink,side*0.09,1.66,0.275);eye.rotation.z=Math.PI;}
+  const beard=add(new THREE.ConeGeometry(0.145,realm.key==='taiqing'?0.57:0.42,16),hair,0,1.26,0.27);beard.rotation.z=Math.PI;
+  add(new THREE.CylinderGeometry(0.23,0.26,0.13,20),gold,0,1.95,0);
+  for(let i=0;i<7;i++){const a=i*Math.PI*2/7;sphere(0.08,gold,Math.cos(a)*0.18,2.05,Math.sin(a)*0.18,0.75,1.8,0.75);}
+  const halo=add(new THREE.TorusGeometry(0.61,0.025,6,32),new THREE.MeshBasicMaterial({color:realm.color,transparent:true,opacity:0.75,depthWrite:false}),0,1.6,-0.28);halo.name='deity-halo-'+realm.key;
+  if(realm.key==='shangqing'){
+    const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(-0.21,0.82,0.57),new THREE.Vector3(0,1.08,0.59),new THREE.Vector3(0.27,1.27,0.59)]);
+    const stem=add(new THREE.TubeGeometry(curve,18,0.035,8,false),gold,0,0,0);stem.name='sanqing-attribute-ruyi';
+    sphere(0.075,gold,0.27,1.27,0.59,1.3,0.7,0.5);sphere(0.055,gold,0.2,1.3,0.59);sphere(0.055,gold,0.34,1.3,0.59);
+  } else if(realm.key==='taiqing'){
+    const fan=new THREE.Shape();fan.moveTo(0,0);fan.absarc(0,0,0.38,Math.PI*0.12,Math.PI*0.88,false);fan.lineTo(0,0);
+    const leaf=add(new THREE.ShapeGeometry(fan),new THREE.MeshStandardMaterial({color:'#f5e6bd',side:THREE.DoubleSide,roughness:0.8}),0.15,1.02,0.61);leaf.name='sanqing-attribute-fan';
+    for(let i=0;i<7;i++){const a=Math.PI*(0.12+i*0.76/6);const curve=new THREE.LineCurve3(new THREE.Vector3(0.15,1.02,0.63),new THREE.Vector3(0.15+Math.cos(a)*0.38,1.02+Math.sin(a)*0.38,0.63));add(new THREE.TubeGeometry(curve,1,0.006,4,false),gold,0,0,0);}
+  }
+  return figure;
+}
+
 function buildSanqingRealms(parent) {
   const data = ISLANDS_DATA.find(node => node.id === 'lingbao_sanqing');
   if (!data?.sanqing) return;
@@ -55,17 +96,8 @@ function buildSanqingRealms(parent) {
     platform.position.copy(center); group.add(clickable(platform,realm.key));
     const rim=new THREE.Mesh(new THREE.TorusGeometry(2.17,0.065,8,64),new THREE.MeshBasicMaterial({color:realm.color}));
     rim.rotation.x=Math.PI/2; rim.position.set(x,y+0.24,z);group.add(rim);
-    // A symbolic sanctuary: four columns and a roof, without invented deity iconography.
-    const sanctuary=new THREE.Group();sanctuary.position.set(x,y+0.25,z);group.add(sanctuary);
-    const material=new THREE.MeshStandardMaterial({color:realm.color,emissive:realm.color,emissiveIntensity:0.25,metalness:0.4,roughness:0.25});
-    for(const dx of [-0.85,0.85]) for(const dz of [-0.65,0.65]){
-      const column=new THREE.Mesh(new THREE.CylinderGeometry(0.085,0.11,1.35,12),material);
-      column.position.set(dx,0.68,dz);sanctuary.add(clickable(column,realm.key));
-    }
-    const roof=new THREE.Mesh(new THREE.ConeGeometry(1.65,0.6,4),material);
-    roof.rotation.y=Math.PI/4;roof.position.y=1.65;sanctuary.add(clickable(roof,realm.key));
-    const pearl=new THREE.Mesh(new THREE.SphereGeometry(0.32,24,16),new THREE.MeshStandardMaterial({color:'#fff',emissive:realm.color,emissiveIntensity:1.2}));
-    pearl.position.y=0.7;sanctuary.add(clickable(pearl,realm.key));
+    const figure=createSanqingFigure(realm,object=>clickable(object,realm.key));
+    figure.position.set(x,y+1.45,z);group.add(figure);
     const curve=new THREE.CatmullRomCurve3([sourcePos.clone(),new THREE.Vector3(x*0.55,3.2,z*0.55),new THREE.Vector3(x,y+2.6,z),new THREE.Vector3(x,y+1.95,z)]);
     group.add(new THREE.Mesh(new THREE.TubeGeometry(curve,40,0.045,8,false),new THREE.MeshBasicMaterial({color:realm.color,transparent:true,opacity:0.7})));
     const qiLabel=sanqingText([realm.qi],realm.color,640,180);
@@ -95,7 +127,8 @@ function renderSanqingPanel(container) {
   if(!model) return;
   const section=document.createElement('section');section.className='sanqing-panel';
   const heading=document.createElement('h3');heading.textContent='一炁化三炁・三天三境對應';section.append(heading);
-  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺以前後錯落的立體三角呈現，仍屬靈寶第二層。三角配置、位置、色彩與宮殿造型為教學設計，不代表經文記載的方位或尊卑。';section.append(help);
+  const help=document.createElement('p');help.textContent='點選 3D 境臺可對照下方內容；三座境臺以前後錯落的立體三角呈現，仍屬靈寶第二層。三角配置、位置、色彩與尊神坐像為當代教學設計，不代表經文記載的方位、尊卑或特定時代造像。';section.append(help);
+  const iconography=document.createElement('p');iconography.className='evidence-note';iconography.textContent='造型辨識：元始天尊採虛拈虛捧手勢示意；靈寶天尊持如意；道德天尊持扇。冠飾、道袍、頭光與坐姿為簡化設計。參考國史館臺灣文獻館《臺灣民俗文物辭典》「三清道祖」（辭條 1255）、國立臺灣歷史博物館〈靈寶天尊畫像掛軸〉（2003.001.0997）及國立歷史博物館〈天清三寶天尊〉（07395）。持物、造像與排列有文本及時代差異；本圖未複製館藏圖像，也非歷史造像復原。';section.append(iconography);
   for(const realm of model.realms){
     const card=document.createElement('article');card.className='sanqing-card';card.dataset.realm=realm.key;card.dataset.selected=String(selectedSanqingKey===realm.key);card.style.setProperty('--realm-color',realm.color);
     const title=document.createElement('h4');title.textContent=`${realm.qi} → ${realm.heaven}・${realm.realm}`;card.append(title);
