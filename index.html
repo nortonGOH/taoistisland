@@ -160,7 +160,7 @@
     <div id="drawer-dynamic-content" class="mt-5 flex-1 flex flex-col gap-4 text-xs text-slate-300"></div>
   </aside>
 
-  <!-- 中央彈出式對話方塊 (Modal Dialog) -->
+  <!-- 中央彈出式對話方塊 -->
   <div id="narrative-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-opacity duration-200">
     <div class="relative w-full max-w-2xl bg-slate-900/95 border border-amber-500/40 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
       <div class="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/60">
@@ -254,7 +254,6 @@
       return texture;
     }
 
-    // 動態生成「靈寶自然天文」赤書雲篆貼圖（非多邊菱形）
     function createNaturalTianshuTexture() {
       const canvas = document.createElement("canvas");
       canvas.width = 512; canvas.height = 512;
@@ -307,7 +306,51 @@
           if (typeof item.color === 'string') item.color = parseInt(item.color, 16);
         });
       } catch (err) {
-        console.warn("使用預設備援資料");
+        console.warn("使用內建安全備援資料庫載入");
+        ISLANDS_DATA = [
+          { id: "beidou", title: "北斗樞紐：生殺注籍與五斗分司", subtitle: "天之綱紀・在身神識・一炁生水", modelType: "星辰身命盤・中央樞紐", disk: "zodiac", isCenter: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "北斗神格如何統御命籍？", step2_concept: "北斗分司五斗，旋運天綱。", step3_evidence: "《太清境中精經第八》。", step4_narrative: "<p>北斗七星分司東、西、南、北、中五斗，統攝眾靈。</p>" }, course: { topicMap: "北斗樞紐", materials: ["《北斗經》"], comparisons: "五斗分司。" }, researcher: { searchTerms: "北斗九星", imageRef: "經本圖示", dispute: "文獻已定。" } },
+          { id: "kalpa_center", title: "玄都玉京天樞樞紐", subtitle: "元始所居・九玄空洞之先", modelType: "五劫天輪・中央天台", disk: "kalpa", isCenter: true, isKalpa: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "五劫天輪之核心是什麼？", step2_concept: "玄都玉京大羅天。", step3_evidence: "《度人經》。", step4_narrative: "<p>玉京山超脫劫數之外。</p>" }, course: { topicMap: "五劫運度", materials: ["《赤書玉訣妙經》"], comparisons: "超劫永存。" }, researcher: { searchTerms: "玄都玉京", imageRef: "玉京圖", dispute: "考訂已確。" } },
+          { id: "proto_center", title: "中央真文：混洞一氣・靈寶自然天文", subtitle: "五劫之先｜唯道為身・八龍雲篆", modelType: "五方五氣本體・中央天文", disk: "proto_lingbao", isCenter: true, color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "五劫之前的本體是什麼？", step2_concept: "混洞赤文，自然天文。", step3_evidence: "《度人經》「唯道為身」。", step4_narrative: "<p>真文即是道身。</p>" }, course: { topicMap: "自然天文", materials: ["《度人經》"], comparisons: "老數一氣。" }, researcher: { searchTerms: "混洞赤文", imageRef: "真文錄", dispute: "本體定論。" } },
+          { id: "lingbao_daluo", title: "至高聖境：大羅天與紫微上宮", subtitle: "玄都玉京・災所不及", modelType: "靈寶空間觀・最高聖境", disk: "cosmology_lingbao", level: "daluo", color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "道教最高天界為何？", step2_concept: "大羅天包羅萬象。", step3_evidence: "《度人經》。", step4_narrative: "<p>大羅天災所不及。</p>" }, course: { topicMap: "大羅天體系", materials: ["《度人經》"], comparisons: "佛道天界對比。" }, researcher: { searchTerms: "大羅天", imageRef: "圖版", dispute: "三十六天之頂。" } }
+        ];
+
+        // 補齊 12 辰位簡短資料
+        for (let i = 0; i < 12; i++) {
+          ISLANDS_DATA.push({
+            id: `sector_${i}`,
+            title: `第 ${i+1} 辰位｜${ZODIAC_LIST[i].branch}・${ZODIAC_LIST[i].animal}`,
+            subtitle: `身命宮位（${ZODIAC_LIST[i].emoji}）`,
+            modelType: "星辰身命盤・中環辰位",
+            disk: "zodiac",
+            isCenter: false,
+            isKalpa: false,
+            sectorIndex: i,
+            color: 0xf59e0b,
+            hexColor: "#f59e0b",
+            beginner: { step1_question: `此辰位對應何種身命修持？`, step2_concept: `十二辰地支生命網絡。`, step3_evidence: `《正統道藏》。`, step4_narrative: `<p>詳見文獻庫。</p>` },
+            course: { topicMap: "十二辰身命", materials: ["《道藏》"], comparisons: "干支命屬。" },
+            researcher: { searchTerms: "地支", imageRef: "圖錄", dispute: "已審查。" }
+          });
+        }
+
+        // 補齊 5 劫期資料
+        for (let k = 0; k < 5; k++) {
+          ISLANDS_DATA.push({
+            id: KALPA_BADGES[k].id,
+            title: `${KALPA_BADGES[k].name}劫期`,
+            subtitle: `靈寶五劫天輪（${KALPA_BADGES[k].emoji}）`,
+            modelType: "五劫天輪・外環扇區",
+            disk: "kalpa",
+            isCenter: false,
+            isKalpa: true,
+            kalpaIndex: k,
+            color: parseInt(KALPA_BADGES[k].color.replace("#", "0x"), 16),
+            hexColor: KALPA_BADGES[k].color,
+            beginner: { step1_question: `${KALPA_BADGES[k].name}劫期特徵為何？`, step2_concept: `宇宙大劫運度。`, step3_evidence: `《九天生神章經》。`, step4_narrative: `<p>詳見文獻庫。</p>` },
+            course: { topicMap: "五劫運度", materials: ["《九天生神章經》"], comparisons: "真文開通。" },
+            researcher: { searchTerms: "靈寶五劫", imageRef: "真形圖", dispute: "版本已校。" }
+          });
+        }
       }
       initScene();
     }
@@ -345,7 +388,6 @@
       dirLight.position.set(0, 45, 25);
       scene.add(dirLight);
 
-      // 左盤、右盤與立體天界光源
       const zLight = new THREE.PointLight(0x38bdf8, 2.2, 32);
       zLight.position.set(ZODIAC_CENTER.x, 4, ZODIAC_CENTER.z);
       scene.add(zLight);
@@ -363,7 +405,7 @@
       scene.add(cosmoLight);
 
       createStarfield();
-      buildAllSystems();
+      buildSceneDisks();
 
       window.addEventListener("resize", onWindowResize);
       window.addEventListener("pointerdown", onPointerDown);
@@ -447,12 +489,10 @@
       return mesh;
     }
 
-    // 建立【立體後軸】：靈寶三界天界與地下九壘剛風
     function buildLingbaoCosmologyTower() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
 
-      // 層級定義：高程 Y、顏色、節點 ID、標籤與 Emoji
       const levels = [
         { id: "lingbao_daluo",          y: 28,  radius: 2.2, color: "#facc15", text: "大羅天・紫微上宮", emoji: "👑" },
         { id: "proto_three_purities",   y: 22,  radius: 3.5, color: "#38bdf8", text: "三清境 (始元玄三氣)", emoji: "☁️" },
@@ -462,14 +502,12 @@
         { id: "lingbao_gangfeng",       y: -8,  radius: 9.2, color: "#94a3b8", text: "九壘底層・剛風風澤", emoji: "🌪️" }
       ];
 
-      // 1. 中央垂直元始光軸 (連通剛風至大羅天)
       const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 40, 16);
       const axisMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, emissive: 0xa855f7, emissiveIntensity: 0.6, transparent: true, opacity: 0.7 });
       const axisMesh = new THREE.Mesh(axisGeo, axisMat);
       axisMesh.position.y = 10;
       cosmoGroup.add(axisMesh);
 
-      // 2. 逐層生成圓台與 Sprite 徽章
       levels.forEach(lvl => {
         const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.4, 48);
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.4, transparent: true, opacity: 0.85 });
@@ -477,14 +515,12 @@
         ringMesh.position.y = lvl.y;
         ringMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(ringGeo), new THREE.LineBasicMaterial({ color: lvl.color, opacity: 0.9 })));
 
-        // 徽章貼圖
         const tex = createBadgeTexture(lvl.emoji, lvl.text, lvl.color);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
         sprite.scale.set(1.9, 1.9, 1.0);
         sprite.position.set(0, lvl.y + 1.25, lvl.radius + 0.8);
         cosmoGroup.add(sprite);
 
-        // 綁定節點資料
         const nodeData = ISLANDS_DATA.find(d => d.id === lvl.id);
         const worldPos = COSMOLOGY_CENTER.clone().add(new THREE.Vector3(0, lvl.y, lvl.radius + 0.8));
         const userDataObj = { data: nodeData, markerMesh: sprite, focusPos: worldPos };
@@ -496,7 +532,6 @@
         cosmoGroup.add(ringMesh);
       });
 
-      // 3. 底層「剛於真金」旋轉風澤光環特效
       const gangfengRingGeo = new THREE.TorusGeometry(9.6, 0.35, 16, 64);
       const gangfengRingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, emissive: 0x94a3b8, emissiveIntensity: 0.8, roughness: 0.1 });
       const gangfengRing = new THREE.Mesh(gangfengRingGeo, gangfengRingMat);
@@ -508,10 +543,9 @@
     }
 
     function buildSceneDisks() {
-      // 1. 後方垂直空間軸：三界天界與九壘剛風
       buildLingbaoCosmologyTower();
 
-      // 2. 左盤：十二辰星盤
+      // 左盤：十二辰星盤
       const zGroup = new THREE.Group();
       zGroup.position.copy(ZODIAC_CENTER);
 
@@ -555,7 +589,7 @@
       }
       scene.add(zGroup);
 
-      // 3. 右盤下層：靈寶五劫天輪 (KALPA_CENTER, Y = 0)
+      // 右盤下層：靈寶五劫天輪
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
 
@@ -597,7 +631,7 @@
       }
       scene.add(kalpaGroup);
 
-      // 4. 右盤上層：五方五氣本體盤 (Y = PROTO_HEIGHT)
+      // 右盤上層：五方五氣本體盤 (垂直位移 Y = PROTO_HEIGHT)
       const protoGroup = new THREE.Group();
       protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
 
@@ -607,7 +641,6 @@
       pBaseMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(pBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15, opacity: 0.7 })));
       protoGroup.add(pBaseMesh);
 
-      // 中心：靈寶自然天文赤文天篆（非多邊菱形）
       const tianshuTex = createNaturalTianshuTexture();
       const tianshuSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tianshuTex, transparent: true, depthTest: true }));
       tianshuSprite.scale.set(3.4, 3.4, 1.0);
@@ -691,14 +724,12 @@
       if (mesh) selectIsland(mesh.userData);
     }
 
-    // 視角快速導航
     function focusOverview() {
       new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
     }
 
     function focusCosmologyStructure() {
-      // 聚焦後方立體軸：三界三十二天與地下九壘
       new TWEEN.Tween(controls.target).to({ x: COSMOLOGY_CENTER.x, y: 12, z: COSMOLOGY_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: COSMOLOGY_CENTER.x + 12, y: 22, z: COSMOLOGY_CENTER.z + 24 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('lingbao_daluo');
