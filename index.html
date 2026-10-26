@@ -43,19 +43,18 @@
   <div id="canvas-container" class="absolute inset-0"></div>
 
   <!-- 頂部學術導言面板 -->
-  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[580px] z-10 pointer-events-none">
+  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[600px] z-10 pointer-events-none">
     <div class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">道教思想史多維空間系統</span>
-        <span class="text-xs text-slate-400">雙盤 × 立體天界九壘剛風</span>
+        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">靈寶六層空間體系</span>
+        <span class="text-xs text-slate-400">大羅聖境至九壘剛風</span>
       </div>
       <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
-        道教科儀與思想史：星辰・命籍・身體・生命 式盤系統
+        道教科儀與思想史：靈寶多維宇宙空間系統
       </h1>
       <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5">
-        <strong>左盤：</strong>十二辰身命星盤；<br>
-        <strong>右盤：</strong>立體雙層（下層五劫天輪、上層五方五氣赤文道身）；<br>
-        <strong>後方立體軸：</strong>靈寶空間幾何（地下九壘剛風、三界三十二天、三清大羅天）。
+        <strong>後方立體軸（靈寶六層空間）：</strong>第六層大羅天 ➔ 第五層三清境 ➔ 第四層四種民天 ➔ 第三層三界二十八天 ➔ 第二層凡俗天地 ➔ 第一層地下九壘與剛風風澤。<br>
+        <strong>前方雙盤：</strong>左盤十二辰身命星盤、右盤五劫天輪與赤文道身。
       </p>
       <!-- 視角快速跳轉列 -->
       <div class="flex flex-wrap gap-2 pt-1.5 border-t border-slate-800">
@@ -63,7 +62,7 @@
           🌐 全覽宇宙諸盤
         </button>
         <button onclick="focusCosmologyStructure()" class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[11px] text-purple-300 transition-colors">
-          🏛️ 聚焦：三十二天與九壘剛風
+          🏛️ 聚焦：靈寶六層空間體系
         </button>
         <button onclick="focusProtoDisk()" class="px-2.5 py-1 rounded bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 text-[11px] text-yellow-300 transition-colors">
           ✨ 聚焦：五方五氣 (赤文道身)
@@ -93,33 +92,30 @@
 
   <!-- 右側獨立分盤速選清單 -->
   <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-72 max-h-[85vh] overflow-y-auto custom-scrollbar">
-    <span class="text-[10px] text-purple-400 font-bold px-2 py-1 uppercase tracking-wider">【靈寶空間觀】垂直幾何架構</span>
+    <span class="text-[10px] text-purple-400 font-bold px-2 py-1 uppercase tracking-wider">【靈寶六層空間】垂直幾何</span>
     <button onclick="selectIslandById('lingbao_daluo')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>大羅天・紫微上宮 (至高聖境)</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+      <span>第六層｜大羅天・紫微上宮</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
     </button>
-    <button onclick="selectIslandById('proto_three_purities')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>三清勝境 (玉清・上清・太清)</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+    <button onclick="selectIslandById('lingbao_sanqing')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>第五層｜三清勝境 (玉・上・太清)</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
     </button>
     <button onclick="selectIslandById('lingbao_four_brahma')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>四種民天 (四梵天・劫災不及)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+      <span>第四層｜四種民天 (四梵天・避劫)</span><span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
     </button>
     <button onclick="selectIslandById('lingbao_three_realms')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>三界二十八天 (欲・色・無色界)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>第三層｜三界二十八天 (32天主體)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
     </button>
-    <button onclick="selectIslandById('lingbao_earth_nine')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>凡俗大地與地下九壘 (36土皇)</span><span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+    <button onclick="selectIslandById('lingbao_earth_realm')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>第二層｜凡俗世界 (日月五嶽十洲)</span><span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
     </button>
-    <button onclick="selectIslandById('lingbao_gangfeng')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>九壘底層：剛風風澤 (風澤擎天)</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+    <button onclick="selectIslandById('lingbao_nine_strata_gangfeng')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>第一層｜地下九壘 (36土皇) 與剛風</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[10px] text-yellow-400 font-bold px-2 py-1 uppercase tracking-wider">【五劫前】五方五氣赤文道身</span>
     <button onclick="selectIslandById('proto_center')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>中央一氣｜混洞赤文 (自然天文)</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
-    </button>
-    <button onclick="selectIslandById('proto_east')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>東方九氣｜青天生氣 (數之極)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+      <span>中央一氣｜自然天文赤篆</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
     </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
@@ -127,17 +123,11 @@
     <button onclick="selectIslandById('kalpa_longhan')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>🌌 龍漢劫｜真文始萌・人民淳樸</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
     </button>
-    <button onclick="selectIslandById('kalpa_chiming')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
-      <span>🔥 赤明劫｜赤明開光・天地復位</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-    </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">【左盤】十二辰星命盤</span>
     <button onclick="selectIslandById('beidou')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>北斗中央樞紐 (五斗分司)</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-    </button>
-    <button onclick="selectIslandById('sector_0')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
-      <span>🐭 子鼠｜先秦命論與天師從數到籍</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
   </div>
 
@@ -192,7 +182,7 @@
     const ZODIAC_CENTER    = new THREE.Vector3(-14, 0, 8);   // 左盤：十二辰星盤
     const KALPA_CENTER     = new THREE.Vector3(14, 0, 8);    // 右盤：靈寶五劫輪
     const PROTO_HEIGHT     = 5.2;                            // 右盤上層五方五氣高程差
-    const COSMOLOGY_CENTER = new THREE.Vector3(0, 0, -18);   // 後方垂直立體軸：三界三十二天與九壘剛風
+    const COSMOLOGY_CENTER = new THREE.Vector3(0, 0, -18);   // 後方垂直立體軸：靈寶六層空間體系
 
     const DISK_HEIGHT = 0.65;
     const TOTAL_SECTORS = 12;
@@ -245,7 +235,7 @@
       ctx.textBaseline = "middle";
       ctx.fillText(emoji, 128, 105);
 
-      ctx.font = "bold 36px sans-serif";
+      ctx.font = "bold 34px sans-serif";
       ctx.fillStyle = colorHex;
       ctx.fillText(text, 128, 185);
 
@@ -306,51 +296,7 @@
           if (typeof item.color === 'string') item.color = parseInt(item.color, 16);
         });
       } catch (err) {
-        console.warn("使用內建安全備援資料庫載入");
-        ISLANDS_DATA = [
-          { id: "beidou", title: "北斗樞紐：生殺注籍與五斗分司", subtitle: "天之綱紀・在身神識・一炁生水", modelType: "星辰身命盤・中央樞紐", disk: "zodiac", isCenter: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "北斗神格如何統御命籍？", step2_concept: "北斗分司五斗，旋運天綱。", step3_evidence: "《太清境中精經第八》。", step4_narrative: "<p>北斗七星分司東、西、南、北、中五斗，統攝眾靈。</p>" }, course: { topicMap: "北斗樞紐", materials: ["《北斗經》"], comparisons: "五斗分司。" }, researcher: { searchTerms: "北斗九星", imageRef: "經本圖示", dispute: "文獻已定。" } },
-          { id: "kalpa_center", title: "玄都玉京天樞樞紐", subtitle: "元始所居・九玄空洞之先", modelType: "五劫天輪・中央天台", disk: "kalpa", isCenter: true, isKalpa: true, color: 0x38bdf8, hexColor: "#38bdf8", beginner: { step1_question: "五劫天輪之核心是什麼？", step2_concept: "玄都玉京大羅天。", step3_evidence: "《度人經》。", step4_narrative: "<p>玉京山超脫劫數之外。</p>" }, course: { topicMap: "五劫運度", materials: ["《赤書玉訣妙經》"], comparisons: "超劫永存。" }, researcher: { searchTerms: "玄都玉京", imageRef: "玉京圖", dispute: "考訂已確。" } },
-          { id: "proto_center", title: "中央真文：混洞一氣・靈寶自然天文", subtitle: "五劫之先｜唯道為身・八龍雲篆", modelType: "五方五氣本體・中央天文", disk: "proto_lingbao", isCenter: true, color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "五劫之前的本體是什麼？", step2_concept: "混洞赤文，自然天文。", step3_evidence: "《度人經》「唯道為身」。", step4_narrative: "<p>真文即是道身。</p>" }, course: { topicMap: "自然天文", materials: ["《度人經》"], comparisons: "老數一氣。" }, researcher: { searchTerms: "混洞赤文", imageRef: "真文錄", dispute: "本體定論。" } },
-          { id: "lingbao_daluo", title: "至高聖境：大羅天與紫微上宮", subtitle: "玄都玉京・災所不及", modelType: "靈寶空間觀・最高聖境", disk: "cosmology_lingbao", level: "daluo", color: 0xfacc15, hexColor: "#facc15", beginner: { step1_question: "道教最高天界為何？", step2_concept: "大羅天包羅萬象。", step3_evidence: "《度人經》。", step4_narrative: "<p>大羅天災所不及。</p>" }, course: { topicMap: "大羅天體系", materials: ["《度人經》"], comparisons: "佛道天界對比。" }, researcher: { searchTerms: "大羅天", imageRef: "圖版", dispute: "三十六天之頂。" } }
-        ];
-
-        // 補齊 12 辰位簡短資料
-        for (let i = 0; i < 12; i++) {
-          ISLANDS_DATA.push({
-            id: `sector_${i}`,
-            title: `第 ${i+1} 辰位｜${ZODIAC_LIST[i].branch}・${ZODIAC_LIST[i].animal}`,
-            subtitle: `身命宮位（${ZODIAC_LIST[i].emoji}）`,
-            modelType: "星辰身命盤・中環辰位",
-            disk: "zodiac",
-            isCenter: false,
-            isKalpa: false,
-            sectorIndex: i,
-            color: 0xf59e0b,
-            hexColor: "#f59e0b",
-            beginner: { step1_question: `此辰位對應何種身命修持？`, step2_concept: `十二辰地支生命網絡。`, step3_evidence: `《正統道藏》。`, step4_narrative: `<p>詳見文獻庫。</p>` },
-            course: { topicMap: "十二辰身命", materials: ["《道藏》"], comparisons: "干支命屬。" },
-            researcher: { searchTerms: "地支", imageRef: "圖錄", dispute: "已審查。" }
-          });
-        }
-
-        // 補齊 5 劫期資料
-        for (let k = 0; k < 5; k++) {
-          ISLANDS_DATA.push({
-            id: KALPA_BADGES[k].id,
-            title: `${KALPA_BADGES[k].name}劫期`,
-            subtitle: `靈寶五劫天輪（${KALPA_BADGES[k].emoji}）`,
-            modelType: "五劫天輪・外環扇區",
-            disk: "kalpa",
-            isCenter: false,
-            isKalpa: true,
-            kalpaIndex: k,
-            color: parseInt(KALPA_BADGES[k].color.replace("#", "0x"), 16),
-            hexColor: KALPA_BADGES[k].color,
-            beginner: { step1_question: `${KALPA_BADGES[k].name}劫期特徵為何？`, step2_concept: `宇宙大劫運度。`, step3_evidence: `《九天生神章經》。`, step4_narrative: `<p>詳見文獻庫。</p>` },
-            course: { topicMap: "五劫運度", materials: ["《九天生神章經》"], comparisons: "真文開通。" },
-            researcher: { searchTerms: "靈寶五劫", imageRef: "真形圖", dispute: "版本已校。" }
-          });
-        }
+        console.warn("使用預設備援資料");
       }
       initScene();
     }
@@ -405,7 +351,7 @@
       scene.add(cosmoLight);
 
       createStarfield();
-      buildSceneDisks();
+      buildSceneSystems();
 
       window.addEventListener("resize", onWindowResize);
       window.addEventListener("pointerdown", onPointerDown);
@@ -489,40 +435,44 @@
       return mesh;
     }
 
-    function buildLingbaoCosmologyTower() {
+    // 建立【靈寶六層空間體系】立體塔 (COSMOLOGY_CENTER)
+    function buildLingbaoSixLayers() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
 
-      const levels = [
-        { id: "lingbao_daluo",          y: 28,  radius: 2.2, color: "#facc15", text: "大羅天・紫微上宮", emoji: "👑" },
-        { id: "proto_three_purities",   y: 22,  radius: 3.5, color: "#38bdf8", text: "三清境 (始元玄三氣)", emoji: "☁️" },
-        { id: "lingbao_four_brahma",    y: 16,  radius: 4.8, color: "#c084fc", text: "四種民天 (四梵天)",   emoji: "✨" },
-        { id: "lingbao_three_realms",   y: 8,   radius: 6.5, color: "#10b981", text: "三界二十八天 (32天)", emoji: "🌌" },
-        { id: "lingbao_earth_nine",     y: 0,   radius: 7.8, color: "#f97316", text: "凡俗大地・地下九壘", emoji: "⛰️" },
-        { id: "lingbao_gangfeng",       y: -8,  radius: 9.2, color: "#94a3b8", text: "九壘底層・剛風風澤", emoji: "🌪️" }
+      // 嚴密對應靈寶六層空間定義：高程 Y、顏色、節點 ID、標籤與 Emoji
+      const layers = [
+        { id: "lingbao_daluo",                y: 28,  radius: 2.2, color: "#facc15", text: "第六層【至高聖境】大羅天", emoji: "👑" },
+        { id: "lingbao_sanqing",              y: 22,  radius: 3.6, color: "#38bdf8", text: "第五層【三清勝境】清微・禹餘・大赤", emoji: "☁️" },
+        { id: "lingbao_four_brahma",          y: 16,  radius: 5.0, color: "#c084fc", text: "第四層【種民聖界】四種民天", emoji: "✨" },
+        { id: "lingbao_three_realms",         y: 8,   radius: 6.6, color: "#10b981", text: "第三層【三界界域】三界二十八天", emoji: "🌌" },
+        { id: "lingbao_earth_realm",          y: 0,   radius: 8.0, color: "#f97316", text: "第二層【凡俗世界】五嶽十洲", emoji: "⛰️" },
+        { id: "lingbao_nine_strata_gangfeng", y: -8,  radius: 9.4, color: "#94a3b8", text: "第一層【地下九壘】三十六土皇・剛風", emoji: "🌪️" }
       ];
 
-      const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 40, 16);
+      // 1. 中央垂直元始混元光軸
+      const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 42, 16);
       const axisMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, emissive: 0xa855f7, emissiveIntensity: 0.6, transparent: true, opacity: 0.7 });
       const axisMesh = new THREE.Mesh(axisGeo, axisMat);
       axisMesh.position.y = 10;
       cosmoGroup.add(axisMesh);
 
-      levels.forEach(lvl => {
-        const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.4, 48);
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.4, transparent: true, opacity: 0.85 });
+      // 2. 逐層生成六層圓台與 Sprite 徽章
+      layers.forEach(lvl => {
+        const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.45, 48);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.4, transparent: true, opacity: 0.88 });
         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
         ringMesh.position.y = lvl.y;
-        ringMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(ringGeo), new THREE.LineBasicMaterial({ color: lvl.color, opacity: 0.9 })));
+        ringMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(ringGeo), new THREE.LineBasicMaterial({ color: lvl.color, opacity: 0.95 })));
 
         const tex = createBadgeTexture(lvl.emoji, lvl.text, lvl.color);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-        sprite.scale.set(1.9, 1.9, 1.0);
-        sprite.position.set(0, lvl.y + 1.25, lvl.radius + 0.8);
+        sprite.scale.set(2.0, 2.0, 1.0);
+        sprite.position.set(0, lvl.y + 1.35, lvl.radius + 0.9);
         cosmoGroup.add(sprite);
 
         const nodeData = ISLANDS_DATA.find(d => d.id === lvl.id);
-        const worldPos = COSMOLOGY_CENTER.clone().add(new THREE.Vector3(0, lvl.y, lvl.radius + 0.8));
+        const worldPos = COSMOLOGY_CENTER.clone().add(new THREE.Vector3(0, lvl.y, lvl.radius + 0.9));
         const userDataObj = { data: nodeData, markerMesh: sprite, focusPos: worldPos };
         ringMesh.userData = userDataObj;
         sprite.userData = userDataObj;
@@ -532,8 +482,9 @@
         cosmoGroup.add(ringMesh);
       });
 
-      const gangfengRingGeo = new THREE.TorusGeometry(9.6, 0.35, 16, 64);
-      const gangfengRingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, emissive: 0x94a3b8, emissiveIntensity: 0.8, roughness: 0.1 });
+      // 3. 第一層底層「剛於真金」旋轉風澤金剛光環
+      const gangfengRingGeo = new THREE.TorusGeometry(9.8, 0.4, 16, 64);
+      const gangfengRingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, emissive: 0x94a3b8, emissiveIntensity: 0.85, roughness: 0.1 });
       const gangfengRing = new THREE.Mesh(gangfengRingGeo, gangfengRingMat);
       gangfengRing.rotation.x = Math.PI / 2;
       gangfengRing.position.y = -8;
@@ -542,10 +493,11 @@
       scene.add(cosmoGroup);
     }
 
-    function buildSceneDisks() {
-      buildLingbaoCosmologyTower();
+    function buildSceneSystems() {
+      // 1. 後方立體空間軸：靈寶六層空間體系
+      buildLingbaoSixLayers();
 
-      // 左盤：十二辰星盤
+      // 2. 左盤：十二辰星盤
       const zGroup = new THREE.Group();
       zGroup.position.copy(ZODIAC_CENTER);
 
@@ -589,7 +541,7 @@
       }
       scene.add(zGroup);
 
-      // 右盤下層：靈寶五劫天輪
+      // 3. 右盤下層：靈寶五劫天輪 (KALPA_CENTER, Y = 0)
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
 
@@ -631,7 +583,7 @@
       }
       scene.add(kalpaGroup);
 
-      // 右盤上層：五方五氣本體盤 (垂直位移 Y = PROTO_HEIGHT)
+      // 4. 右盤上層：五方五氣本體盤 (垂直位移 Y = PROTO_HEIGHT)
       const protoGroup = new THREE.Group();
       protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
 
@@ -724,12 +676,14 @@
       if (mesh) selectIsland(mesh.userData);
     }
 
+    // 視角導航
     function focusOverview() {
       new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
     }
 
     function focusCosmologyStructure() {
+      // 聚焦後方立體軸：靈寶六層空間體系
       new TWEEN.Tween(controls.target).to({ x: COSMOLOGY_CENTER.x, y: 12, z: COSMOLOGY_CENTER.z }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: COSMOLOGY_CENTER.x + 12, y: 22, z: COSMOLOGY_CENTER.z + 24 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       selectIslandById('lingbao_daluo');
