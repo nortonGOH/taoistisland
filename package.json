@@ -1,10 +1,10 @@
 {
   "name": "taoistisland",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.2.0",
   "scripts": {
     "build:css": "tailwindcss --content ./index.html --output ./vendor/tailwind.css --minify",
-    "test": "node tests/reader.cjs && node tests/controls.cjs"
+    "test": "node tests/reader.cjs && node tests/controls.cjs && node tests/sanqing.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

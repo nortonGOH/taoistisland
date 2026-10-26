@@ -83,6 +83,7 @@
           <button onclick="focusCelestialSymmetry()" class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[11px] text-purple-300 transition-colors">
             ⚖️ 聚焦：三十六天王 ── 對稱 ── 三十六土皇
           </button>
+          <button onclick="selectIslandById('lingbao_sanqing')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-cyan-300 transition-colors">☁️ 聚焦：三炁化三天（第五層）</button>
           <button onclick="focusZodiacDisk()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] text-amber-300 transition-colors">
             🧭 聚焦：十二辰星盤
           </button>
@@ -179,6 +180,7 @@
     </div>
   </div>
 
+  <script src="sanqing.js"></script>
   <script>
     let ISLANDS_DATA = [];
     let scene, camera, renderer, controls;
@@ -715,9 +717,10 @@
       clickableMeshes.push(daluoMainSprite);
       cosmoGroup.add(daluoMainSprite);
 
-      // 2. 生成第 2~5 層圓台與徽章
+      buildSanqingRealms(cosmoGroup);
+
+      // 2. 生成第 2~4 層圓台與徽章
       const midLayers = [
-        { id: "lingbao_sanqing",     y: 22, radius: 3.6, color: "#38bdf8", text: "第五層【三清勝境】清微・禹餘・大赤", emoji: "☁️" },
         { id: "lingbao_four_brahma", y: 16, radius: 5.0, color: "#c084fc", text: "第四層【種民聖界】四種民天 (避劫)", emoji: "✨" },
         { id: "lingbao_three_realms",y: 8,  radius: 6.6, color: "#10b981", text: "第三層【三界界域】三界二十八天", emoji: "🌌" },
         { id: "lingbao_earth_realm", y: 0,  radius: 8.0, color: "#f97316", text: "第二層【凡俗世界】五嶽十洲器界", emoji: "⛰️" }
@@ -1068,6 +1071,7 @@
 
    function selectIsland(userData) {
       if (!userData || !userData.data) return;
+      selectedSanqingKey = userData.sanqingKey || null;
       selectedIsland = userData.data;
       renderDrawer();
       renderNodeList();
@@ -1086,6 +1090,11 @@
         if (selectedIsland.id === "lingbao_nine_strata_gangfeng") {
           // 第一層九宮格：採用前上方 45 度俯視，將九宮方陣與剛風盡收眼底
           targetCamPos.set(targetPos.x, targetPos.y + 7.5, targetPos.z + 10.5);
+        } else if (selectedIsland.id === "lingbao_sanqing") {
+          // Show the three realms together, leaving space for the reading drawer.
+          targetLookAt.x += 4.2;
+          targetLookAt.y += 2;
+          targetCamPos.set(targetPos.x + 4.2, targetPos.y + 5.5, targetPos.z + 28);
         } else if (selectedIsland.id === "lingbao_daluo") {
           // 第六層大羅天玉京山：正對金闕與玄臺
           targetCamPos.set(targetPos.x, targetPos.y + 4.5, targetPos.z + 9.5);
@@ -1405,6 +1414,7 @@
           </div>
         `;
       }
+      renderSanqingPanel(contentBox);
     }
 
     function closeDrawer() {
@@ -1490,6 +1500,7 @@
         }
       });
 
+      animateSanqingFlow(time);
       renderer.render(scene, camera);
     }
 

@@ -60,3 +60,10 @@ body.text-view { padding-bottom: 110px; overflow: auto; height: auto; min-height
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+.sanqing-panel { border: 1px solid #475569; border-radius: 12px; padding: 16px; }
+.sanqing-panel h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: #fef3c7; }
+.sanqing-card { border-left: 3px solid var(--realm-color); padding: 12px; margin: 12px 0; border-radius: 6px; background: #172033; }
+.sanqing-card h4 { font-size: 16px; font-weight: 700; color: var(--realm-color); }
+.sanqing-card[data-selected="true"] { outline: 2px solid var(--realm-color); background: #252c46; }
+.sanqing-panel a { color: #a5d8ff; text-decoration: underline; }
+.sanqing-source-note { color: #cbd5e1; }
