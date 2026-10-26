@@ -43,36 +43,41 @@
   <div id="canvas-container" class="absolute inset-0"></div>
 
   <!-- 【左側導言面板】可收放容器 -->
-  <header class="absolute top-4 left-4 z-10 pointer-events-none transition-all duration-300">
-    <div id="left-panel" class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto w-[calc(100vw-2rem)] sm:w-[560px] md:w-[620px] transition-all duration-300">
+  <header class="absolute top-4 left-4 z-20 pointer-events-none">
+    <div id="left-panel" class="bg-slate-900/95 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto w-[calc(100vw-2rem)] sm:w-[560px] md:w-[620px] transition-all duration-300">
       
-      <div class="flex items-center justify-between mb-2">
+      <!-- 頂部列：標籤與收合切換按鈕 -->
+      <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">靈寶空間全息對稱體系</span>
           <span class="text-xs text-slate-400 hidden sm:inline">風澤洞虛 ‧ 金剛乘天 ‧ 上接大羅</span>
         </div>
-        <button onclick="toggleLeftPanel()" class="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors flex items-center gap-1 text-xs" title="收合/展開說明">
-          <span id="left-collapse-text" class="text-[10px] hidden sm:inline">收合</span>
-          <svg id="left-collapse-icon" class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <!-- 左側面板收合鈕 -->
+        <button id="btn-toggle-left" onclick="toggleLeftPanel()" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition-all flex items-center gap-1.5 text-xs">
+          <span id="left-collapse-text">收合說明</span>
+          <svg id="left-collapse-icon" class="w-3.5 h-3.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7-7" />
           </svg>
         </button>
       </div>
 
-      <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1 leading-snug">
+      <!-- 標題 -->
+      <h1 class="text-sm font-bold text-slate-100 tracking-wide mt-2 leading-snug">
         道教科儀與思想史：靈寶多維宇宙空間系統
       </h1>
 
-      <div id="left-panel-content" class="transition-all duration-300 overflow-hidden">
-        <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5 mt-1.5">
+      <!-- 可收合之主體內容（文字說明與視角快捷按鈕） -->
+      <div id="left-panel-content" class="transition-all duration-300">
+        <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5 mt-2">
           <strong>【金剛乘天機制】：</strong>「擎持九壘，乃載諸天，高而洞浮，垂而不落，上接大羅，蓋道之炁也。故經云：風澤洞虛，金剛乘天也。」<br>
           底層剛風產生不可摧折之巨大壓強網絡，即使天地大劫毀滅，依然「承天不墜」，牢固托舉九壘三十六土皇與三十六天王之全息司法架構。
         </p>
-        <div class="flex flex-wrap gap-2 pt-1.5 border-t border-slate-800">
+        <!-- 視角快速跳轉列 -->
+        <div class="flex flex-wrap gap-2 pt-2 border-t border-slate-800">
           <button onclick="focusOverview()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-300 transition-colors">
             🌐 全覽宇宙諸盤
           </button>
-          <button onclick="focusNineStrataGrid()" class="px-2.5 py-1 rounded bg-slate-700/60 hover:bg-slate-600 border border-slate-500/50 text-[11px] text-slate-100 font-semibold transition-colors">
+          <button onclick="focusNineStrataGrid()" class="px-2.5 py-1 rounded bg-slate-700/70 hover:bg-slate-600 border border-slate-500/50 text-[11px] text-slate-100 font-semibold transition-colors">
             🌪️ 聚焦：風澤洞虛・金剛乘天 (第一層)
           </button>
           <button onclick="focusCelestialSymmetry()" class="px-2.5 py-1 rounded bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-[11px] text-purple-300 transition-colors">
@@ -84,26 +89,32 @@
           <button onclick="focusZodiacDisk()" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-[11px] text-amber-300 transition-colors">
             🧭 聚焦：十二辰星盤
           </button>
+          <button onclick="focusKalpaDisk()" class="px-2.5 py-1 rounded bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-[11px] text-cyan-300 transition-colors">
+            🌌 聚焦：靈寶五劫輪
+          </button>
         </div>
       </div>
 
     </div>
   </header>
 
-  <!-- 【右上角清單面板】懸浮呼出按鈕 -->
-  <button id="right-panel-trigger" onclick="toggleRightPanel()" class="fixed top-4 right-4 z-10 hidden items-center gap-1.5 bg-slate-900/90 hover:bg-slate-800 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-2xl text-xs text-slate-200 transition-all">
+  <!-- 【右上角清單面板】懸浮呼出按鈕（當右側清單收起時顯示） -->
+  <button id="right-panel-trigger" onclick="toggleRightPanel()" style="display: none;" class="fixed top-4 right-4 z-20 items-center gap-1.5 bg-slate-900/95 hover:bg-slate-800 backdrop-blur-md px-3.5 py-2 rounded-xl border border-purple-500/40 shadow-2xl text-xs font-semibold text-purple-200 transition-all">
     <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
     </svg>
-    <span>節點清單</span>
+    <span>展開節點清單</span>
   </button>
 
   <!-- 【右上角清單面板】主體可收放卡片 -->
-  <div id="right-panel" class="absolute top-4 right-4 z-10 flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-76 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl transition-transform duration-300">
+  <div id="right-panel" class="fixed top-4 right-4 z-20 flex flex-col gap-1 bg-slate-900/90 backdrop-blur-md p-2.5 rounded-xl border border-slate-700/80 text-xs w-76 max-h-[85vh] overflow-y-auto custom-scrollbar shadow-2xl transition-all duration-300">
+    
+    <!-- 頂部標題列與收合鈕 -->
     <div class="flex items-center justify-between px-2 py-1 border-b border-slate-800 mb-1">
       <span class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">天界・命籍・空間清單</span>
-      <button onclick="toggleRightPanel()" class="p-1 rounded-md hover:bg-slate-800 text-slate-400 hover:text-slate-100 transition-colors" title="收起清單">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <button onclick="toggleRightPanel()" class="px-2 py-0.5 rounded-md bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-100 transition-colors flex items-center gap-1 text-[11px]" title="收起清單">
+        <span>收起</span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
@@ -187,7 +198,7 @@
     </button>
   </div>
 
-  <!-- 閱讀路徑切換列 -->
+  <!-- 閱讀路徑切換列 (底部居中) -->
   <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-2xl border border-slate-700/90 shadow-xl">
     <button onclick="setReaderMode('beginner')" id="btn-beginner" class="mode-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all bg-indigo-600 text-white shadow-md">
       初學者導讀
@@ -201,7 +212,7 @@
   </div>
 
   <!-- 側邊深度檢視抽屜 -->
-  <aside id="side-drawer" class="absolute top-0 right-0 bottom-0 w-full sm:w-[480px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-20 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
+  <aside id="side-drawer" class="fixed top-0 right-0 bottom-0 w-full sm:w-[480px] bg-slate-900/95 backdrop-blur-xl border-l border-slate-700/80 shadow-2xl p-6 flex flex-col z-30 transform translate-x-full transition-transform duration-300 ease-out custom-scrollbar overflow-y-auto">
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
       <div class="flex items-center gap-2">
         <span id="drawer-tag" class="text-[11px] px-2 py-0.5 rounded font-mono uppercase tracking-wider font-semibold"></span>
@@ -247,6 +258,10 @@
     let selectedIsland = null;
     const clickableMeshes = [];
 
+    // 狀態變數
+    let isLeftPanelCollapsed = false;
+    let isRightPanelOpen = true;
+
     // 空間座標配置
     const ZODIAC_CENTER    = new THREE.Vector3(-14, 0, 8);   // 左盤：十二辰星盤
     const KALPA_CENTER     = new THREE.Vector3(14, 0, 8);    // 右盤：靈寶五劫輪
@@ -288,6 +303,40 @@
 
     let dynamicGangfengRing = null;
     let dynamicUpliftParticles = null;
+
+    // ==========================================
+    // 徹底修復的左右面板收放邏輯
+    // ==========================================
+    function toggleLeftPanel() {
+      const content = document.getElementById("left-panel-content");
+      const icon = document.getElementById("left-collapse-icon");
+      const text = document.getElementById("left-collapse-text");
+      isLeftPanelCollapsed = !isLeftPanelCollapsed;
+
+      if (isLeftPanelCollapsed) {
+        content.style.display = "none";
+        icon.style.transform = "rotate(180deg)";
+        if (text) text.textContent = "展開說明";
+      } else {
+        content.style.display = "block";
+        icon.style.transform = "rotate(0deg)";
+        if (text) text.textContent = "收合說明";
+      }
+    }
+
+    function toggleRightPanel() {
+      const rightPanel = document.getElementById("right-panel");
+      const triggerBtn = document.getElementById("right-panel-trigger");
+      isRightPanelOpen = !isRightPanelOpen;
+
+      if (isRightPanelOpen) {
+        rightPanel.style.display = "flex";
+        triggerBtn.style.display = "none";
+      } else {
+        rightPanel.style.display = "none";
+        triggerBtn.style.display = "inline-flex";
+      }
+    }
 
     function createBadgeTexture(emoji, text, colorHex) {
       const canvas = document.createElement("canvas");
@@ -374,7 +423,7 @@
           if (typeof item.color === 'string') item.color = parseInt(item.color, 16);
         });
       } catch (err) {
-        console.warn("使用預設備援資料載入");
+        console.warn("使用備援文獻資料庫");
       }
       initScene();
     }
@@ -513,7 +562,6 @@
       return mesh;
     }
 
-    // 建立【靈寶空間體系】：三十六天王 ── 對稱 ── 三十六土皇九宮格與金剛乘天
     function buildLingbaoSixLayers() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
@@ -526,14 +574,12 @@
         { id: "lingbao_earth_realm", y: 0,  radius: 8.0, color: "#f97316", text: "第二層【凡俗世界】五嶽十洲器界", emoji: "⛰️" }
       ];
 
-      // 1. 中央垂直元始貫通混元光軸（自金剛風澤直達大羅天）
       const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 46, 16);
       const axisMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, emissive: 0xa855f7, emissiveIntensity: 0.6, transparent: true, opacity: 0.7 });
       const axisMesh = new THREE.Mesh(axisGeo, axisMat);
       axisMesh.position.y = 8;
       cosmoGroup.add(axisMesh);
 
-      // 2. 生成第 2~6 層圓台與徽章
       upperLayers.forEach(lvl => {
         const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.45, 48);
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.4, transparent: true, opacity: 0.88 });
@@ -558,7 +604,6 @@
         cosmoGroup.add(ringMesh);
       });
 
-      // 3. 【第一層地下九壘】：以「3x3 九宮格幾何方陣」建立 (Y = -8)
       const gridY = -8;
       const cellSize = 3.2;
       const cellGap = 0.4;
@@ -604,7 +649,6 @@
       }
       cosmoGroup.add(strataGroup);
 
-      // 第一層主標題徽章：「風澤洞虛・金剛乘天」
       const strataMainTex = createBadgeTexture("🌪️", "第一層【九壘三十六土皇】風澤洞虛・金剛乘天", "#94a3b8");
       const strataMainSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: strataMainTex, transparent: true }));
       strataMainSprite.scale.set(2.3, 2.3, 1.0);
@@ -615,7 +659,6 @@
       strataMainSprite.userData = { data: strataNodeData, markerMesh: strataMainSprite, focusPos: strataMainWorldPos };
       clickableMeshes.push(strataMainSprite);
 
-      // 4. 【天地對稱動態法理光索】：自大羅天三十六天王連線至九壘三十六土皇九宮格四角
       const rayPoints = [
         new THREE.Vector3(0, 28, 0), new THREE.Vector3(-totalOffset, gridY, -totalOffset),
         new THREE.Vector3(0, 28, 0), new THREE.Vector3(totalOffset, gridY, -totalOffset),
@@ -634,8 +677,6 @@
       symmetryLines.computeLineDistances();
       cosmoGroup.add(symmetryLines);
 
-      // 5. 【風澤洞虛・金剛乘天】懸浮支撐力學場 (Y = -12.5 至 -8)
-      // (A) 剛風風澤雙同心剛性金剛環
       const gangfengRingGeo = new THREE.TorusGeometry(10.8, 0.45, 16, 64);
       const gangfengRingMat = new THREE.MeshStandardMaterial({
         color: 0xe2e8f0,
@@ -661,7 +702,6 @@
       innerCarrierRing.position.y = -11.0;
       cosmoGroup.add(innerCarrierRing);
 
-      // (B) 風澤向上巨型壓強氣流托舉光線 (Cosmic Carrier Uplift Rays)
       const upliftCount = 18;
       const upliftPoints = [];
       for (let u = 0; u < upliftCount; u++) {
@@ -681,7 +721,6 @@
       const upliftLines = new THREE.LineSegments(upliftGeo, upliftMat);
       cosmoGroup.add(upliftLines);
 
-      // (C) 頑空風澤向上浮動粒子光點 (Uplift Particles)
       const particleCount = 120;
       const particlePos = new Float32Array(particleCount * 3);
       for (let p = 0; p < particleCount * 3; p += 3) {
@@ -752,7 +791,7 @@
       }
       scene.add(zGroup);
 
-      // 右盤下層：靈寶五劫天輪 (KALPA_CENTER, Y = 0)
+      // 右盤下層：靈寶五劫天輪
       const kalpaGroup = new THREE.Group();
       kalpaGroup.position.copy(KALPA_CENTER);
 
@@ -794,7 +833,7 @@
       }
       scene.add(kalpaGroup);
 
-      // 右盤上層：五方五氣本體盤 (垂直位移 Y = PROTO_HEIGHT)
+      // 右盤上層：五方五氣本體盤
       const protoGroup = new THREE.Group();
       protoGroup.position.set(KALPA_CENTER.x, PROTO_HEIGHT, KALPA_CENTER.z);
 
@@ -887,7 +926,6 @@
       if (mesh) selectIsland(mesh.userData);
     }
 
-    // 視角快速導航
     function focusOverview() {
       new TWEEN.Tween(controls.target).to({ x: 0, y: 5, z: 0 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
       new TWEEN.Tween(camera.position).to({ x: 0, y: 40, z: 50 }, 900).easing(TWEEN.Easing.Cubic.Out).start();
@@ -1076,7 +1114,7 @@
       if (dynamicUpliftParticles) {
         const positions = dynamicUpliftParticles.geometry.attributes.position.array;
         for (let i = 1; i < positions.length; i += 3) {
-          positions[i] += 0.055; // 粒子自下而上持續湧昇
+          positions[i] += 0.065; // 湧昇流動
           if (positions[i] > -8.0) {
             positions[i] = -12.5; // 重置到底部風澤
           }
