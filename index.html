@@ -43,17 +43,17 @@
   <div id="canvas-container" class="absolute inset-0"></div>
 
   <!-- 頂部學術導言面板 -->
-  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[600px] z-10 pointer-events-none">
+  <header class="absolute top-4 left-4 right-4 md:right-auto md:w-[580px] z-10 pointer-events-none">
     <div class="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 shadow-2xl pointer-events-auto">
       <div class="flex items-center justify-between mb-2">
         <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">靈寶六層空間體系</span>
-        <span class="text-xs text-slate-400">大羅聖境至九壘剛風</span>
+        <span class="text-xs text-slate-400">大羅聖境至九壘剛風・六層分散標示</span>
       </div>
       <h1 class="text-sm font-bold text-slate-100 tracking-wide mb-1.5 leading-snug">
         道教科儀與思想史：靈寶多維宇宙空間系統
       </h1>
       <p class="text-[11px] text-slate-300 leading-relaxed mb-2.5">
-        <strong>後方立體軸（靈寶六層空間）：</strong>第六層大羅天 ➔ 第五層三清境 ➔ 第四層四種民天 ➔ 第三層三界二十八天 ➔ 第二層凡俗天地 ➔ 第一層地下九壘與剛風風澤。<br>
+        <strong>後方立體軸：</strong>六大空間圖樣已各自分散標示於對應高程層級（大羅天 ➔ 三清境 ➔ 四梵天 ➔ 三界二十八天 ➔ 凡俗天地 ➔ 地下九壘剛風）。<br>
         <strong>前方雙盤：</strong>左盤十二辰身命星盤、右盤五劫天輪與赤文道身。
       </p>
       <!-- 視角快速跳轉列 -->
@@ -92,7 +92,7 @@
 
   <!-- 右側獨立分盤速選清單 -->
   <div class="absolute top-4 right-4 z-10 hidden lg:flex flex-col gap-1 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl border border-slate-700/70 text-xs w-72 max-h-[85vh] overflow-y-auto custom-scrollbar">
-    <span class="text-[10px] text-purple-400 font-bold px-2 py-1 uppercase tracking-wider">【靈寶六層空間】垂直幾何</span>
+    <span class="text-[10px] text-purple-400 font-bold px-2 py-1 uppercase tracking-wider">【靈寶六層空間】各層分散圖樣</span>
     <button onclick="selectIslandById('lingbao_daluo')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>第六層｜大羅天・紫微上宮</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
     </button>
@@ -117,17 +117,26 @@
     <button onclick="selectIslandById('proto_center')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>中央一氣｜自然天文赤篆</span><span class="w-2 h-2 rounded-full bg-yellow-400"></span>
     </button>
+    <button onclick="selectIslandById('proto_east')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>東方九氣｜青天生氣 (數之極)</span><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+    </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[10px] text-cyan-400 font-bold px-2 py-1 uppercase tracking-wider">【右盤下層】靈寶五劫天輪</span>
     <button onclick="selectIslandById('kalpa_longhan')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>🌌 龍漢劫｜真文始萌・人民淳樸</span><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
     </button>
+    <button onclick="selectIslandById('kalpa_chiming')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
+      <span>🔥 赤明劫｜赤明開光・天地復位</span><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+    </button>
 
     <div class="h-px bg-slate-800 my-1"></div>
     <span class="text-[10px] text-amber-400 font-bold px-2 py-1 uppercase tracking-wider">【左盤】十二辰星命盤</span>
     <button onclick="selectIslandById('beidou')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-200 transition-colors flex items-center justify-between">
       <span>北斗中央樞紐 (五斗分司)</span><span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+    </button>
+    <button onclick="selectIslandById('sector_0')" class="px-2 py-1 text-left rounded-lg hover:bg-slate-800 text-slate-300 transition-colors flex items-center justify-between">
+      <span>🐭 子鼠｜先秦命論與天師從數到籍</span><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
     </button>
   </div>
 
@@ -334,6 +343,7 @@
       dirLight.position.set(0, 45, 25);
       scene.add(dirLight);
 
+      // 左盤、右盤與立體天界光源
       const zLight = new THREE.PointLight(0x38bdf8, 2.2, 32);
       zLight.position.set(ZODIAC_CENTER.x, 4, ZODIAC_CENTER.z);
       scene.add(zLight);
@@ -366,7 +376,7 @@
       const positions = new Float32Array(count * 3);
       for (let i = 0; i < count * 3; i += 3) {
         positions[i] = (Math.random() - 0.5) * 280;
-        positions[i + 1] = Math.random() * 110 - 20;
+        positions[i + 1] = Math.random() * 90 - 10;
         positions[i + 2] = (Math.random() - 0.5) * 280;
       }
       starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -435,12 +445,12 @@
       return mesh;
     }
 
-    // 建立【靈寶六層空間體系】立體塔 (COSMOLOGY_CENTER)
+    // 建立【靈寶六層空間體系】：每一層各自配置專屬圖樣與徽章標記
     function buildLingbaoSixLayers() {
       const cosmoGroup = new THREE.Group();
       cosmoGroup.position.copy(COSMOLOGY_CENTER);
 
-      // 嚴密對應靈寶六層空間定義：高程 Y、顏色、節點 ID、標籤與 Emoji
+      // 六層空間嚴密對應高程 Y、半徑、顏色、節點 ID、標籤與專屬 Emoji 圖樣
       const layers = [
         { id: "lingbao_daluo",                y: 28,  radius: 2.2, color: "#facc15", text: "第六層【至高聖境】大羅天", emoji: "👑" },
         { id: "lingbao_sanqing",              y: 22,  radius: 3.6, color: "#38bdf8", text: "第五層【三清勝境】清微・禹餘・大赤", emoji: "☁️" },
@@ -450,14 +460,14 @@
         { id: "lingbao_nine_strata_gangfeng", y: -8,  radius: 9.4, color: "#94a3b8", text: "第一層【地下九壘】三十六土皇・剛風", emoji: "🌪️" }
       ];
 
-      // 1. 中央垂直元始混元光軸
+      // 1. 中央垂直元始混元貫通光軸
       const axisGeo = new THREE.CylinderGeometry(0.2, 0.2, 42, 16);
       const axisMat = new THREE.MeshStandardMaterial({ color: 0x7e22ce, emissive: 0xa855f7, emissiveIntensity: 0.6, transparent: true, opacity: 0.7 });
       const axisMesh = new THREE.Mesh(axisGeo, axisMat);
       axisMesh.position.y = 10;
       cosmoGroup.add(axisMesh);
 
-      // 2. 逐層生成六層圓台與 Sprite 徽章
+      // 2. 逐層生成圓台並將圖樣分散懸掛於該層前方
       layers.forEach(lvl => {
         const ringGeo = new THREE.CylinderGeometry(lvl.radius, lvl.radius, 0.45, 48);
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.4, transparent: true, opacity: 0.88 });
@@ -465,10 +475,11 @@
         ringMesh.position.y = lvl.y;
         ringMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(ringGeo), new THREE.LineBasicMaterial({ color: lvl.color, opacity: 0.95 })));
 
+        // 該層專屬圖樣與標題徽章
         const tex = createBadgeTexture(lvl.emoji, lvl.text, lvl.color);
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
-        sprite.scale.set(2.0, 2.0, 1.0);
-        sprite.position.set(0, lvl.y + 1.35, lvl.radius + 0.9);
+        sprite.scale.set(2.1, 2.1, 1.0);
+        sprite.position.set(0, lvl.y + 1.4, lvl.radius + 0.9);
         cosmoGroup.add(sprite);
 
         const nodeData = ISLANDS_DATA.find(d => d.id === lvl.id);
@@ -593,6 +604,7 @@
       pBaseMesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(pBaseGeo), new THREE.LineBasicMaterial({ color: 0xfacc15, opacity: 0.7 })));
       protoGroup.add(pBaseMesh);
 
+      // 中心：靈寶自然天文赤文天篆（非多邊菱形）
       const tianshuTex = createNaturalTianshuTexture();
       const tianshuSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tianshuTex, transparent: true, depthTest: true }));
       tianshuSprite.scale.set(3.4, 3.4, 1.0);
@@ -858,10 +870,11 @@
         if (!mesh.userData.data || mesh.userData.data.isCenter) return;
         const marker = mesh.userData.markerMesh;
         if (marker && marker.isSprite) {
-          const baseH = mesh.userData.data.disk === "proto_lingbao" 
-            ? 1.15 
-            : (mesh.userData.data.isKalpa ? (DISK_HEIGHT / 2 + 1.45) : (DISK_HEIGHT / 2 + 1.25));
-          marker.position.y = baseH + Math.sin(t * 1.5 + idx) * 0.06;
+          let baseH = 1.25;
+          if (mesh.userData.data.disk === "proto_lingbao") baseH = 1.15;
+          else if (mesh.userData.data.disk === "cosmology_lingbao") baseH = 1.35;
+          else if (mesh.userData.data.isKalpa) baseH = DISK_HEIGHT / 2 + 1.45;
+          marker.position.y = (mesh.userData.focusPos.y + baseH) + Math.sin(t * 1.5 + idx) * 0.06;
         }
       });
 
