@@ -187,6 +187,7 @@
 
   <script src="sanqing.js"></script>
   <script src="shangqing.js"></script>
+  <script src="sanguang.js"></script>
   <script>
     let ISLANDS_DATA = [];
     let scene, camera, renderer, controls;
@@ -207,7 +208,7 @@
         const bearing=userData.prototypeNode && userData.data?.id==='proto_center' ? Math.PI/4 : Math.atan2(point.x-axisX,point.z-axisZ);
         const radius=Math.hypot(point.x-axisX,point.z-axisZ)+(window.innerWidth<=700?10.5:8.5);
         endX=Math.sin(bearing)*radius;endZ=Math.cos(bearing)*radius;
-        lookY=point.y;endY=point.y+(userData.prototypeNode?4.5:1.8);
+        lookY=point.y;endY=point.y+(userData.horizontalSurface?10:(userData.prototypeNode?4.5:1.8));
       }
       const endRadius=Math.max(2.5,Math.hypot(endX,endZ));
       let endAngle=Math.atan2(endX,endZ);
@@ -1246,6 +1247,7 @@
       const junctionLabel=sanqingText(['五方五氣本體','第三、四層交界'],'#fde68a',1024,256);
       junctionLabel.position.set(0,-0.8,6.1);protoGroup.add(junctionLabel);
       buildWuqiAcross(scene.getObjectByName('lingbao-six-layers'));
+      buildSanguangRealm(scene.getObjectByName('lingbao-six-layers'));
     }
 
     function onPointerDown(event) {
@@ -1270,6 +1272,7 @@
       selectedShangqingHeaven=userData.shangqingHeaven||null;selectedShangqingHouse=userData.shangqingHouse||null;
       selectedSanqingKey = userData.sanqingKey || null;
       selectedYujingPart = userData.yujingPart || null;
+      selectedEarthPart = userData.earthPart || null;
       selectedFourBrahmaKey = userData.fourBrahmaKey || null;
       selectedKalpaRealmKey = userData.kalpaRealmKey || null;
       selectedWuqiLayer = userData.towerWuqiLayer || null;
@@ -1307,6 +1310,10 @@
           // Show the three realms together, leaving space for the reading drawer.
           targetLookAt.y = COSMOLOGY_CENTER.y + 23.0;
           targetCamPos.set(COSMOLOGY_CENTER.x + 1.2, COSMOLOGY_CENTER.y + 30.5, COSMOLOGY_CENTER.z + 26);
+        } else if (selectedIsland.id === "lingbao_earth_realm" && !userData.earthPart) {
+          const distanceScale=Math.max(1,700/window.innerWidth);
+          targetLookAt.set(COSMOLOGY_CENTER.x,-4,COSMOLOGY_CENTER.z);
+          targetCamPos.set(COSMOLOGY_CENTER.x,-4+13*distanceScale,COSMOLOGY_CENTER.z+38*distanceScale);
         } else if (selectedIsland.id === "lingbao_daluo") {
           // 第六層大羅天玉京山：正對金闕與玄臺
           const distanceScale=Math.max(1,700/window.innerWidth);
@@ -1380,7 +1387,7 @@
       if (focusObject && !focusObject.isObject3D) focusObject = null;
       if (!focusObject) focusObject = clickableMeshes.find(m=>m.isSprite && m.userData.data?.id===selectedIsland.id);
       const individual = !!(userData.sanqingKey || userData.fourBrahmaKey || userData.kalpaRealmKey || userData.axisPart || userData.towerWuqiKey || (userData.data?.disk==='kalpa' && !userData.data.isCenter));
-      if (focusObject && (individual || !['lingbao_sanqing','lingbao_nine_strata_gangfeng','lingbao_daluo','kalpa_center','lingbao_three_realms'].includes(selectedIsland.id))) {
+      if (focusObject && (individual || !['lingbao_sanqing','lingbao_nine_strata_gangfeng','lingbao_daluo','lingbao_earth_realm','kalpa_center','lingbao_three_realms'].includes(selectedIsland.id))) {
         const actual = focusObject.getWorldPosition(new THREE.Vector3());
         const offset=targetCamPos.clone().sub(targetLookAt);
         targetLookAt.copy(actual);
@@ -1697,6 +1704,7 @@
       renderKalpaBoundaryPanel(contentBox);
       renderYujingPanel(contentBox);
       renderShangqingPanel(contentBox);
+      renderSanguangPanel(contentBox);
       removeOutboundLinks(contentBox);
       const cards = contentBox.querySelectorAll(':scope > div > div');
       cards.forEach((card,index) => { card.classList.add('reading-card'); card.dataset.step=String(index+1).padStart(2,'0'); });

@@ -13,7 +13,7 @@ function buildShangqingSpace(){
   const axis=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-16,0),new THREE.Vector3(0,33,0)]),new THREE.LineDashedMaterial({color:'#a5b4fc',transparent:true,opacity:0.15,dashSize:0.4,gapSize:0.6,depthWrite:false}));axis.computeLineDistances();root.add(axis);
   const upper=new THREE.Group();upper.name='shangqing-nine-heavens';root.add(upper);
   const links=new THREE.Group();links.name='shangqing-register-links';links.visible=shangqingLinks;root.add(links);
-  const earthGrid=new THREE.Group();earthGrid.name='shangqing-earth-grid';earthGrid.position.y=-8.2;root.add(earthGrid);
+  const earthGrid=new THREE.Group();earthGrid.name='shangqing-earth-grid';earthGrid.position.y=-8.2;earthGrid.rotation.x=-Math.PI/2;root.add(earthGrid);
   for(let i=0;i<9;i++){
     const y=i*3.4,r=6.6-i*0.23;
     const ring=new THREE.Mesh(new THREE.TorusGeometry(r,0.055,6,64),new THREE.MeshBasicMaterial({color:'#818cf8',transparent:true,opacity:0.45}));ring.rotation.x=Math.PI/2;ring.position.y=y;ring.name='shangqing-heaven-ring-'+(i+1);upper.add(ring);root.updateMatrixWorld(true);register(ring,'shangqing_nine_heavens',{shangqingHeaven:i+1});
@@ -21,17 +21,17 @@ function buildShangqingSpace(){
     const gx=(i%3-1)*3.8,gy=(1-Math.floor(i/3))*3.8;
     const cell=new THREE.Group();cell.name='shangqing-nine-cell-'+(i+1);cell.position.set(gx,gy,0);earthGrid.add(cell);
     const tile=new THREE.Mesh(new THREE.BoxGeometry(3.2,3.2,0.2),new THREE.MeshBasicMaterial({color:'#9e8c6d',transparent:true,opacity:0.13,depthWrite:false}));
-    tile.add(new THREE.LineSegments(new THREE.EdgesGeometry(tile.geometry),new THREE.LineBasicMaterial({color:'#d3bc92',transparent:true,opacity:0.7})));cell.add(tile);root.updateMatrixWorld(true);register(tile,'shangqing_earth_register',{shangqingEarth:i+1});
-    label(cell,[`第 ${i+1} 壘`],0,1.12,0.24,'shangqing_earth_register',{shangqingEarth:i+1},null,2.1);
+    tile.add(new THREE.LineSegments(new THREE.EdgesGeometry(tile.geometry),new THREE.LineBasicMaterial({color:'#d3bc92',transparent:true,opacity:0.7})));cell.add(tile);root.updateMatrixWorld(true);register(tile,'shangqing_earth_register',{shangqingEarth:i+1,horizontalSurface:true});
+    label(cell,[`第 ${i+1} 壘`],0,1.12,0.24,'shangqing_earth_register',{shangqingEarth:i+1,horizontalSurface:true},null,2.1);
     for(let j=0;j<4;j++){
       const a=j*Math.PI/2+Math.PI/4,x=Math.cos(a)*r,z=Math.sin(a)*r;
       const top=new THREE.Mesh(new THREE.SphereGeometry(0.17,10,8),new THREE.MeshBasicMaterial({color:j===0?'#ddd6fe':'#67e8f9'}));top.position.set(x,y,z);top.name='shangqing-celestial-'+(i*4+j+1);upper.add(top);root.updateMatrixWorld(true);register(top,'shangqing_thirty_six',{shangqingHeaven:i+1,shangqingOrdinal:i*4+j+1});
-      const bottom=new THREE.Mesh(new THREE.OctahedronGeometry(0.2),new THREE.MeshStandardMaterial({color:'#bda77c',roughness:0.6}));bottom.position.set(j%2===0?-0.64:0.64,j<2?0.28:-0.75,0.4);bottom.name='shangqing-earth-'+(i*4+j+1);cell.add(bottom);root.updateMatrixWorld(true);register(bottom,'shangqing_earth_register',{shangqingEarth:i+1,shangqingOrdinal:i*4+j+1});
-      links.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([top.position.clone(),new THREE.Vector3(gx+bottom.position.x,earthGrid.position.y+gy+bottom.position.y,bottom.position.z)]),new THREE.LineBasicMaterial({color:'#a5b4fc',transparent:true,opacity:0.13,depthWrite:false})));
+      const bottom=new THREE.Mesh(new THREE.OctahedronGeometry(0.2),new THREE.MeshStandardMaterial({color:'#bda77c',roughness:0.6}));bottom.position.set(j%2===0?-0.64:0.64,j<2?0.28:-0.75,0.4);bottom.name='shangqing-earth-'+(i*4+j+1);cell.add(bottom);root.updateMatrixWorld(true);register(bottom,'shangqing_earth_register',{shangqingEarth:i+1,shangqingOrdinal:i*4+j+1,horizontalSurface:true});
+      links.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([top.position.clone(),root.worldToLocal(bottom.getWorldPosition(new THREE.Vector3()))]),new THREE.LineBasicMaterial({color:'#a5b4fc',transparent:true,opacity:0.13,depthWrite:false})));
     }
   }
   label(root,['九玄三十六天','9 組 × 4 點：幾何分組示意'],-8.7,17,1,'shangqing_thirty_six',{},null,5);
-  label(root,['九壘九宮格・三十六土皇','九組各四位・視覺配置'],0,-14,1,'shangqing_earth_register',{},null,6);
+  label(root,['九壘九宮格・三十六土皇','水平九宮・每宮四位'],0,-7.2,6.6,'shangqing_earth_register',{horizontalSurface:true},null,6);
   const comparison=new THREE.Group();comparison.name='shangqing-three-model';comparison.position.y=14;root.add(comparison);
   ['清微天','禹餘天','大赤天'].forEach((name,i)=>{const o=new THREE.Mesh(new THREE.SphereGeometry(0.45,14,10),new THREE.MeshStandardMaterial({color:['#7dd3fc','#e2e8f0','#e9c46a'][i],emissive:'#64627a',emissiveIntensity:0.15}));o.position.set((i-1)*2.2,0,0);comparison.add(o);root.updateMatrixWorld(true);register(o,'shangqing_three_nine',{},o);label(comparison,[name],(i-1)*2.2,0.95,0,'shangqing_three_nine',{},null,2.4);});
   label(root,['三天／九天・比較模型','位格與文本層次分讀'],-8,29,1,'shangqing_three_nine',{},null,5);
@@ -77,7 +77,7 @@ function renderShangqingPanel(container){
   add('p',shangqingModel==='nine'?'三天比較節點放入九天模型內，示意「別號／屬區」讀法；其經文定位與是否能證成九天高於三天，仍待底本與語境考證。':'三天比較節點升至九天之上，示意三炁各生三炁的總攝讀法；不是將所有上清材料改成同一晚出宇宙論。');
   add('p','三天總攝模式依提供的對應：始炁—清微天玉清境；元炁—禹餘天上清境；玄炁—大赤天太清境。此為特定模式的比較，不表示所有經典一致。');
   add('p','九組各四點＝36，以及九個主天另加27個分支＝36，在算術上都可成立；視覺分組不證明經典只有一種衍生算法。所提供《太真科》引文含「以木七，七名號真……乾木七」等疑似訛文，保留待核，不自行補字，也不依它演算三十六天。');
-  add('h4','天地對應與名籍');add('p','本圖以36個光點表示天王數目，並將九壘排為3×3立面九宮格，每格保留四個土皇點。九宮格是閱讀用的視覺配置，不代表經文將九壘逐一對應洛書九宮或方位。文獻支持上下相應及仙籍上奏；不能把每對光線理解成已核實的逐名配屬，三十六國也不逕等於固定的現代地理國家。提供材料所述生死圖籍、青宮仙號的精確引文定位另待核。');
+  add('h4','天地對應與名籍');add('p','本圖以36個光點表示天王數目，並將九壘排為3×3水平平面九宮格，每格保留四個土皇點。九宮格是閱讀用的視覺配置，不代表經文將九壘逐一對應洛書九宮或方位。文獻支持上下相應及仙籍上奏；不能把每對光線理解成已核實的逐名配屬，三十六國也不逕等於固定的現代地理國家。提供材料所述生死圖籍、青宮仙號的精確引文定位另待核。');
   const link=add('button',shangqingLinks?'隱藏天地對應示意線':'顯示天地對應示意線');link.type='button';link.dataset.action='register-links';link.setAttribute('aria-pressed',String(shangqingLinks));link.addEventListener('click',()=>{shangqingLinks=!shangqingLinks;if(sceneReady)applyShangqingModel();renderDrawer();});
   add('h4','三十九戶與徊風混合');add('p',selectedShangqingHouse?`已選象徵點 ${selectedShangqingHouse}／39；此編號只是介面定位，並非已核實的神名或器官對應。`:'選取大字人體上的光點，可檢視39個象徵位置。');
   add('p','《大洞真經》現存序文可見三十九帝皇迴真下映身中三十九戶與徊風混合之說；應區分傳本序文、經文與後世修法。天界至人身的流光僅示意下映關係，不是逐神逐戶的實際通路。模型雙臂展開、雙腿分開，39點分散於頭部、軀幹與四肢，配置僅為介面設計。此處的點位不作器官解剖圖，不將「辟非」逕定為心臟生理氣體，也不把修行敘述當成可實證的生理機制。');
